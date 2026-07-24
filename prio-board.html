@@ -153,7 +153,7 @@
   .addbtn:hover{border-color:var(--accent);background:var(--accent-soft)}
   .scrim{position:fixed;inset:0;background:rgba(15,17,21,.32);opacity:0;pointer-events:none;transition:opacity .2s;z-index:40}
   .scrim.show{opacity:1;pointer-events:auto}
-  .drawer{position:fixed;top:0;right:0;height:100%;width:min(420px,94vw);background:var(--surface);border-left:1px solid var(--line);box-shadow:-8px 0 30px rgba(0,0,0,.15);z-index:50;transform:translateX(100%);transition:transform .24s cubic-bezier(.16,1,.3,1);display:flex;flex-direction:column;overflow:hidden}
+  .drawer{position:fixed;top:0;right:0;height:100%;width:min(420px,94vw);background:var(--surface);color:var(--ink);border-left:1px solid var(--line);box-shadow:-8px 0 30px rgba(0,0,0,.15);z-index:50;transform:translateX(100%);transition:transform .24s cubic-bezier(.16,1,.3,1);display:flex;flex-direction:column;overflow:hidden}
   .drawer.open{transform:translateX(0)}
   .dw-h{display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid var(--line)}
   .dw-h .did{font-family:var(--mono);font-size:.72rem;color:var(--ink-soft)}
@@ -189,7 +189,7 @@
   .dw-del:hover{background:var(--hi-soft);border-color:var(--hi)}
   .modal-scrim{position:fixed;inset:0;background:rgba(15,17,21,.42);display:none;align-items:center;justify-content:center;z-index:60;padding:20px}
   .modal-scrim.show{display:flex}
-  .modal{background:var(--surface);border:1px solid var(--line);border-radius:16px;width:min(460px,96vw);max-height:90vh;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,.34)}
+  .modal{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:16px;width:min(460px,96vw);max-height:90vh;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,.34)}
   .modal-h{display:flex;align-items:center;padding:15px 18px;border-bottom:1px solid var(--line);font-weight:800}
   .modal-h .close{margin-left:auto;width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:var(--surface);cursor:pointer;color:var(--ink-soft)}
   .modal-b{padding:16px 18px;display:flex;flex-direction:column;gap:12px;overflow-y:auto}
