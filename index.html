@@ -1,0 +1,646 @@
+<style>
+  :root{
+    --paper:#faf9f6; --ink:#191c23; --ink-soft:#5b6472; --line:#e6e5df;
+    --surface:#ffffff; --surface-2:#f2f3f0; --surface-3:#ecedeb;
+    --accent:#2f6df0; --accent-ink:#1a49b0; --accent-soft:#e9f0ff;
+    --copper:#a5702f; --copper-soft:#f6ecdd;
+    --hi:#c0402f; --hi-soft:#fce3e1; --md:#b0761a; --md-soft:#fbefd6; --lo:#6b7482; --lo-soft:#edeff2;
+    --st-todo:#6b7482; --st-prog:#2f6df0; --st-rev:#b0761a; --st-appr:#1f8f80; --st-uat:#6b5bd0; --st-done:#2e7d5b;
+    --font:system-ui,-apple-system,"Segoe UI","Helvetica Neue","Noto Sans Thai","Sarabun",sans-serif;
+    --mono:ui-monospace,"SF Mono","JetBrains Mono","Menlo",monospace;
+    --shadow:0 1px 2px rgba(20,25,40,.05),0 4px 14px rgba(20,25,40,.05);
+  }
+  @media (prefers-color-scheme:dark){:root{
+    --paper:#0e1014; --ink:#eef1f6; --ink-soft:#a7b1c0; --line:#343c49;
+    --surface:#191e26; --surface-2:#242a36; --surface-3:#2f3743;
+    --accent:#6f9dff; --accent-ink:#bcd2ff; --accent-soft:#1c2e4d;
+    --copper:#e0bd8f; --copper-soft:#3a2c17;
+    --hi:#f0806e; --hi-soft:#4a231d; --md:#e0a747; --md-soft:#41310f; --lo:#94a0b1; --lo-soft:#272d38;
+    --st-todo:#94a0b1; --st-prog:#6f9dff; --st-rev:#e0a747; --st-appr:#57cbba; --st-uat:#a99bff; --st-done:#5fd0a2;
+    --shadow:0 1px 2px rgba(0,0,0,.35),0 8px 22px rgba(0,0,0,.45);
+  }}
+  :root[data-theme="dark"]{
+    --paper:#0e1014; --ink:#eef1f6; --ink-soft:#a7b1c0; --line:#343c49;
+    --surface:#191e26; --surface-2:#242a36; --surface-3:#2f3743;
+    --accent:#6f9dff; --accent-ink:#bcd2ff; --accent-soft:#1c2e4d;
+    --copper:#e0bd8f; --copper-soft:#3a2c17;
+    --hi:#f0806e; --hi-soft:#4a231d; --md:#e0a747; --md-soft:#41310f; --lo:#94a0b1; --lo-soft:#272d38;
+    --st-todo:#94a0b1; --st-prog:#6f9dff; --st-rev:#e0a747; --st-appr:#57cbba; --st-uat:#a99bff; --st-done:#5fd0a2;
+    --shadow:0 1px 2px rgba(0,0,0,.35),0 8px 22px rgba(0,0,0,.45);
+  }
+  :root[data-theme="light"]{
+    --paper:#faf9f6; --ink:#191c23; --ink-soft:#5b6472; --line:#e6e5df;
+    --surface:#ffffff; --surface-2:#f2f3f0; --surface-3:#ecedeb;
+    --accent:#2f6df0; --accent-ink:#1a49b0; --accent-soft:#e9f0ff;
+    --copper:#a5702f; --copper-soft:#f6ecdd;
+    --hi:#c0402f; --hi-soft:#fce3e1; --md:#b0761a; --md-soft:#fbefd6; --lo:#6b7482; --lo-soft:#edeff2;
+    --st-todo:#6b7482; --st-prog:#2f6df0; --st-rev:#b0761a; --st-appr:#1f8f80; --st-uat:#6b5bd0; --st-done:#2e7d5b;
+    --shadow:0 1px 2px rgba(20,25,40,.05),0 4px 14px rgba(20,25,40,.05);
+  }
+  *{box-sizing:border-box} body{margin:0}
+  .app{background:var(--paper);color:var(--ink);font-family:var(--font);min-height:100vh;padding:0 clamp(14px,3vw,32px) 40px;-webkit-font-smoothing:antialiased}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+  .bar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 0;margin-bottom:6px}
+  .logo{height:40px;width:40px;border-radius:9px;flex:none;box-shadow:var(--shadow);object-fit:cover}
+  .brand{display:flex;flex-direction:column;gap:1px;min-width:0}
+  .brand .kicker{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--copper);font-weight:700}
+  .brand h1{margin:0;font-size:clamp(1.05rem,.9rem+.7vw,1.4rem);font-weight:800;letter-spacing:-.02em}
+  .spacer{flex:1 1 auto}
+  .seg{display:inline-flex;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px}
+  .seg button{font:inherit;font-size:.82rem;font-weight:600;border:0;background:transparent;color:var(--ink-soft);padding:6px 12px;border-radius:7px;cursor:pointer;transition:.15s}
+  .seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+  .seg button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .ghost{font:inherit;font-size:.82rem;font-weight:600;border:1px solid var(--line);background:var(--surface);color:var(--ink-soft);padding:7px 12px;border-radius:9px;cursor:pointer;transition:.15s}
+  .ghost:hover{border-color:var(--accent);color:var(--accent-ink)}
+  .ghost:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .ghost[hidden]{display:none}
+  .ghost:disabled,.addbtn:disabled{opacity:.4;cursor:not-allowed}
+  #lock.on{border-color:var(--hi);color:var(--hi);background:var(--hi-soft)}
+  .app.locked .pedit{display:none}
+  .app.locked .addbtn{display:none}
+  .icon{width:38px;height:36px;display:grid;place-items:center;padding:0;font-size:1rem}
+  select.ghost{padding:7px 10px}
+  #expsel{width:118px}
+  #buFilter{max-width:170px}
+  .saved{font-family:var(--mono);font-size:.68rem;color:var(--st-done);opacity:0;transition:opacity .3s}
+  .saved.show{opacity:1}
+  .zone{padding:18px 0 4px}
+  .zlab{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+  .zlab .n{font-family:var(--mono);font-size:.7rem;font-weight:700;color:var(--paper);background:var(--ink);width:20px;height:20px;border-radius:6px;display:grid;place-items:center;flex:none}
+  .zlab h2{margin:0;font-size:1.02rem;font-weight:800;letter-spacing:-.01em}
+  .impact{display:flex;flex-direction:column;gap:16px}
+  .impact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+  .igh{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+  .igh .tag-lbl{display:inline-flex;align-items:center;gap:6px;font-size:.76rem;font-weight:800;color:var(--ink);background:var(--surface-2);border:1px solid var(--line);border-radius:99px;padding:4px 12px}
+  .igh .cnt{font-family:var(--mono);font-size:.72rem;font-weight:700;color:var(--accent-ink);background:var(--accent-soft);border-radius:99px;padding:2px 9px}
+  .count-badge{font-family:var(--mono);font-size:.72rem;font-weight:700;color:var(--accent-ink);background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);border-radius:99px;padding:2px 10px}
+  .igroup{border:1.5px dashed transparent;border-radius:16px;transition:.15s;padding:3px}
+  .igroup.idrop{border-color:var(--accent);background:var(--accent-soft)}
+  .scope-chip{font-size:.6rem;font-weight:800;padding:2px 7px;border-radius:99px;white-space:nowrap}
+  .scope-chip.corp{color:var(--accent-ink);background:var(--accent-soft)}
+  .scope-chip.bu{color:var(--copper);background:var(--copper-soft)}
+  .pmo-chip{font-size:.6rem;font-weight:800;padding:2px 7px;border-radius:99px;white-space:nowrap;color:var(--ink);background:var(--surface-2);border:1px solid var(--line)}
+  .pcard{position:relative;text-align:left;font:inherit;cursor:grab;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:15px 16px;box-shadow:var(--shadow);transition:transform .15s,border-color .15s;overflow:hidden}
+  .pcard.dragging,.pmini.dragging{opacity:.45}
+  .pcard:hover{transform:translateY(-2px)}
+  .pcard:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .pcard[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft),var(--shadow)}
+  .pcard .prow{display:flex;align-items:center;gap:7px;margin-bottom:9px;flex-wrap:wrap;padding-right:30px}
+  .pedit{position:absolute;top:12px;right:12px;width:26px;height:26px;border-radius:7px;border:1px solid var(--line);background:var(--surface);color:var(--ink-soft);cursor:pointer;display:grid;place-items:center;font-size:.78rem;z-index:2}
+  .pedit:hover{border-color:var(--accent);color:var(--accent-ink)}
+  .rank{font-family:var(--mono);font-weight:800;font-size:.78rem;color:var(--ink-soft)}
+  .pf{font-family:var(--mono);font-size:.62rem;font-weight:700;padding:2px 6px;border-radius:5px;background:var(--surface-2);color:var(--ink-soft);border:1px solid var(--line)}
+  .pcard h3{margin:0 0 12px;font-size:.96rem;font-weight:700;line-height:1.25;letter-spacing:-.01em}
+  .pi{display:flex;align-items:flex-end;gap:6px;margin-bottom:8px}
+  .pi b{font-family:var(--mono);font-size:1.55rem;font-weight:800;line-height:.9;color:var(--accent-ink);font-variant-numeric:tabular-nums}
+  .pi span{font-size:.66rem;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em;font-weight:600;padding-bottom:2px}
+  .vbar{height:7px;border-radius:99px;background:var(--surface-3);overflow:hidden;margin-bottom:11px}
+  .vbar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--copper),var(--accent))}
+  .pmeta{display:flex;align-items:center;gap:8px;font-size:.74rem;color:var(--ink-soft)}
+  .chip{font-family:var(--mono);font-size:.68rem;font-weight:700;padding:2px 7px;border-radius:6px;background:var(--surface-2);border:1px solid var(--line)}
+  .prog{flex:1;height:6px;border-radius:99px;background:var(--surface-3);overflow:hidden;min-width:34px}
+  .prog i{display:block;height:100%;background:var(--st-done)}
+  .pmini{width:100%;text-align:left;font:inherit;cursor:grab;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:11px 12px;box-shadow:var(--shadow);transition:transform .12s,border-color .12s}
+  .pmini:hover{transform:translateY(-1px)}
+  .pmini:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .pmini[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft),var(--shadow)}
+  .pm-top{display:flex;align-items:center;gap:7px;margin-bottom:6px}
+  .pm-pi{margin-left:auto;font-family:var(--mono);font-size:.72rem;font-weight:800;color:var(--accent-ink)}
+  .pm-name{font-size:.84rem;font-weight:700;line-height:1.25;margin-bottom:9px}
+  .pm-meta{display:flex;align-items:center;gap:7px;font-size:.7rem;color:var(--ink-soft)}
+  .board-wrap{overflow-x:auto;padding-bottom:8px}
+  .board{display:flex;gap:14px;min-width:min-content}
+  .col{flex:0 0 250px;display:flex;flex-direction:column;background:var(--surface-2);border:1px solid var(--line);border-radius:16px;padding:12px;transition:background .15s,box-shadow .15s}
+  .col.drop{background:var(--accent-soft);box-shadow:inset 0 0 0 2px var(--accent)}
+  .col-h{display:flex;align-items:center;gap:8px;margin:2px 4px 12px}
+  .dot{width:9px;height:9px;border-radius:99px;flex:none}
+  .col-h .t{font-weight:800;font-size:.86rem}
+  .col-h .c{font-family:var(--mono);font-size:.72rem;font-weight:700;color:var(--ink-soft);background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:1px 8px}
+  .col-h .d{margin-left:auto;font-family:var(--mono);font-size:.7rem;color:var(--ink-soft)}
+  .stack{display:flex;flex-direction:column;gap:10px;min-height:40px}
+  .tcard{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 13px 11px 16px;box-shadow:var(--shadow);cursor:pointer;transition:transform .12s,box-shadow .12s,opacity .12s}
+  .tcard:hover{transform:translateY(-1px);box-shadow:0 2px 4px rgba(20,25,40,.06),0 8px 20px rgba(20,25,40,.09)}
+  .tcard:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .tcard.dragging{opacity:.45}
+  .tcard.sel{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft),var(--shadow)}
+  .tcard .stripe{position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:12px 0 0 12px}
+  .tcard .top{display:flex;align-items:center;gap:6px;margin-bottom:7px}
+  .ptag{display:inline-flex;align-items:center;gap:5px;font-size:.68rem;font-weight:700;color:var(--ink-soft);background:var(--surface-2);border:1px solid var(--line);border-radius:99px;padding:2px 8px 2px 6px}
+  .ptag .pd{width:7px;height:7px;border-radius:99px}
+  .adhoc{font-size:.62rem;font-weight:800;color:var(--md);background:var(--md-soft);border-radius:99px;padding:2px 7px}
+  .tid{margin-left:auto;font-family:var(--mono);font-size:.66rem;color:var(--ink-soft)}
+  .tcard .ttl{font-size:.86rem;font-weight:600;line-height:1.32;margin:0 0 8px}
+  .tcard .cmt{font-size:.74rem;color:var(--ink-soft);margin:0 0 9px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .tcard .foot{display:flex;align-items:center;gap:8px}
+  .av{width:22px;height:22px;border-radius:99px;display:grid;place-items:center;font-size:.66rem;font-weight:800;color:#fff;flex:none}
+  .who{font-size:.74rem;color:var(--ink-soft);margin-right:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .lab{font-family:var(--mono);font-size:.62rem;font-weight:700;padding:2px 7px;border-radius:6px;white-space:nowrap}
+  .spent{font-family:var(--mono);font-size:.7rem;color:var(--ink-soft);font-variant-numeric:tabular-nums;white-space:nowrap}
+  .empty{font-size:.76rem;color:var(--ink-soft);text-align:center;padding:16px 6px;border:1px dashed var(--line);border-radius:10px}
+  .tl{border:1px solid var(--line);border-radius:16px;background:var(--surface);padding:14px 16px;overflow-x:auto}
+  .tl-inner{min-width:640px}
+  .tl-axis{position:relative;height:20px;margin-left:140px;border-bottom:1px solid var(--line);margin-bottom:10px}
+  .tl-tick{position:absolute;top:0;transform:translateX(-50%);font-family:var(--mono);font-size:.64rem;color:var(--ink-soft)}
+  .tl-tick::after{content:"";position:absolute;left:50%;top:16px;width:1px;height:9999px;background:var(--line);opacity:.5}
+  .tl-lane{display:flex;align-items:stretch;gap:10px;margin:6px 0}
+  .tl-lname{flex:0 0 130px;display:flex;align-items:center;gap:7px;font-size:.78rem;font-weight:700;overflow:hidden}
+  .tl-track{position:relative;flex:1;min-height:34px;background:var(--surface-2);border-radius:8px}
+  .tl-bar{position:absolute;top:5px;height:24px;border-radius:7px;display:flex;align-items:center;gap:6px;padding:0 9px;color:#fff;font-size:.7rem;font-weight:700;cursor:pointer;overflow:hidden;white-space:nowrap;box-shadow:var(--shadow);transition:transform .12s;border:0}
+  .tl-bar:hover{transform:translateY(-1px);filter:brightness(1.05)}
+  .tl-bar:focus-visible{outline:2px solid var(--ink);outline-offset:1px}
+  .tl-bar .bd{width:6px;height:6px;border-radius:99px;background:rgba(255,255,255,.85);flex:none}
+  .addbtn{font:inherit;font-size:.8rem;font-weight:700;border:1px dashed var(--line);background:transparent;color:var(--accent-ink);border-radius:9px;padding:6px 12px;cursor:pointer;white-space:nowrap}
+  .addbtn:hover{border-color:var(--accent);background:var(--accent-soft)}
+  .scrim{position:fixed;inset:0;background:rgba(15,17,21,.32);opacity:0;pointer-events:none;transition:opacity .2s;z-index:40}
+  .scrim.show{opacity:1;pointer-events:auto}
+  .drawer{position:fixed;top:0;right:0;height:100%;width:min(420px,94vw);background:var(--surface);border-left:1px solid var(--line);box-shadow:-8px 0 30px rgba(0,0,0,.15);z-index:50;transform:translateX(100%);transition:transform .24s cubic-bezier(.16,1,.3,1);display:flex;flex-direction:column;overflow:hidden}
+  .drawer.open{transform:translateX(0)}
+  .dw-h{display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid var(--line)}
+  .dw-h .did{font-family:var(--mono);font-size:.72rem;color:var(--ink-soft)}
+  .dw-h .close{margin-left:auto;width:32px;height:32px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink-soft);cursor:pointer;font-size:1rem;display:grid;place-items:center}
+  .dw-h .close:hover{border-color:var(--accent);color:var(--accent-ink)}
+  .dw-body{padding:16px 18px;overflow-y:auto;display:flex;flex-direction:column;gap:14px}
+  .fld{display:flex;flex-direction:column;gap:5px}
+  .fld label{font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;font-weight:700;color:var(--ink-soft)}
+  .fld input,.fld select,.fld textarea{font:inherit;font-size:.86rem;color:var(--ink);background:var(--surface-2);border:1px solid var(--line);border-radius:9px;padding:8px 10px;width:100%}
+  .fld input:focus,.fld select:focus,.fld textarea:focus{outline:2px solid var(--accent);outline-offset:0;border-color:var(--accent)}
+  .fld input[readonly]{opacity:.7;cursor:default}
+  .fld textarea{resize:vertical;min-height:62px}
+  .f-title input{font-size:1rem;font-weight:700}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+  .grid5 .fld label{text-align:center}
+  .ptag-ro{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:700;color:var(--ink);background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:7px 10px;width:max-content}
+  .ptag-ro .pd{width:8px;height:8px;border-radius:99px}
+  .subhead{display:flex;align-items:center;justify-content:space-between}
+  .subhead .pct{font-family:var(--mono);font-size:.72rem;color:var(--ink-soft)}
+  .subwrap-box{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+  .subtable{width:100%;border-collapse:collapse;font-size:.76rem;min-width:420px}
+  .subtable th{text-align:left;font-size:.58rem;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-soft);font-weight:700;padding:7px 8px;background:var(--surface-2);border-bottom:1px solid var(--line);white-space:nowrap}
+  .subtable td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:middle;color:var(--ink);font-weight:500}
+  .subtable tr:last-child td{border-bottom:0}
+  .subtable select{font:inherit;font-size:.68rem;padding:3px 5px;border-radius:6px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink)}
+  .subtable .slink{color:var(--accent-ink);text-decoration:none;font-weight:600}
+  .subtable .slink:hover{text-decoration:underline}
+  .subtable .sdel{border:0;background:transparent;color:var(--ink-soft);cursor:pointer;font-size:.85rem}
+  .subtable .sdel:hover{color:var(--hi)}
+  .subtable .dcol{font-family:var(--mono);text-align:center}
+  .dw-del{margin:4px 0 0;border:1px solid var(--line);background:transparent;color:var(--hi);font:inherit;font-size:.8rem;font-weight:600;border-radius:9px;padding:8px;cursor:pointer}
+  .dw-del:hover{background:var(--hi-soft);border-color:var(--hi)}
+  .modal-scrim{position:fixed;inset:0;background:rgba(15,17,21,.42);display:none;align-items:center;justify-content:center;z-index:60;padding:20px}
+  .modal-scrim.show{display:flex}
+  .modal{background:var(--surface);border:1px solid var(--line);border-radius:16px;width:min(460px,96vw);max-height:90vh;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,.34)}
+  .modal-h{display:flex;align-items:center;padding:15px 18px;border-bottom:1px solid var(--line);font-weight:800}
+  .modal-h .close{margin-left:auto;width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:var(--surface);cursor:pointer;color:var(--ink-soft)}
+  .modal-b{padding:16px 18px;display:flex;flex-direction:column;gap:12px;overflow-y:auto}
+  .modal-f{display:flex;justify-content:flex-end;gap:8px;padding:14px 18px;border-top:1px solid var(--line)}
+  .btn-primary{font:inherit;font-weight:700;font-size:.85rem;border:0;background:var(--accent);color:#fff;border-radius:9px;padding:9px 16px;cursor:pointer}
+  .btn-primary:hover{background:var(--accent-ink)}
+  .btn-cancel{font:inherit;font-weight:600;font-size:.85rem;border:1px solid var(--line);background:var(--surface);color:var(--ink-soft);border-radius:9px;padding:9px 16px;cursor:pointer}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="app">
+  <h2 class="sr-only">Prioritization board — Corporate Impact, Project Priority, Task Priority 3 ชั้น</h2>
+  <header class="bar">
+    <img class="logo" src="data:image/jpeg;base64,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" alt="Easy Money">
+    <div class="brand"><span class="kicker">Easy Money · CEO Office</span><h1>Prioritization Board</h1></div>
+    <span class="saved" id="saved">✓ บันทึกแล้ว</span>
+    <span class="spacer"></span>
+    <button class="ghost" id="lock">🔓 Unlocked</button>
+    <button class="ghost" id="reset" hidden>× ล้าง filter</button>
+    <select id="expsel" class="ghost" title="ดาวน์โหลด"><option value="">⬇ Export</option><option value="xls">Excel (รายงาน)</option><option value="json">JSON (backup)</option></select>
+    <button class="ghost" id="imp" title="โหลด JSON กลับ">Import</button>
+    <button class="ghost icon" id="theme" aria-label="สลับธีม">🌙</button>
+    <div class="seg" role="group" aria-label="มุมมอง">
+      <button id="v-prio" aria-pressed="true">Priority</button>
+      <button id="v-stat" aria-pressed="false">Status</button>
+      <button id="v-time" aria-pressed="false">Timeline</button>
+    </div>
+  </header>
+
+  <section class="zone" aria-labelledby="z1">
+    <div class="zlab"><span class="n">1</span><h2 id="z1">Corporate Impact</h2>
+      <span id="impCount" class="count-badge"></span>
+      <span class="spacer"></span>
+      <select id="buFilter" class="ghost"><option value="">BU: ทั้งหมด</option></select>
+      <button class="addbtn" id="addProj">＋ เพิ่ม Project</button></div>
+    <div class="impact" id="impact"></div>
+  </section>
+
+  <section class="zone" aria-labelledby="z2p">
+    <div class="zlab"><span class="n">2</span><h2 id="z2p">Project Priority</h2></div>
+    <div class="board-wrap"><div class="board" id="projboard"></div></div>
+  </section>
+
+  <section class="zone" aria-labelledby="z3">
+    <div class="zlab"><span class="n">3</span><h2 id="z3">Task Priority</h2></div>
+    <div id="main"></div>
+  </section>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="รายละเอียด" aria-hidden="true"></aside>
+<div class="modal-scrim" id="modalScrim">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-h"><span id="modalTitle"></span><button class="close" id="modalClose" aria-label="ปิด">✕</button></div>
+    <div class="modal-b" id="modalBody"></div>
+    <div class="modal-f"><button class="btn-cancel" id="modalCancel">ยกเลิก</button><button class="btn-primary" id="modalSave">บันทึก</button></div>
+  </div>
+</div>
+<input type="file" id="impfile" accept="application/json" hidden>
+<datalist id="ownerlist"></datalist>
+
+<script>
+(function(){
+  "use strict";
+  const STORE="em_prio_board_v3", TKEY="em_prio_theme";
+  const BUS=["MKT","Fin","Accounting","MBRS","PGY","CEO Office","CEO Office : Data","QPCH","ทรัพย์หลุด","Easy Care","CX team","Audit","Sale"];
+  const PMO_LIST=["Chay","Mew","Sine"];
+  const OWNERS=["มายด์","บอล","ต้น","ฟ้า","เจ","แนน","โอ๊ต"];
+  const TYPES=["Project","Ad-hoc"];
+  const PAL=["#2f6df0","#a5702f","#1f8f80","#6b5bd0","#c0402f","#2e7d5b","#b0761a","#0e7490","#9a3412"];
+  let projects=[];
+  let tasks=[];
+  const W={S:.30,V:.25,K:.15,R:.15,U:.15}, EMAP={XS:1,S:2,M:3,L:4,XL:5};
+  const vscore=p=>p.S*W.S+p.V*W.V+p.K*W.K+p.R*W.R+p.U*W.U;
+  const pindex=p=>vscore(p)/(EMAP[p.size]||3);
+  const projById=id=>projects.find(p=>p.id===id);
+  const PRIO=[{k:"High",c:"--hi",s:"--hi-soft"},{k:"Med",c:"--md",s:"--md-soft"},{k:"Low",c:"--lo",s:"--lo-soft"}];
+  const TASK_STAT=["Not started","Review","Task Approved","In progress","UAT","Done"];
+  const PROJ_STAT=["Not started","Review","Project Approved","In progress","UAT","Done"];
+  const STCOLOR={"Not started":"--st-todo","Review":"--st-rev","Task Approved":"--st-appr","Project Approved":"--st-appr","In progress":"--st-prog","UAT":"--st-uat","Done":"--st-done"};
+  const statColor=k=>STCOLOR[k]||"--st-todo";
+  const prioMeta=k=>PRIO.find(p=>p.k===k)||PRIO[2];
+  const cssVal=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+  function pcolor(id){let h=0;for(let i=0;i<id.length;i++)h=(h*31+id.charCodeAt(i))>>>0;const known={CRD:0,COL:1,MKT:2,CHN:3};return PAL[known[id]!==undefined?known[id]:h%PAL.length];}
+  function dayspan(a,b){const s=new Date(a),e=new Date(b);if(isNaN(s)||isNaN(e)||e<s)return 0;return Math.round((e-s)/864e5)+1;}
+  const spentOf=t=>dayspan(t.start,t.end);
+  function sizeFromDays(d){if(!d)return null;if(d<=2)return "XS";if(d<=7)return "S";if(d<=14)return "M";if(d<=31)return "L";return "XL";}
+  const projTasks=id=>tasks.filter(t=>t.proj===id);
+  function projDone(p){const ts=projTasks(p.id);if(!ts.length)return 0;return ts.filter(t=>t.status==="Done").length/ts.length;}
+  function projStatus(id){const pp=projById(id);if(pp&&pp.statusOverride)return pp.statusOverride;
+    const ts=projTasks(id);if(!ts.length)return "Not started";const st=ts.map(t=>t.status);
+    if(st.every(s=>s==="Done"))return "Done";
+    if(st.every(s=>s==="Done"||s==="Task Approved"))return "Project Approved";
+    if(st.some(s=>s==="In progress"||s==="Review"||s==="UAT"||s==="Task Approved"))return "In progress";
+    return "Not started";}
+
+  let view="prio", filterProj=null, filterBU="", selId=null, locked=false;
+  try{locked=localStorage.getItem("em_prio_lock")==="1";}catch(e){}
+  const projMatchesBU=p=>!filterBU||p.bu===filterBU||projTasks(p.id).some(t=>t.bu===filterBU);
+  const $=s=>document.querySelector(s), el=(t,c)=>{const e=document.createElement(t);if(c)e.className=c;return e;};
+  const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
+  const fmt=d=>{const x=new Date(d);return isNaN(x)?"—":(x.getDate()+"/"+(x.getMonth()+1));};
+  const opt=(list,cur)=>list.map(v=>`<option value="${esc(v)}"${String(v)===String(cur)?" selected":""}>${esc(v)}</option>`).join("");
+
+  function refreshOwners(){const set=new Set(OWNERS);projects.forEach(p=>p.owner&&set.add(p.owner));tasks.forEach(t=>t.owner&&set.add(t.owner));$("#ownerlist").innerHTML=[...set].map(o=>`<option value="${esc(o)}"></option>`).join("");}
+  function normAll(){
+    projects.forEach(p=>{if(!p.pmo)p.pmo="Chay";if(p.statusOverride==="Approved")p.statusOverride="Project Approved";if(p.statusOverride&&PROJ_STAT.indexOf(p.statusOverride)<0&&p.statusOverride!=="")p.statusOverride="";});
+    tasks.forEach(t=>{if(!t.pmo)t.pmo=(projById(t.proj)||{}).pmo||"Chay";if(t.status==="Approved")t.status="Task Approved";if(TASK_STAT.indexOf(t.status)<0)t.status="Not started";if(!t.type)t.type="Project";});
+  }
+
+  let savedTimer=null;
+  function save(){try{localStorage.setItem(STORE,JSON.stringify({projects,tasks}));const s=$("#saved");s.classList.add("show");clearTimeout(savedTimer);savedTimer=setTimeout(()=>s.classList.remove("show"),1200);}catch(e){}}
+  function load(){try{const raw=localStorage.getItem(STORE);if(!raw)return;const o=JSON.parse(raw);if(o&&Array.isArray(o.projects)&&Array.isArray(o.tasks)&&o.projects.length){projects=o.projects;tasks=o.tasks;}}catch(e){}}
+
+  function impactCard(p,i){
+    const b=el("div","pcard"); b.setAttribute("role","button"); b.tabIndex=0; b.draggable=!locked; b.dataset.id=p.id;
+    b.setAttribute("aria-pressed", filterProj===p.id?"true":"false");
+    const scope=p.scope||"Corporate";
+    const scopeChip=scope==="Corporate"?`<span class="scope-chip corp">🏢 องค์กร</span>`:`<span class="scope-chip bu">🏬 ${esc(p.bu||"ฝ่าย")}</span>`;
+    b.innerHTML=`<button class="pedit" aria-label="แก้ไข">✎</button>
+      <div class="prow"><span class="rank">#${i+1}</span>${scopeChip}
+      <span class="pmo-chip">PMO ${esc(p.pmo||"—")}</span>
+      <span class="pf" style="border-color:${pcolor(p.id)};color:${pcolor(p.id)}">${esc(p.id)}</span></div>
+      <h3>${esc(p.name)}</h3>
+      <div class="pi"><b>${pindex(p).toFixed(2)}</b><span>Priority Index</span></div>
+      <div class="vbar"><i style="width:${(vscore(p)/5*100).toFixed(0)}%"></i></div>
+      <div class="pmeta"><span class="chip">${esc(p.size)}</span><span>${esc(p.owner)}</span>
+      <span class="prog"><i style="width:${projDone(p)*100}%"></i></span><span style="font-family:var(--mono)">${Math.round(projDone(p)*100)}%</span></div>`;
+    b.querySelector(".pedit").addEventListener("click",ev=>{ev.stopPropagation();openProjectDetail(p.id);});
+    const flt=()=>{filterProj=filterProj===p.id?null:p.id;render();};
+    b.addEventListener("click",flt);
+    b.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();flt();}});
+    b.addEventListener("dragstart",e=>{e.dataTransfer.setData("text/plain","proj:"+p.id);e.dataTransfer.effectAllowed="move";b.classList.add("dragging");});
+    b.addEventListener("dragend",()=>b.classList.remove("dragging"));
+    return b;
+  }
+  function renderImpact(){
+    const wrap=$("#impact"); wrap.innerHTML="";
+    const base=[...projects].sort((a,b)=>pindex(b)-pindex(a)).filter(projMatchesBU);
+    $("#impCount").textContent="Total "+base.length+" projects";
+    if(!base.length){const e=el("div","empty");e.textContent=filterBU?"ไม่มีโปรเจกต์ตรงตัวกรอง":"ยังไม่มีโปรเจกต์ — กด ＋ เพิ่ม Project";wrap.appendChild(e);return;}
+    [{key:"Corporate",label:"🏢 Corporate"},{key:"BU",label:"🏬 BU"}].forEach(g=>{
+      const items=base.filter(p=>(p.scope||"Corporate")===g.key);
+      const grp=el("div","igroup");
+      const gh=el("div","igh"); gh.innerHTML=`<span class="tag-lbl">${g.label}</span><span class="cnt">${items.length} projects</span>`; grp.appendChild(gh);
+      const grid=el("div","impact-grid");
+      if(!items.length){const e=el("div","empty");e.textContent="—";grid.appendChild(e);}
+      else items.forEach((p,i)=>grid.appendChild(impactCard(p,i)));
+      grp.appendChild(grid); wrap.appendChild(grp);
+      grp.addEventListener("dragover",e=>{e.preventDefault();grp.classList.add("idrop");});
+      grp.addEventListener("dragleave",()=>grp.classList.remove("idrop"));
+      grp.addEventListener("drop",e=>{e.preventDefault();grp.classList.remove("idrop");const id=e.dataTransfer.getData("text/plain");if(!id.startsWith("proj:"))return;const p=projById(id.slice(5));if(p){p.scope=g.key;if(g.key==="BU"&&!p.bu)p.bu=BUS[0];if(g.key==="Corporate")p.bu="";render();}});
+    });
+  }
+
+  function renderProjBoard(){
+    const board=$("#projboard"); board.innerHTML="";
+    const base=projects.filter(projMatchesBU);
+    PROJ_STAT.forEach(k=>{
+      const items=base.filter(p=>projStatus(p.id)===k).sort((a,b)=>pindex(b)-pindex(a));
+      const c=el("div","col");
+      const h=el("div","col-h");
+      h.innerHTML=`<span class="dot" style="background:var(${statColor(k)})"></span><span class="t">${k}</span><span class="c">${items.length}</span>`;
+      c.appendChild(h);
+      const stack=el("div","stack");
+      if(!items.length){const e=el("div","empty");e.textContent="—";stack.appendChild(e);}
+      else items.forEach(p=>{
+        const n=projTasks(p.id).length;
+        const b=el("div","pmini"); b.setAttribute("role","button"); b.tabIndex=0; b.draggable=!locked; b.dataset.id=p.id; b.setAttribute("aria-pressed",filterProj===p.id?"true":"false");
+        b.innerHTML=`<div class="pm-top"><span class="pf" style="border-color:${pcolor(p.id)};color:${pcolor(p.id)}">${esc(p.id)}</span><span class="pmo-chip">${esc(p.pmo||"—")}</span><span class="pm-pi">PI ${pindex(p).toFixed(2)}</span></div>
+          <div class="pm-name">${esc(p.name)}</div>
+          <div class="pm-meta"><span>${n} งาน</span><span class="prog"><i style="width:${projDone(p)*100}%"></i></span><span style="font-family:var(--mono)">${Math.round(projDone(p)*100)}%</span></div>`;
+        const flt=()=>{filterProj=filterProj===p.id?null:p.id;render();};
+        b.addEventListener("click",flt);
+        b.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();flt();}});
+        b.addEventListener("dragstart",e=>{e.dataTransfer.setData("text/plain","proj:"+p.id);e.dataTransfer.effectAllowed="move";b.classList.add("dragging");});
+        b.addEventListener("dragend",()=>b.classList.remove("dragging"));
+        stack.appendChild(b);
+      });
+      c.appendChild(stack);
+      c.addEventListener("dragover",e=>{e.preventDefault();c.classList.add("drop");});
+      c.addEventListener("dragleave",()=>c.classList.remove("drop"));
+      c.addEventListener("drop",e=>{e.preventDefault();c.classList.remove("drop");const id=e.dataTransfer.getData("text/plain");if(!id.startsWith("proj:"))return;const p=projById(id.slice(5));if(p){p.statusOverride=k;render();}});
+      board.appendChild(c);
+    });
+  }
+
+  function taskCard(t){
+    const c=el("div","tcard"); c.tabIndex=0; c.draggable=!locked; c.dataset.id=t.id;
+    if(t.id===selId)c.classList.add("sel");
+    const pm=prioMeta(t.prio), sc=statColor(t.status);
+    const stripe=view==="prio"?`var(${pm.c})`:`var(${sc})`;
+    const labHtml=view==="prio"
+      ? `<span class="lab" style="color:var(${sc});background:color-mix(in srgb,var(${sc}) 14%,transparent)">${esc(t.status)}</span>`
+      : `<span class="lab" style="color:var(${pm.c});background:var(${pm.s})">${esc(t.prio)}</span>`;
+    const cmtHtml=t.comment?`<p class="cmt">💬 ${esc(t.comment)}</p>`:"";
+    const adHtml=t.type==="Ad-hoc"?`<span class="adhoc">⚡ ad-hoc</span>`:"";
+    c.innerHTML=`<span class="stripe" style="background:${stripe}"></span>
+      <div class="top"><span class="ptag"><span class="pd" style="background:${pcolor(t.proj)}"></span>${esc(t.proj)}</span>${adHtml}<span class="tid">${esc(t.id)}</span></div>
+      <p class="ttl">${esc(t.title)}</p>${cmtHtml}
+      <div class="foot"><span class="av" style="background:${pcolor(t.proj)}">${esc((t.owner||"?").slice(0,1))}</span>
+      <span class="who">${esc(t.owner)}</span><span class="chip">${esc(t.size)}</span>${labHtml}<span class="spent">⏱ ${spentOf(t)}d</span></div>`;
+    c.addEventListener("dragstart",e=>{e.dataTransfer.setData("text/plain",t.id);e.dataTransfer.effectAllowed="move";c.classList.add("dragging");});
+    c.addEventListener("dragend",()=>c.classList.remove("dragging"));
+    c.addEventListener("click",()=>openTaskDetail(t.id));
+    c.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();openTaskDetail(t.id);}});
+    return c;
+  }
+
+  function renderBoard(list){
+    const main=$("#main"); main.innerHTML="";
+    const wrap=el("div","board-wrap"), board=el("div","board");
+    const cols = view==="prio" ? PRIO.map(p=>({k:p.k,c:p.c})) : TASK_STAT.map(k=>({k,c:statColor(k)}));
+    cols.forEach(col=>{
+      const items=list.filter(t=>(view==="prio"?t.prio:t.status)===col.k);
+      const days=items.reduce((s,t)=>s+spentOf(t),0);
+      const c=el("div","col");
+      const h=el("div","col-h");
+      h.innerHTML=`<span class="dot" style="background:var(${col.c})"></span><span class="t">${col.k}</span><span class="c">${items.length}</span><span class="d">⏱ ${days}d</span>`;
+      c.appendChild(h);
+      const stack=el("div","stack");
+      if(!items.length){const e=el("div","empty");e.textContent="— ว่าง —";stack.appendChild(e);}
+      else items.forEach(t=>stack.appendChild(taskCard(t)));
+      c.appendChild(stack);
+      c.addEventListener("dragover",e=>{e.preventDefault();c.classList.add("drop");});
+      c.addEventListener("dragleave",()=>c.classList.remove("drop"));
+      c.addEventListener("drop",e=>{e.preventDefault();c.classList.remove("drop");const id=e.dataTransfer.getData("text/plain");if(id.startsWith("proj:"))return;const t=tasks.find(x=>x.id===id);if(!t)return;if(view==="prio")t.prio=col.k;else t.status=col.k;render();});
+      board.appendChild(c);
+    });
+    wrap.appendChild(board); main.appendChild(wrap);
+  }
+
+  function renderTimeline(list){
+    const main=$("#main"); main.innerHTML="";
+    const box=el("div","tl"), inner=el("div","tl-inner");
+    const ds=list.flatMap(t=>[new Date(t.start),new Date(t.end)]).filter(d=>!isNaN(d));
+    if(!ds.length){const e=el("div","empty");e.textContent="ไม่มีงาน (ที่มีวันที่) ในมุมมองนี้";box.appendChild(e);main.appendChild(box);return;}
+    let min=new Date(Math.min(...ds)), max=new Date(Math.max(...ds));
+    const span=Math.max(max-min,864e5);
+    const axis=el("div","tl-axis");
+    for(let d=new Date(min); d<=max; d.setDate(d.getDate()+7)){const tk=el("div","tl-tick");tk.style.left=((d-min)/span*100)+"%";tk.textContent=d.getDate()+"/"+(d.getMonth()+1);axis.appendChild(tk);}
+    inner.appendChild(axis);
+    const pids=[...new Set(list.map(t=>t.proj))];
+    const lanes=pids.map(pid=>{const its=list.filter(t=>t.proj===pid&&!isNaN(new Date(t.start)));const ms=its.map(t=>+new Date(t.start));return {pid,its,min:ms.length?Math.min(...ms):Infinity};}).filter(l=>l.its.length).sort((a,b)=>a.min-b.min);
+    lanes.forEach(l=>{
+      const pj=projById(l.pid)||{name:l.pid};
+      const lane=el("div","tl-lane");
+      lane.innerHTML=`<div class="tl-lname"><span class="dot" style="background:${pcolor(l.pid)}"></span>${esc(l.pid)} · ${esc(pj.name||"")}</div>`;
+      const track=el("div","tl-track"); let vi=0;
+      l.its.sort((a,b)=>+new Date(a.start)-+new Date(b.start)).forEach(t=>{const s=new Date(t.start),e=new Date(t.end);if(isNaN(e)||e<s)return;
+        const bar=el("button","tl-bar");bar.type="button";
+        bar.style.left=((s-min)/span*100)+"%";bar.style.width=Math.max((e-s)/span*100,3)+"%";
+        bar.style.background=cssVal(prioMeta(t.prio).c)||"#888";bar.style.top=(5+vi*30)+"px";vi++;
+        bar.innerHTML=`<span class="bd"></span>${esc(t.id)} · ${esc(t.title)}`;
+        bar.title=`${t.title}\n${fmt(t.start)} → ${fmt(t.end)} · ${t.owner} · ${t.status}`;
+        bar.addEventListener("click",()=>openTaskDetail(t.id));track.appendChild(bar);});
+      track.style.minHeight=(Math.max(vi,1)*30+10)+"px";lane.appendChild(track);inner.appendChild(lane);
+    });
+    box.appendChild(inner); main.appendChild(box);
+  }
+
+  function render(){
+    $("#v-prio").setAttribute("aria-pressed",view==="prio");
+    $("#v-stat").setAttribute("aria-pressed",view==="stat");
+    $("#v-time").setAttribute("aria-pressed",view==="timeline");
+    $("#z3").textContent=view==="timeline"?"Task Timeline":"Task Priority";
+    $("#buFilter").value=filterBU;
+    const lk=$("#lock"); lk.innerHTML=locked?"🔒 Locked":"🔓 Unlocked"; lk.classList.toggle("on",locked);
+    document.querySelector(".app").classList.toggle("locked",locked);
+    $("#addProj").disabled=locked; $("#imp").disabled=locked;
+    if(filterProj&&!projById(filterProj))filterProj=null;
+    $("#reset").hidden=!filterProj&&!filterBU;
+    refreshOwners();
+    const list=tasks.filter(t=>{if(filterBU&&t.bu!==filterBU)return false;if(filterProj&&t.proj!==filterProj)return false;return true;});
+    renderImpact(); renderProjBoard();
+    if(view==="timeline")renderTimeline(list); else renderBoard(list);
+    save();
+  }
+
+  /* ---- drawer ---- */
+  const drawer=$("#drawer"), scrim=$("#scrim");
+  function closeDetail(){selId=null;drawer.classList.remove("open");drawer.setAttribute("aria-hidden","true");scrim.classList.remove("show");render();}
+  function applyLock(){if(!locked)return;drawer.querySelectorAll("input,select,textarea,button").forEach(x=>{if(x.id!=="dw-close")x.disabled=true;});}
+  scrim.addEventListener("click",closeDetail);
+  document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(mScrim.classList.contains("show"))closeModal();else closeDetail();}});
+
+  function renderProjSubs(p){
+    const box=drawer.querySelector("#psubs"); if(!box)return;
+    const ts=projTasks(p.id);
+    drawer.querySelector("#psubcount").textContent=ts.length+" งาน";
+    if(!ts.length){box.innerHTML=`<div class="empty">ยังไม่มี sub-task — กด ＋ เพิ่ม</div>`;return;}
+    box.innerHTML=`<div class="subwrap-box"><table class="subtable"><thead><tr>
+      <th>Sub-task</th><th>Owner</th><th>PMO</th><th>BU</th><th>Status</th><th class="dcol">วัน</th><th></th></tr></thead><tbody>${
+      ts.map(t=>`<tr>
+        <td><a href="#" class="slink" data-id="${esc(t.id)}">${esc(t.title)}</a></td>
+        <td>${esc(t.owner||"—")}</td><td>${esc(t.pmo||"—")}</td><td>${esc(t.bu||"—")}</td>
+        <td><select class="ss" data-id="${esc(t.id)}">${opt(TASK_STAT,t.status)}</select></td>
+        <td class="dcol">${spentOf(t)||"—"}</td>
+        <td><button class="sdel" data-id="${esc(t.id)}" aria-label="ลบ">✕</button></td></tr>`).join("")
+      }</tbody></table></div>`;
+    box.querySelectorAll(".ss").forEach(sel=>sel.addEventListener("change",e=>{const t=tasks.find(x=>x.id===e.target.dataset.id);if(t){t.status=e.target.value;renderProjSubs(p);render();}}));
+    box.querySelectorAll(".sdel").forEach(b=>b.addEventListener("click",e=>{tasks=tasks.filter(x=>x.id!==e.target.dataset.id);renderProjSubs(p);render();}));
+    box.querySelectorAll(".slink").forEach(a=>a.addEventListener("click",e=>{e.preventDefault();openTaskDetail(a.dataset.id);}));
+  }
+  function openProjectDetail(id){
+    const p=projById(id); if(!p)return; selId=null; filterProj=id;
+    const svku=["S","V","K","R","U"].map(k=>`<div class="fld"><label>${k}</label><select id="p-${k}">${opt(["1","2","3","4","5"],String(p[k]))}</select></div>`).join("");
+    drawer.innerHTML=`
+      <div class="dw-h"><span class="ptag-ro"><span class="pd" style="background:${pcolor(p.id)}"></span>Corporate Impact</span>
+        <span class="did" id="p-pi">${esc(p.id)} · PI ${pindex(p).toFixed(2)}</span><button class="close" id="dw-close">✕</button></div>
+      <div class="dw-body">
+        <div class="fld f-title"><label>ชื่อโปรเจกต์</label><input id="p-name" value="${esc(p.name)}"></div>
+        <div class="fld"><label>PMO ผู้ดูแล</label><select id="p-pmo"><option value=""${p.pmo?"":" selected"}>— ระบุภายหลัง —</option>${opt(PMO_LIST,p.pmo||"")}</select></div>
+        <div class="fld"><label>Owner (คนทำ)</label><input list="ownerlist" id="p-owner" value="${esc(p.owner)}" placeholder="พิมพ์ชื่อ / เลือกจากที่มี"></div>
+        <div class="grid2"><div class="fld"><label>Impact scope</label><select id="p-scope">${opt(["Corporate","BU"],p.scope||"Corporate")}</select></div>
+          <div class="fld"><label>BU</label><select id="p-bu">${opt(BUS,p.bu||BUS[0])}</select></div></div>
+        <div class="grid2"><div class="fld"><label>Start date</label><input type="date" id="p-start" value="${esc(p.start||"")}"></div>
+          <div class="fld"><label>End date</label><input type="date" id="p-end" value="${esc(p.end||"")}"></div></div>
+        <div class="grid2"><div class="fld"><label>เวลาที่ใช้ (auto)</label><input id="p-spent" value="${dayspan(p.start,p.end)} วัน" readonly></div>
+          <div class="fld"><label>Size (auto จากวันที่)</label><select id="p-size">${opt(["XS","S","M","L","XL"],p.size)}</select></div></div>
+        <div class="fld"><label>สถานะโปรเจกต์ (Auto = รวมจาก sub-task)</label><select id="p-status">${opt(["Auto"].concat(PROJ_STAT),p.statusOverride||"Auto")}</select></div>
+        <div class="fld"><label>คะแนน Impact (1–5): S=Strategic V=Value K=Risk R=Reach U=Urgency</label><div class="grid5">${svku}</div></div>
+        <div class="fld"><div class="subhead"><label>Sub-tasks (แสดงบน Task Priority)</label><span class="pct" id="psubcount"></span></div>
+          <div id="psubs"></div>
+          <button class="addbtn" id="p-addsub" type="button" style="align-self:flex-start;margin-top:6px">＋ เพิ่ม sub-task</button></div>
+        <button class="dw-del" id="p-del">🗑 ลบโปรเจกต์ (และ sub-task ทั้งหมด)</button>
+      </div>`;
+    drawer.querySelector("#dw-close").addEventListener("click",closeDetail);
+    const bindP=(sel,fn)=>drawer.querySelector(sel).addEventListener("input",e=>{fn(e.target.value);drawer.querySelector("#p-pi").textContent=p.id+" · PI "+pindex(p).toFixed(2);render();});
+    bindP("#p-name",v=>p.name=v);bindP("#p-pmo",v=>p.pmo=v);bindP("#p-owner",v=>p.owner=v);
+    bindP("#p-scope",v=>p.scope=v);bindP("#p-bu",v=>p.bu=v);bindP("#p-size",v=>p.size=v);
+    ["S","V","K","R","U"].forEach(k=>bindP("#p-"+k,v=>p[k]=+v));
+    const pupd=()=>{const d=dayspan(p.start,p.end);const sp=drawer.querySelector("#p-spent");if(sp)sp.value=d+" วัน";if(d){p.size=sizeFromDays(d);const sz=drawer.querySelector("#p-size");if(sz)sz.value=p.size;}drawer.querySelector("#p-pi").textContent=p.id+" · PI "+pindex(p).toFixed(2);render();};
+    drawer.querySelector("#p-start").addEventListener("input",e=>{p.start=e.target.value;pupd();});
+    drawer.querySelector("#p-end").addEventListener("input",e=>{p.end=e.target.value;pupd();});
+    drawer.querySelector("#p-status").addEventListener("input",e=>{p.statusOverride=e.target.value==="Auto"?"":e.target.value;render();});
+    drawer.querySelector("#p-addsub").addEventListener("click",()=>openAddSub(p));
+    drawer.querySelector("#p-del").addEventListener("click",()=>{if(confirm("ลบโปรเจกต์ "+p.id+" และ sub-task ทั้งหมด?")){tasks=tasks.filter(t=>t.proj!==p.id);projects=projects.filter(x=>x.id!==p.id);filterProj=null;closeDetail();}});
+    renderProjSubs(p);
+    drawer.classList.add("open");drawer.setAttribute("aria-hidden","false");scrim.classList.add("show");applyLock();render();
+  }
+  function openTaskDetail(id){
+    const t=tasks.find(x=>x.id===id); if(!t)return; selId=id;
+    drawer.innerHTML=`
+      <div class="dw-h"><span class="ptag-ro"><span class="pd" style="background:${pcolor(t.proj)}"></span>${esc(t.proj)}</span>
+        <span class="did">${esc(t.id)}</span><button class="close" id="dw-close">✕</button></div>
+      <div class="dw-body">
+        <div class="fld f-title"><label>ชื่อ sub-task</label><input id="f-title" value="${esc(t.title)}"></div>
+        <div class="grid2"><div class="fld"><label>อยู่โปรเจกต์</label><select id="f-proj">${projects.map(p=>`<option value="${esc(p.id)}"${p.id===t.proj?" selected":""}>${esc(p.id)}</option>`).join("")}</select></div>
+          <div class="fld"><label>Type</label><select id="f-type">${opt(TYPES,t.type)}</select></div></div>
+        <div class="grid2"><div class="fld"><label>Owner assign</label><input list="ownerlist" id="f-owner" value="${esc(t.owner)}" placeholder="พิมพ์ชื่อ / เลือก"></div>
+          <div class="fld"><label>PMO</label><select id="f-pmo">${opt(PMO_LIST,t.pmo||"Chay")}</select></div></div>
+        <div class="fld"><label>BU / ฝ่าย</label><select id="f-bu">${opt(BUS,t.bu)}</select></div>
+        <div class="grid2"><div class="fld"><label>Status</label><select id="f-status">${opt(TASK_STAT,t.status)}</select></div>
+          <div class="fld"><label>Priority</label><select id="f-prio">${opt(PRIO.map(x=>x.k),t.prio)}</select></div></div>
+        <div class="grid2"><div class="fld"><label>Start date</label><input type="date" id="f-start" value="${esc(t.start)}"></div>
+          <div class="fld"><label>End date</label><input type="date" id="f-end" value="${esc(t.end)}"></div></div>
+        <div class="grid2"><div class="fld"><label>Size</label><select id="f-size">${opt(["XS","S","M","L","XL"],t.size)}</select></div>
+          <div class="fld"><label>เวลาที่ใช้ (auto)</label><input id="f-spent" value="${spentOf(t)} วัน" readonly></div></div>
+        <div class="fld"><label>Comment</label><textarea id="f-comment">${esc(t.comment)}</textarea></div>
+        <button class="dw-del" id="f-del">🗑 ลบ sub-task นี้</button>
+      </div>`;
+    drawer.querySelector("#dw-close").addEventListener("click",closeDetail);
+    const bind=(sel,fn)=>drawer.querySelector(sel).addEventListener("input",e=>{fn(e.target.value);render();});
+    bind("#f-title",v=>t.title=v);bind("#f-proj",v=>t.proj=v);bind("#f-type",v=>t.type=v);bind("#f-owner",v=>t.owner=v);bind("#f-pmo",v=>t.pmo=v);bind("#f-bu",v=>t.bu=v);
+    bind("#f-status",v=>t.status=v);bind("#f-prio",v=>t.prio=v);bind("#f-size",v=>t.size=v);bind("#f-comment",v=>t.comment=v);
+    const rs=()=>{const d=dayspan(t.start,t.end);const f=drawer.querySelector("#f-spent");if(f)f.value=d+" วัน";if(d){t.size=sizeFromDays(d);const sz=drawer.querySelector("#f-size");if(sz)sz.value=t.size;}};
+    drawer.querySelector("#f-start").addEventListener("input",e=>{t.start=e.target.value;rs();render();});
+    drawer.querySelector("#f-end").addEventListener("input",e=>{t.end=e.target.value;rs();render();});
+    drawer.querySelector("#f-del").addEventListener("click",()=>{if(confirm("ลบ "+t.id+" ?")){tasks=tasks.filter(x=>x.id!==t.id);closeDetail();}});
+    drawer.classList.add("open");drawer.setAttribute("aria-hidden","false");scrim.classList.add("show");applyLock();render();
+  }
+
+  /* ---- modal ---- */
+  const mScrim=$("#modalScrim"); let modalSaveFn=null;
+  function openModal(title,html,onSave){$("#modalTitle").textContent=title;$("#modalBody").innerHTML=html;modalSaveFn=onSave;mScrim.classList.add("show");const f=$("#modalBody").querySelector("input,select,textarea");if(f)f.focus();}
+  function closeModal(){mScrim.classList.remove("show");modalSaveFn=null;}
+  $("#modalClose").addEventListener("click",closeModal);
+  $("#modalCancel").addEventListener("click",closeModal);
+  mScrim.addEventListener("click",e=>{if(e.target===mScrim)closeModal();});
+  $("#modalSave").addEventListener("click",()=>{if(modalSaveFn&&modalSaveFn()!==false){closeModal();render();}});
+  function nextTaskId(){let n=tasks.reduce((m,t)=>{const x=parseInt((String(t.id).match(/\d+/)||[0])[0],10)||0;return Math.max(m,x);},0);return "TSK-"+(n+1);}
+  function uniqId(base,exists){let id=base||"P",n=1;while(exists(id)){id=(base||"P")+(++n);}return id;}
+
+  function openAddSub(p){
+    openModal("เพิ่ม Sub-task ใน "+p.id,`
+      <div class="fld"><label>ชื่อ sub-task</label><input id="m-title" placeholder="เช่น เตรียมข้อมูล"></div>
+      <div class="grid2"><div class="fld"><label>Owner assign</label><input list="ownerlist" id="m-owner" value="${esc(p.owner)}"></div>
+        <div class="fld"><label>PMO</label><select id="m-pmo">${opt(PMO_LIST,p.pmo||"Chay")}</select></div></div>
+      <div class="grid2"><div class="fld"><label>BU / ฝ่าย</label><select id="m-bu">${opt(BUS,BUS[0])}</select></div>
+        <div class="fld"><label>Type</label><select id="m-type">${opt(TYPES,"Project")}</select></div></div>
+      <div class="grid2"><div class="fld"><label>Priority</label><select id="m-prio">${opt(PRIO.map(x=>x.k),"Med")}</select></div>
+        <div class="fld"><label>Status</label><select id="m-status">${opt(TASK_STAT,"Not started")}</select></div></div>
+      <div class="grid2"><div class="fld"><label>Start date</label><input type="date" id="m-start"></div>
+        <div class="fld"><label>End date</label><input type="date" id="m-end"></div></div>`,
+      ()=>{const title=$("#m-title").value.trim();if(!title){$("#m-title").focus();return false;}
+        const st=$("#m-start").value,en=$("#m-end").value,d=dayspan(st,en);
+        tasks.push({id:nextTaskId(),proj:p.id,title,type:$("#m-type").value,owner:$("#m-owner").value,pmo:$("#m-pmo").value,bu:$("#m-bu").value,
+          size:d?sizeFromDays(d):"M",prio:$("#m-prio").value,status:$("#m-status").value,start:st,end:en,comment:""});
+        renderProjSubs(p);});
+  }
+  $("#addProj").addEventListener("click",()=>{
+    const svku=["S","V","K","R","U"].map(k=>`<div class="fld"><label>${k}</label><select id="m-${k}">${opt(["1","2","3","4","5"],"3")}</select></div>`).join("");
+    openModal("เพิ่ม Project ใหม่",`
+      <div class="fld"><label>ชื่อโปรเจกต์</label><input id="m-name" placeholder="เช่น Fraud Detection Model"></div>
+      <div class="fld"><label>PMO ผู้ดูแล (เว้นว่างได้)</label><select id="m-pmo"><option value="" selected>— ระบุภายหลัง —</option>${PMO_LIST.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("")}</select></div>
+      <div class="fld"><label>Owner (คนทำ)</label><input list="ownerlist" id="m-owner" placeholder="พิมพ์ชื่อ / เลือก"></div>
+      <div class="grid2"><div class="fld"><label>Impact scope</label><select id="m-scope">${opt(["Corporate","BU"],"Corporate")}</select></div>
+        <div class="fld"><label>BU</label><select id="m-bu">${opt(BUS,BUS[0])}</select></div></div>
+      <div class="grid2"><div class="fld"><label>Start date</label><input type="date" id="m-start"></div>
+        <div class="fld"><label>End date</label><input type="date" id="m-end"></div></div>
+      <div class="fld"><label>คะแนน Impact (1–5)</label><div class="grid5">${svku}</div></div>`,
+      ()=>{const name=$("#m-name").value.trim();if(!name){$("#m-name").focus();return false;}
+        const base=((name.match(/[A-Za-z]/g)||[]).join("").slice(0,3).toUpperCase())||"PRJ";
+        const id=uniqId(base,x=>projById(x));
+        const scope=$("#m-scope").value; const st=$("#m-start").value,en=$("#m-end").value; const d=dayspan(st,en);
+        projects.push({id,name,pmo:$("#m-pmo").value,owner:$("#m-owner").value||OWNERS[0],scope,bu:scope==="BU"?$("#m-bu").value:"",statusOverride:"",start:st,end:en,size:d?sizeFromDays(d):"M",S:+$("#m-S").value,V:+$("#m-V").value,K:+$("#m-K").value,R:+$("#m-R").value,U:+$("#m-U").value});
+        openProjectDetail(id);});
+  });
+
+  function dl(blob,name){const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);}
+  function exportJSON(){dl(new Blob([JSON.stringify({projects,tasks},null,2)],{type:"application/json"}),"prio-board-backup.json");}
+  function exportExcel(){
+    const cx=s=>String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    const head=["Project","ชื่อโปรเจกต์","PMO","Scope","BU (project)","Project PI","Project Status","Task ID","Sub-task","Owner assign","Task PMO","Task BU","Type","Priority","Status","Start","End","Days","Comment"];
+    let h='<table border="1"><thead><tr>'+head.map(x=>`<th>${cx(x)}</th>`).join("")+'</tr></thead><tbody>';
+    tasks.forEach(t=>{const p=projById(t.proj)||{};
+      const row=[t.proj,p.name,p.pmo,p.scope,p.bu,p.S!==undefined?pindex(p).toFixed(2):"",projStatus(t.proj),t.id,t.title,t.owner,t.pmo,t.bu,t.type,t.prio,t.status,t.start,t.end,spentOf(t),t.comment];
+      h+='<tr>'+row.map(c=>`<td>${cx(c)}</td>`).join("")+'</tr>';});
+    h+='</tbody></table>';
+    dl(new Blob(['﻿<html><head><meta charset="utf-8"></head><body>'+h+'</body></html>'],{type:"application/vnd.ms-excel"}),"prio-board.xls");
+  }
+  $("#expsel").addEventListener("change",e=>{const v=e.target.value;e.target.selectedIndex=0;if(v==="json")exportJSON();else if(v==="xls")exportExcel();});
+  $("#imp").addEventListener("click",()=>$("#impfile").click());
+  $("#impfile").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const o=JSON.parse(r.result);if(o.projects&&o.tasks){projects=o.projects;tasks=o.tasks;normAll();filterProj=null;filterBU="";selId=null;render();}else alert("ไฟล์ไม่ถูกต้อง");}catch(err){alert("อ่านไฟล์ไม่ได้");}};r.readAsText(f);e.target.value="";});
+
+  const themeBtn=$("#theme");
+  function curDark(){const t=document.documentElement.dataset.theme;return t?t==="dark":matchMedia("(prefers-color-scheme:dark)").matches;}
+  function syncIcon(){themeBtn.textContent=curDark()?"☀️":"🌙";}
+  try{const stx=localStorage.getItem(TKEY);if(stx)document.documentElement.dataset.theme=stx;}catch(e){}
+  themeBtn.addEventListener("click",()=>{const nv=curDark()?"light":"dark";document.documentElement.dataset.theme=nv;try{localStorage.setItem(TKEY,nv);}catch(e){}syncIcon();});
+  syncIcon();
+
+  $("#v-prio").addEventListener("click",()=>{view="prio";render();});
+  $("#v-stat").addEventListener("click",()=>{view="stat";render();});
+  $("#v-time").addEventListener("click",()=>{view="timeline";render();});
+  $("#reset").addEventListener("click",()=>{filterProj=null;filterBU="";render();});
+  $("#buFilter").addEventListener("change",e=>{filterBU=e.target.value;filterProj=null;render();});
+  $("#lock").addEventListener("click",()=>{locked=!locked;try{localStorage.setItem("em_prio_lock",locked?"1":"0");}catch(e){}closeDetail();render();});
+  $("#buFilter").insertAdjacentHTML("beforeend",BUS.map(b=>`<option value="${esc(b)}">${esc(b)}</option>`).join(""));
+
+  load(); normAll(); render();
+})();
+</script>
