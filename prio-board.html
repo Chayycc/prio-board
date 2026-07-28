@@ -260,7 +260,7 @@
   const SB_URL="https://rticsujbdozqmjyiohvm.supabase.co";
   const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ0aWNzdWpiZG96cW1qeWlvaHZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ4OTg0NzksImV4cCI6MjEwMDQ3NDQ3OX0.sXpsoHkXh8Exwb4Ep2H25PuVLNrw7GUlJNcnyzPb6hk";
   const SB_HEAD={apikey:SB_KEY,Authorization:"Bearer "+SB_KEY,"Content-Type":"application/json"};
-  const BUS=["MKT","Fin","Accounting","MBRS","PGY","CEO Office","CEO Office : Data","QPCH","ทรัพย์หลุด","Easy Care","CX team","Audit","Sale"];
+  const BUS=["MKT","Fin","Accounting","MBRS","PGY","IT","CEO Office","CEO Office : Data","QPCH","ทรัพย์หลุด","Easy Care","CX team","Audit","Sale"];
   const PMO_LIST=["Chay","Mew","Sine"];
   const OWNERS=["มายด์","บอล","ต้น","ฟ้า","เจ","แนน","โอ๊ต"];
   const TYPES=["Project","Ad-hoc"];
@@ -587,8 +587,9 @@
 
   /* ---- modal ---- */
   const mScrim=$("#modalScrim"); let modalSaveFn=null;
-  function openModal(title,html,onSave){$("#modalTitle").textContent=title;$("#modalBody").innerHTML=html;modalSaveFn=onSave;mScrim.classList.add("show");const f=$("#modalBody").querySelector("input,select,textarea");if(f)f.focus();}
+  function openModal(title,html,onSave){$("#modalTitle").textContent=title;$("#modalBody").innerHTML=html;modalSaveFn=onSave;mScrim.classList.add("show");const f=$("#modalBody").querySelector("input,select,textarea");if(f)f.focus();wireAutoDays();}
   function closeModal(){mScrim.classList.remove("show");modalSaveFn=null;}
+  function wireAutoDays(){const s=$("#m-start"),e=$("#m-end");if(!s||!e)return;const upd=()=>{const d=dayspan(s.value,e.value);const sp=$("#m-spent");if(sp)sp.value=(d||0)+" วัน";const sz=$("#m-size");if(sz&&d)sz.value=sizeFromDays(d);};s.addEventListener("input",upd);e.addEventListener("input",upd);}
   $("#modalClose").addEventListener("click",closeModal);
   $("#modalCancel").addEventListener("click",closeModal);
   mScrim.addEventListener("click",e=>{if(e.target===mScrim)closeModal();});
@@ -623,6 +624,7 @@
         <div class="fld"><label>BU</label><select id="m-bu">${opt(BUS,BUS[0])}</select></div></div>
       <div class="grid2"><div class="fld"><label>Start date</label><input type="date" id="m-start"></div>
         <div class="fld"><label>End date</label><input type="date" id="m-end"></div></div>
+      <div class="fld"><label>เวลาที่ใช้ (auto จาก start–end)</label><input id="m-spent" value="0 วัน" readonly></div>
       <div class="fld"><label>คะแนน Impact (1–5)</label><div class="grid5">${svku}</div></div>`,
       ()=>{const name=$("#m-name").value.trim();if(!name){$("#m-name").focus();return false;}
         const base=((name.match(/[A-Za-z]/g)||[]).join("").slice(0,3).toUpperCase())||"PRJ";
