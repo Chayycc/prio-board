@@ -88,6 +88,14 @@
   .chip2{display:inline-flex;align-items:center;gap:5px;font-size:.8rem;font-weight:600;background:var(--accent-soft);color:var(--accent-ink);border:1px solid var(--accent);border-radius:99px;padding:3px 6px 3px 11px}
   .chip2 .cx{border:0;background:transparent;color:var(--accent-ink);cursor:pointer;font-size:.72rem;padding:0}
   .chip-add{font:inherit;font-size:.8rem;border:1px dashed var(--line);background:var(--surface-2);color:var(--ink);border-radius:8px;padding:6px 8px;cursor:pointer}
+  .chip-inwrap{display:inline-flex;gap:4px}
+  .chip-in{font:inherit;font-size:.8rem;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:5px 8px;width:130px}
+  .chip-addbtn{border:1px solid var(--line);background:var(--surface-2);color:var(--accent-ink);border-radius:8px;font-weight:700;cursor:pointer;padding:0 10px}
+  .assign-row{border:1px solid var(--line);background:var(--surface-2);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px;margin-bottom:8px}
+  .assign-head{display:flex;gap:8px;align-items:center}
+  .assign-head .a-bu{flex:1;font:inherit;font-size:.86rem;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:7px 9px}
+  .assign-head .a-del{border:1px solid var(--line);background:var(--surface);color:var(--ink-soft);border-radius:8px;cursor:pointer;padding:4px 9px}
+  .assign-head .a-del:hover{color:var(--hi);border-color:var(--hi)}
   .pcard{position:relative;text-align:left;font:inherit;cursor:grab;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:15px 16px;box-shadow:var(--shadow);transition:transform .15s,border-color .15s;overflow:hidden}
   .pcard.dragging,.pmini.dragging{opacity:.45}
   .pcard:hover{transform:translateY(-2px)}
@@ -305,14 +313,31 @@
   function allPeople(){const set=new Set(OWNERS);projects.forEach(p=>{p.owner&&set.add(p.owner);(p.team||[]).forEach(x=>set.add(x));});tasks.forEach(t=>{t.owner&&set.add(t.owner);(t.team||[]).forEach(x=>set.add(x));});return [...set];}
   function renderChips(box,arr,onChange){
     if(!box)return;
-    const avail=allPeople().filter(o=>arr.indexOf(o)<0);
     box.innerHTML=arr.map((n,i)=>`<span class="chip2">${esc(n)}<button class="cx" data-i="${i}" type="button" aria-label="ลบ">✕</button></span>`).join("")
-      +`<select class="chip-add"><option value="">＋ เพิ่มคน</option>${avail.map(o=>`<option value="${esc(o)}">${esc(o)}</option>`).join("")}</select>`;
+      +`<span class="chip-inwrap"><input class="chip-in" list="ownerlist" placeholder="พิมพ์ชื่อ / เลือก"><button class="chip-addbtn" type="button">＋</button></span>`;
+    const inp=box.querySelector(".chip-in");
+    const add=()=>{const v=inp.value.trim();if(!v)return;arr.push(v);renderChips(box,arr,onChange);const ni=box.querySelector(".chip-in");if(ni)ni.focus();onChange&&onChange();};
+    box.querySelector(".chip-addbtn").addEventListener("click",add);
+    inp.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();add();}});
     box.querySelectorAll(".cx").forEach(b=>b.addEventListener("click",e=>{arr.splice(+e.currentTarget.dataset.i,1);renderChips(box,arr,onChange);onChange&&onChange();}));
-    box.querySelector(".chip-add").addEventListener("change",e=>{const v=e.target.value;if(v){arr.push(v);renderChips(box,arr,onChange);onChange&&onChange();}});
+  }
+  function renderAssigns(box,arr,onChange){
+    if(!box)return;
+    if(!arr.length)arr.push({bu:"",members:[]});
+    box.innerHTML=arr.map((g,i)=>`<div class="assign-row" data-i="${i}">
+        <div class="assign-head"><select class="a-bu"><option value="">— BU Assign —</option>${BUS.map(b=>`<option value="${esc(b)}"${b===g.bu?" selected":""}>${esc(b)}</option>`).join("")}</select>${arr.length>1?`<button class="a-del" type="button" aria-label="ลบเจ้าของงานร่วม">✕</button>`:""}</div>
+        <div class="chip-box a-team"></div></div>`).join("")
+      +`<button class="a-add addbtn" type="button" style="margin-top:2px">＋ เพิ่มเจ้าของงานร่วม</button>`;
+    box.querySelectorAll(".assign-row").forEach(row=>{
+      const i=+row.dataset.i; if(!Array.isArray(arr[i].members))arr[i].members=[];
+      row.querySelector(".a-bu").addEventListener("change",e=>{arr[i].bu=e.target.value;onChange&&onChange();});
+      const del=row.querySelector(".a-del"); if(del)del.addEventListener("click",()=>{arr.splice(i,1);renderAssigns(box,arr,onChange);onChange&&onChange();});
+      renderChips(row.querySelector(".a-team"),arr[i].members,onChange);
+    });
+    box.querySelector(".a-add").addEventListener("click",()=>{arr.push({bu:"",members:[]});renderAssigns(box,arr,onChange);onChange&&onChange();});
   }
   function normAll(){
-    projects.forEach(p=>{if(!p.pmo)p.pmo="Chay";if(!p.status){var so=p.statusOverride;if(so==="Approved")so="Project Approved";p.status=(so&&PROJ_STAT.indexOf(so)>=0)?so:"Not started";}if(PROJ_STAT.indexOf(p.status)<0)p.status="Not started";if(!Array.isArray(p.team))p.team=[];if(p.buOwner===undefined)p.buOwner="";});
+    projects.forEach(p=>{if(!p.pmo)p.pmo="Chay";if(!p.status){var so=p.statusOverride;if(so==="Approved")so="Project Approved";p.status=(so&&PROJ_STAT.indexOf(so)>=0)?so:"Not started";}if(PROJ_STAT.indexOf(p.status)<0)p.status="Not started";if(!Array.isArray(p.assigns)){p.assigns=(p.buOwner||(Array.isArray(p.team)&&p.team.length))?[{bu:p.buOwner||"",members:p.team||[]}]:[];}});
     tasks.forEach(t=>{if(!t.pmo)t.pmo=(projById(t.proj)||{}).pmo||"Chay";if(t.status==="Approved")t.status="Task Approved";if(TASK_STAT.indexOf(t.status)<0)t.status="Not started";if(!t.type)t.type="Project";if(!Array.isArray(t.team))t.team=[];if(t.buOwner===undefined)t.buOwner="";});
   }
 
@@ -350,7 +375,7 @@
       <h3>${esc(p.name)}</h3>
       <div class="pi"><b>${pindex(p).toFixed(2)}</b><span>Priority Index</span></div>
       <div class="vbar"><i style="width:${(vscore(p)/5*100).toFixed(0)}%"></i></div>
-      <div class="pmeta"><span class="chip">${esc(p.size)}</span><span>${esc(p.owner)}</span>${(p.team&&p.team.length)?`<span class="team-chip">👥 ${p.team.length}</span>`:""}
+      <div class="pmeta"><span class="chip">${esc(p.size)}</span><span>${esc(p.owner)}</span>${(()=>{const n=(p.assigns||[]).reduce((a,g)=>a+((g.members||[]).length),0);return n?`<span class="team-chip">👥 ${n}</span>`:"";})()}
       <span class="prog"><i style="width:${projDone(p)*100}%"></i></span><span style="font-family:var(--mono)">${Math.round(projDone(p)*100)}%</span></div>`;
     b.querySelector(".pedit").addEventListener("click",ev=>{ev.stopPropagation();openProjectDetail(p.id);});
     const flt=()=>{filterProj=filterProj===p.id?null:p.id;render();};
@@ -537,11 +562,10 @@
       <div class="dw-body">
         <div class="fld f-title"><label>ชื่อโปรเจกต์</label><input id="p-name" value="${esc(p.name)}"></div>
         <div class="fld"><label>PMO ผู้ดูแล</label><select id="p-pmo"><option value=""${p.pmo?"":" selected"}>— ระบุภายหลัง —</option>${opt(PMO_LIST,p.pmo||"")}</select></div>
-        <div class="fld"><label>Owner (คนทำ)</label><input list="ownerlist" id="p-owner" value="${esc(p.owner)}" placeholder="พิมพ์ชื่อ / เลือกจากที่มี"></div>
-        <div class="grid2"><div class="fld"><label>Impact scope</label><select id="p-scope">${opt(["Corporate","BU"],p.scope||"Corporate")}</select></div>
+        <div class="fld"><label>Impact scope</label><select id="p-scope">${opt(["Corporate","BU"],p.scope||"Corporate")}</select></div>
+        <div class="grid2"><div class="fld"><label>Owner (คนทำ)</label><input list="ownerlist" id="p-owner" value="${esc(p.owner)}" placeholder="พิมพ์ชื่อ / เลือก"></div>
           <div class="fld"><label>BU/ฝ่าย (ที่มาขอ)</label><select id="p-bu">${opt(BUS,p.bu||BUS[0])}</select></div></div>
-        <div class="fld"><label>BU Assign (เจ้าของงาน)</label><select id="p-buOwner"><option value=""${p.buOwner?"":" selected"}>— ไม่ระบุ —</option>${opt(BUS,p.buOwner||"")}</select></div>
-        <div class="fld"><label>ทีมร่วม (คนที่ทำด้วย)</label><div id="p-team" class="chip-box"></div></div>
+        <div class="fld"><label>เจ้าของงานร่วม (BU Assign + ทีมร่วม) — เพิ่มได้หลายคน</label><div id="p-assigns"></div></div>
         <div class="grid2"><div class="fld"><label>Start date</label><input type="date" id="p-start" value="${esc(p.start||"")}"></div>
           <div class="fld"><label>End date</label><input type="date" id="p-end" value="${esc(p.end||"")}"></div></div>
         <div class="grid2"><div class="fld"><label>เวลาที่ใช้ (auto)</label><input id="p-spent" value="${dayspan(p.start,p.end)} วัน" readonly></div>
@@ -556,9 +580,9 @@
     drawer.querySelector("#dw-close").addEventListener("click",closeDetail);
     const bindP=(sel,fn)=>drawer.querySelector(sel).addEventListener("input",e=>{fn(e.target.value);drawer.querySelector("#p-pi").textContent=p.id+" · PI "+pindex(p).toFixed(2);render();});
     bindP("#p-name",v=>p.name=v);bindP("#p-pmo",v=>p.pmo=v);bindP("#p-owner",v=>p.owner=v);
-    bindP("#p-scope",v=>p.scope=v);bindP("#p-bu",v=>p.bu=v);bindP("#p-buOwner",v=>p.buOwner=v);bindP("#p-size",v=>p.size=v);
+    bindP("#p-scope",v=>p.scope=v);bindP("#p-bu",v=>p.bu=v);bindP("#p-size",v=>p.size=v);
     ["S","V","K","R","U"].forEach(k=>bindP("#p-"+k,v=>p[k]=+v));
-    if(!Array.isArray(p.team))p.team=[];renderChips(drawer.querySelector("#p-team"),p.team,render);
+    if(!Array.isArray(p.assigns))p.assigns=[];renderAssigns(drawer.querySelector("#p-assigns"),p.assigns,render);
     const pupd=()=>{const d=dayspan(p.start,p.end);const sp=drawer.querySelector("#p-spent");if(sp)sp.value=d+" วัน";if(d){p.size=sizeFromDays(d);const sz=drawer.querySelector("#p-size");if(sz)sz.value=p.size;}drawer.querySelector("#p-pi").textContent=p.id+" · PI "+pindex(p).toFixed(2);render();};
     drawer.querySelector("#p-start").addEventListener("input",e=>{p.start=e.target.value;pupd();});
     drawer.querySelector("#p-end").addEventListener("input",e=>{p.end=e.target.value;pupd();});
@@ -637,16 +661,15 @@
     renderChips($("#m-team"),team);
   }
   $("#addProj").addEventListener("click",()=>{
-    const team=[];
+    const assigns=[];
     const svku=["S","V","K","R","U"].map(k=>`<div class="fld"><label>${k}</label><select id="m-${k}">${opt(["1","2","3","4","5"],"3")}</select></div>`).join("");
     openModal("เพิ่ม Project ใหม่",`
       <div class="fld"><label>ชื่อโปรเจกต์</label><input id="m-name" placeholder="เช่น Fraud Detection Model"></div>
       <div class="fld"><label>PMO ผู้ดูแล (เว้นว่างได้)</label><select id="m-pmo"><option value="" selected>— ระบุภายหลัง —</option>${PMO_LIST.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("")}</select></div>
-      <div class="fld"><label>Owner (คนทำ)</label><input list="ownerlist" id="m-owner" placeholder="พิมพ์ชื่อ / เลือก"></div>
-      <div class="grid2"><div class="fld"><label>Impact scope</label><select id="m-scope">${opt(["Corporate","BU"],"Corporate")}</select></div>
+      <div class="fld"><label>Impact scope</label><select id="m-scope">${opt(["Corporate","BU"],"Corporate")}</select></div>
+      <div class="grid2"><div class="fld"><label>Owner (คนทำ)</label><input list="ownerlist" id="m-owner" placeholder="พิมพ์ชื่อ / เลือก"></div>
         <div class="fld"><label>BU/ฝ่าย (ที่มาขอ)</label><select id="m-bu">${opt(BUS,BUS[0])}</select></div></div>
-      <div class="fld"><label>BU Assign (เจ้าของงาน)</label><select id="m-buOwner"><option value="" selected>— ไม่ระบุ —</option>${opt(BUS,"")}</select></div>
-      <div class="fld"><label>ทีมร่วม (คนที่ทำด้วย)</label><div id="m-team" class="chip-box"></div></div>
+      <div class="fld"><label>เจ้าของงานร่วม (BU Assign + ทีมร่วม) — เพิ่มได้หลายคน</label><div id="m-assigns"></div></div>
       <div class="fld"><label>สถานะโปรเจกต์</label><select id="m-status">${opt(PROJ_STAT,"Not started")}</select></div>
       <div class="grid2"><div class="fld"><label>Start date</label><input type="date" id="m-start"></div>
         <div class="fld"><label>End date</label><input type="date" id="m-end"></div></div>
@@ -656,9 +679,9 @@
         const base=((name.match(/[A-Za-z]/g)||[]).join("").slice(0,3).toUpperCase())||"PRJ";
         const id=uniqId(base,x=>projById(x));
         const scope=$("#m-scope").value; const st=$("#m-start").value,en=$("#m-end").value; const d=dayspan(st,en);
-        projects.push({id,name,pmo:$("#m-pmo").value,owner:$("#m-owner").value||OWNERS[0],scope,bu:scope==="BU"?$("#m-bu").value:"",buOwner:$("#m-buOwner").value,team:[...team],status:$("#m-status").value,start:st,end:en,size:d?sizeFromDays(d):"M",S:+$("#m-S").value,V:+$("#m-V").value,K:+$("#m-K").value,R:+$("#m-R").value,U:+$("#m-U").value});
+        projects.push({id,name,pmo:$("#m-pmo").value,owner:$("#m-owner").value||OWNERS[0],scope,bu:scope==="BU"?$("#m-bu").value:"",assigns:assigns.filter(g=>g.bu||(g.members&&g.members.length)).map(g=>({bu:g.bu,members:[...(g.members||[])]})),status:$("#m-status").value,start:st,end:en,size:d?sizeFromDays(d):"M",S:+$("#m-S").value,V:+$("#m-V").value,K:+$("#m-K").value,R:+$("#m-R").value,U:+$("#m-U").value});
         openProjectDetail(id);});
-    renderChips($("#m-team"),team);
+    renderAssigns($("#m-assigns"),assigns,null);
   });
 
   function dl(blob,name){const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);}
@@ -668,7 +691,7 @@
     const head=["Project","ชื่อโปรเจกต์","PMO","Scope","BU (ที่มาขอ)","BU Assign","Project Team","Project PI","Project Status","Task ID","Sub-task","Owner assign","Task PMO","Task BU","Task BU Assign","Task Team","Type","Priority","Status","Start","End","Days","Comment"];
     let h='<table border="1"><thead><tr>'+head.map(x=>`<th>${cx(x)}</th>`).join("")+'</tr></thead><tbody>';
     tasks.forEach(t=>{const p=projById(t.proj)||{};
-      const row=[t.proj,p.name,p.pmo,p.scope,p.bu,p.buOwner,(p.team||[]).join(", "),p.S!==undefined?pindex(p).toFixed(2):"",projStatus(t.proj),t.id,t.title,t.owner,t.pmo,t.bu,t.buOwner,(t.team||[]).join(", "),t.type,t.prio,t.status,t.start,t.end,spentOf(t),t.comment];
+      const row=[t.proj,p.name,p.pmo,p.scope,p.bu,(p.assigns||[]).map(g=>g.bu).filter(Boolean).join(", "),(p.assigns||[]).map(g=>g.bu+((g.members&&g.members.length)?" ("+g.members.join("/")+")":"")).join("; "),p.S!==undefined?pindex(p).toFixed(2):"",projStatus(t.proj),t.id,t.title,t.owner,t.pmo,t.bu,t.buOwner,(t.team||[]).join(", "),t.type,t.prio,t.status,t.start,t.end,spentOf(t),t.comment];
       h+='<tr>'+row.map(c=>`<td>${cx(c)}</td>`).join("")+'</tr>';});
     h+='</tbody></table>';
     dl(new Blob(['﻿<html><head><meta charset="utf-8"></head><body>'+h+'</body></html>'],{type:"application/vnd.ms-excel"}),"prio-board.xls");
