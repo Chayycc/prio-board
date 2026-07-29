@@ -81,6 +81,13 @@
   .scope-chip.corp{color:var(--accent-ink);background:var(--accent-soft)}
   .scope-chip.bu{color:var(--copper);background:var(--copper-soft)}
   .pmo-chip{font-size:.6rem;font-weight:800;padding:2px 7px;border-radius:99px;white-space:nowrap;color:var(--ink);background:var(--surface-2);border:1px solid var(--line)}
+  .stat-chip{display:inline-flex;align-items:center;gap:4px;font-size:.6rem;font-weight:800;padding:2px 7px;border-radius:99px;white-space:nowrap;color:var(--ink);background:var(--surface-2);border:1px solid var(--line)}
+  .stat-chip .pd{width:6px;height:6px;border-radius:99px}
+  .team-chip{font-size:.6rem;font-weight:800;padding:2px 7px;border-radius:99px;white-space:nowrap;color:var(--accent-ink);background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 25%,transparent)}
+  .chip-box{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+  .chip2{display:inline-flex;align-items:center;gap:5px;font-size:.8rem;font-weight:600;background:var(--accent-soft);color:var(--accent-ink);border:1px solid var(--accent);border-radius:99px;padding:3px 6px 3px 11px}
+  .chip2 .cx{border:0;background:transparent;color:var(--accent-ink);cursor:pointer;font-size:.72rem;padding:0}
+  .chip-add{font:inherit;font-size:.8rem;border:1px dashed var(--line);background:var(--surface-2);color:var(--ink);border-radius:8px;padding:6px 8px;cursor:pointer}
   .pcard{position:relative;text-align:left;font:inherit;cursor:grab;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:15px 16px;box-shadow:var(--shadow);transition:transform .15s,border-color .15s;overflow:hidden}
   .pcard.dragging,.pmini.dragging{opacity:.45}
   .pcard:hover{transform:translateY(-2px)}
@@ -284,12 +291,7 @@
   function sizeFromDays(d){if(!d)return null;if(d<=2)return "XS";if(d<=7)return "S";if(d<=14)return "M";if(d<=31)return "L";return "XL";}
   const projTasks=id=>tasks.filter(t=>t.proj===id);
   function projDone(p){const ts=projTasks(p.id);if(!ts.length)return 0;return ts.filter(t=>t.status==="Done").length/ts.length;}
-  function projStatus(id){const pp=projById(id);if(pp&&pp.statusOverride)return pp.statusOverride;
-    const ts=projTasks(id);if(!ts.length)return "Not started";const st=ts.map(t=>t.status);
-    if(st.every(s=>s==="Done"))return "Done";
-    if(st.every(s=>s==="Done"||s==="Task Approved"))return "Project Approved";
-    if(st.some(s=>s==="In progress"||s==="Review"||s==="UAT"||s==="Task Approved"))return "In progress";
-    return "Not started";}
+  function projStatus(id){return (projById(id)||{}).status||"Not started";}
 
   let view="prio", filterProj=null, filterBU="", selId=null, locked=false;
   try{locked=localStorage.getItem("em_prio_lock")==="1";}catch(e){}
@@ -300,9 +302,18 @@
   const opt=(list,cur)=>list.map(v=>`<option value="${esc(v)}"${String(v)===String(cur)?" selected":""}>${esc(v)}</option>`).join("");
 
   function refreshOwners(){const set=new Set(OWNERS);projects.forEach(p=>p.owner&&set.add(p.owner));tasks.forEach(t=>t.owner&&set.add(t.owner));$("#ownerlist").innerHTML=[...set].map(o=>`<option value="${esc(o)}"></option>`).join("");}
+  function allPeople(){const set=new Set(OWNERS);projects.forEach(p=>{p.owner&&set.add(p.owner);(p.team||[]).forEach(x=>set.add(x));});tasks.forEach(t=>{t.owner&&set.add(t.owner);(t.team||[]).forEach(x=>set.add(x));});return [...set];}
+  function renderChips(box,arr,onChange){
+    if(!box)return;
+    const avail=allPeople().filter(o=>arr.indexOf(o)<0);
+    box.innerHTML=arr.map((n,i)=>`<span class="chip2">${esc(n)}<button class="cx" data-i="${i}" type="button" aria-label="ลบ">✕</button></span>`).join("")
+      +`<select class="chip-add"><option value="">＋ เพิ่มคน</option>${avail.map(o=>`<option value="${esc(o)}">${esc(o)}</option>`).join("")}</select>`;
+    box.querySelectorAll(".cx").forEach(b=>b.addEventListener("click",e=>{arr.splice(+e.currentTarget.dataset.i,1);renderChips(box,arr,onChange);onChange&&onChange();}));
+    box.querySelector(".chip-add").addEventListener("change",e=>{const v=e.target.value;if(v){arr.push(v);renderChips(box,arr,onChange);onChange&&onChange();}});
+  }
   function normAll(){
-    projects.forEach(p=>{if(!p.pmo)p.pmo="Chay";if(p.statusOverride==="Approved")p.statusOverride="Project Approved";if(p.statusOverride&&PROJ_STAT.indexOf(p.statusOverride)<0&&p.statusOverride!=="")p.statusOverride="";});
-    tasks.forEach(t=>{if(!t.pmo)t.pmo=(projById(t.proj)||{}).pmo||"Chay";if(t.status==="Approved")t.status="Task Approved";if(TASK_STAT.indexOf(t.status)<0)t.status="Not started";if(!t.type)t.type="Project";});
+    projects.forEach(p=>{if(!p.pmo)p.pmo="Chay";if(!p.status){var so=p.statusOverride;if(so==="Approved")so="Project Approved";p.status=(so&&PROJ_STAT.indexOf(so)>=0)?so:"Not started";}if(PROJ_STAT.indexOf(p.status)<0)p.status="Not started";if(!Array.isArray(p.team))p.team=[];if(p.buOwner===undefined)p.buOwner="";});
+    tasks.forEach(t=>{if(!t.pmo)t.pmo=(projById(t.proj)||{}).pmo||"Chay";if(t.status==="Approved")t.status="Task Approved";if(TASK_STAT.indexOf(t.status)<0)t.status="Not started";if(!t.type)t.type="Project";if(!Array.isArray(t.team))t.team=[];if(t.buOwner===undefined)t.buOwner="";});
   }
 
   let savedTimer=null, sbOK=false, lastSeen=null, pushTimer=null, skipPush=false;
@@ -334,11 +345,12 @@
     b.innerHTML=`<button class="pedit" aria-label="แก้ไข">✎</button>
       <div class="prow"><span class="rank">#${i+1}</span>${scopeChip}
       <span class="pmo-chip">PMO ${esc(p.pmo||"—")}</span>
+      <span class="stat-chip"><span class="pd" style="background:var(${statColor(projStatus(p.id))})"></span>${esc(projStatus(p.id))}</span>
       <span class="pf" style="border-color:${pcolor(p.id)};color:${pcolor(p.id)}">${esc(p.id)}</span></div>
       <h3>${esc(p.name)}</h3>
       <div class="pi"><b>${pindex(p).toFixed(2)}</b><span>Priority Index</span></div>
       <div class="vbar"><i style="width:${(vscore(p)/5*100).toFixed(0)}%"></i></div>
-      <div class="pmeta"><span class="chip">${esc(p.size)}</span><span>${esc(p.owner)}</span>
+      <div class="pmeta"><span class="chip">${esc(p.size)}</span><span>${esc(p.owner)}</span>${(p.team&&p.team.length)?`<span class="team-chip">👥 ${p.team.length}</span>`:""}
       <span class="prog"><i style="width:${projDone(p)*100}%"></i></span><span style="font-family:var(--mono)">${Math.round(projDone(p)*100)}%</span></div>`;
     b.querySelector(".pedit").addEventListener("click",ev=>{ev.stopPropagation();openProjectDetail(p.id);});
     const flt=()=>{filterProj=filterProj===p.id?null:p.id;render();};
@@ -394,7 +406,7 @@
       c.appendChild(stack);
       c.addEventListener("dragover",e=>{e.preventDefault();c.classList.add("drop");});
       c.addEventListener("dragleave",()=>c.classList.remove("drop"));
-      c.addEventListener("drop",e=>{e.preventDefault();c.classList.remove("drop");const id=e.dataTransfer.getData("text/plain");if(!id.startsWith("proj:"))return;const p=projById(id.slice(5));if(p){p.statusOverride=k;render();}});
+      c.addEventListener("drop",e=>{e.preventDefault();c.classList.remove("drop");const id=e.dataTransfer.getData("text/plain");if(!id.startsWith("proj:"))return;const p=projById(id.slice(5));if(p){p.status=k;render();}});
       board.appendChild(c);
     });
   }
@@ -527,12 +539,14 @@
         <div class="fld"><label>PMO ผู้ดูแล</label><select id="p-pmo"><option value=""${p.pmo?"":" selected"}>— ระบุภายหลัง —</option>${opt(PMO_LIST,p.pmo||"")}</select></div>
         <div class="fld"><label>Owner (คนทำ)</label><input list="ownerlist" id="p-owner" value="${esc(p.owner)}" placeholder="พิมพ์ชื่อ / เลือกจากที่มี"></div>
         <div class="grid2"><div class="fld"><label>Impact scope</label><select id="p-scope">${opt(["Corporate","BU"],p.scope||"Corporate")}</select></div>
-          <div class="fld"><label>BU</label><select id="p-bu">${opt(BUS,p.bu||BUS[0])}</select></div></div>
+          <div class="fld"><label>BU/ฝ่าย (ที่มาขอ)</label><select id="p-bu">${opt(BUS,p.bu||BUS[0])}</select></div></div>
+        <div class="fld"><label>BU Assign (เจ้าของงาน)</label><select id="p-buOwner"><option value=""${p.buOwner?"":" selected"}>— ไม่ระบุ —</option>${opt(BUS,p.buOwner||"")}</select></div>
+        <div class="fld"><label>ทีมร่วม (คนที่ทำด้วย)</label><div id="p-team" class="chip-box"></div></div>
         <div class="grid2"><div class="fld"><label>Start date</label><input type="date" id="p-start" value="${esc(p.start||"")}"></div>
           <div class="fld"><label>End date</label><input type="date" id="p-end" value="${esc(p.end||"")}"></div></div>
         <div class="grid2"><div class="fld"><label>เวลาที่ใช้ (auto)</label><input id="p-spent" value="${dayspan(p.start,p.end)} วัน" readonly></div>
           <div class="fld"><label>Size (auto จากวันที่)</label><select id="p-size">${opt(["XS","S","M","L","XL"],p.size)}</select></div></div>
-        <div class="fld"><label>สถานะโปรเจกต์ (Auto = รวมจาก sub-task)</label><select id="p-status">${opt(["Auto"].concat(PROJ_STAT),p.statusOverride||"Auto")}</select></div>
+        <div class="fld"><label>สถานะโปรเจกต์ (ตั้งเอง)</label><select id="p-status">${opt(PROJ_STAT,p.status||"Not started")}</select></div>
         <div class="fld"><label>คะแนน Impact (1–5): S=Strategic V=Value K=Risk R=Reach U=Urgency</label><div class="grid5">${svku}</div></div>
         <div class="fld"><div class="subhead"><label>Sub-tasks (แสดงบน Task Priority)</label><span class="pct" id="psubcount"></span></div>
           <div id="psubs"></div>
@@ -542,12 +556,13 @@
     drawer.querySelector("#dw-close").addEventListener("click",closeDetail);
     const bindP=(sel,fn)=>drawer.querySelector(sel).addEventListener("input",e=>{fn(e.target.value);drawer.querySelector("#p-pi").textContent=p.id+" · PI "+pindex(p).toFixed(2);render();});
     bindP("#p-name",v=>p.name=v);bindP("#p-pmo",v=>p.pmo=v);bindP("#p-owner",v=>p.owner=v);
-    bindP("#p-scope",v=>p.scope=v);bindP("#p-bu",v=>p.bu=v);bindP("#p-size",v=>p.size=v);
+    bindP("#p-scope",v=>p.scope=v);bindP("#p-bu",v=>p.bu=v);bindP("#p-buOwner",v=>p.buOwner=v);bindP("#p-size",v=>p.size=v);
     ["S","V","K","R","U"].forEach(k=>bindP("#p-"+k,v=>p[k]=+v));
+    if(!Array.isArray(p.team))p.team=[];renderChips(drawer.querySelector("#p-team"),p.team,render);
     const pupd=()=>{const d=dayspan(p.start,p.end);const sp=drawer.querySelector("#p-spent");if(sp)sp.value=d+" วัน";if(d){p.size=sizeFromDays(d);const sz=drawer.querySelector("#p-size");if(sz)sz.value=p.size;}drawer.querySelector("#p-pi").textContent=p.id+" · PI "+pindex(p).toFixed(2);render();};
     drawer.querySelector("#p-start").addEventListener("input",e=>{p.start=e.target.value;pupd();});
     drawer.querySelector("#p-end").addEventListener("input",e=>{p.end=e.target.value;pupd();});
-    drawer.querySelector("#p-status").addEventListener("input",e=>{p.statusOverride=e.target.value==="Auto"?"":e.target.value;render();});
+    drawer.querySelector("#p-status").addEventListener("input",e=>{p.status=e.target.value;render();});
     drawer.querySelector("#p-addsub").addEventListener("click",()=>openAddSub(p));
     drawer.querySelector("#p-del").addEventListener("click",()=>{if(confirm("ลบโปรเจกต์ "+p.id+" และ sub-task ทั้งหมด?")){tasks=tasks.filter(t=>t.proj!==p.id);projects=projects.filter(x=>x.id!==p.id);filterProj=null;closeDetail();}});
     renderProjSubs(p);
@@ -564,7 +579,9 @@
           <div class="fld"><label>Type</label><select id="f-type">${opt(TYPES,t.type)}</select></div></div>
         <div class="grid2"><div class="fld"><label>Owner assign</label><input list="ownerlist" id="f-owner" value="${esc(t.owner)}" placeholder="พิมพ์ชื่อ / เลือก"></div>
           <div class="fld"><label>PMO</label><select id="f-pmo"><option value=""${t.pmo?"":" selected"}>— ยังไม่เลือก —</option>${opt(PMO_LIST,t.pmo||"")}</select></div></div>
-        <div class="fld"><label>BU / ฝ่าย</label><select id="f-bu">${opt(BUS,t.bu)}</select></div>
+        <div class="grid2"><div class="fld"><label>BU/ฝ่าย (ที่มาขอ)</label><select id="f-bu">${opt(BUS,t.bu)}</select></div>
+          <div class="fld"><label>BU Assign (เจ้าของงาน)</label><select id="f-buOwner"><option value=""${t.buOwner?"":" selected"}>— ไม่ระบุ —</option>${opt(BUS,t.buOwner||"")}</select></div></div>
+        <div class="fld"><label>ทีมร่วม (คนที่ทำด้วย)</label><div id="f-team" class="chip-box"></div></div>
         <div class="grid2"><div class="fld"><label>Status</label><select id="f-status">${opt(TASK_STAT,t.status)}</select></div>
           <div class="fld"><label>Priority</label><select id="f-prio">${opt(PRIO.map(x=>x.k),t.prio)}</select></div></div>
         <div class="grid2"><div class="fld"><label>Start date</label><input type="date" id="f-start" value="${esc(t.start)}"></div>
@@ -577,7 +594,8 @@
     drawer.querySelector("#dw-close").addEventListener("click",closeDetail);
     const bind=(sel,fn)=>drawer.querySelector(sel).addEventListener("input",e=>{fn(e.target.value);render();});
     bind("#f-title",v=>t.title=v);bind("#f-proj",v=>t.proj=v);bind("#f-type",v=>t.type=v);bind("#f-owner",v=>t.owner=v);bind("#f-pmo",v=>t.pmo=v);bind("#f-bu",v=>t.bu=v);
-    bind("#f-status",v=>t.status=v);bind("#f-prio",v=>t.prio=v);bind("#f-size",v=>t.size=v);bind("#f-comment",v=>t.comment=v);
+    bind("#f-status",v=>t.status=v);bind("#f-prio",v=>t.prio=v);bind("#f-size",v=>t.size=v);bind("#f-comment",v=>t.comment=v);bind("#f-buOwner",v=>t.buOwner=v);
+    if(!Array.isArray(t.team))t.team=[];renderChips(drawer.querySelector("#f-team"),t.team,render);
     const rs=()=>{const d=dayspan(t.start,t.end);const f=drawer.querySelector("#f-spent");if(f)f.value=d+" วัน";if(d){t.size=sizeFromDays(d);const sz=drawer.querySelector("#f-size");if(sz)sz.value=t.size;}};
     drawer.querySelector("#f-start").addEventListener("input",e=>{t.start=e.target.value;rs();render();});
     drawer.querySelector("#f-end").addEventListener("input",e=>{t.end=e.target.value;rs();render();});
@@ -598,30 +616,38 @@
   function uniqId(base,exists){let id=base||"P",n=1;while(exists(id)){id=(base||"P")+(++n);}return id;}
 
   function openAddSub(p){
+    const team=[];
     openModal("เพิ่ม Sub-task",`
       <div class="fld"><label>ชื่อ sub-task</label><input id="m-title" placeholder="เช่น เตรียมข้อมูล"></div>
       <div class="grid2"><div class="fld"><label>Owner assign</label><input list="ownerlist" id="m-owner" value="${esc(p.owner)}"></div>
         <div class="fld"><label>PMO</label><select id="m-pmo"><option value=""${p.pmo?"":" selected"}>— ยังไม่เลือก —</option>${opt(PMO_LIST,p.pmo||"")}</select></div></div>
-      <div class="grid2"><div class="fld"><label>BU / ฝ่าย</label><select id="m-bu">${opt(BUS,BUS[0])}</select></div>
-        <div class="fld"><label>Type</label><select id="m-type">${opt(TYPES,"Project")}</select></div></div>
-      <div class="grid2"><div class="fld"><label>Priority</label><select id="m-prio">${opt(PRIO.map(x=>x.k),"Med")}</select></div>
-        <div class="fld"><label>Status</label><select id="m-status">${opt(TASK_STAT,"Not started")}</select></div></div>
-      <div class="grid2"><div class="fld"><label>Start date</label><input type="date" id="m-start"></div>
-        <div class="fld"><label>End date</label><input type="date" id="m-end"></div></div>`,
+      <div class="fld"><label>ทีมร่วม (คนที่ทำด้วย)</label><div id="m-team" class="chip-box"></div></div>
+      <div class="grid2"><div class="fld"><label>BU/ฝ่าย (ที่มาขอ)</label><select id="m-bu">${opt(BUS,BUS[0])}</select></div>
+        <div class="fld"><label>BU Assign (เจ้าของงาน)</label><select id="m-buOwner"><option value="" selected>— ไม่ระบุ —</option>${opt(BUS,"")}</select></div></div>
+      <div class="grid2"><div class="fld"><label>Type</label><select id="m-type">${opt(TYPES,"Project")}</select></div>
+        <div class="fld"><label>Priority</label><select id="m-prio">${opt(PRIO.map(x=>x.k),"Med")}</select></div></div>
+      <div class="grid2"><div class="fld"><label>Status</label><select id="m-status">${opt(TASK_STAT,"Not started")}</select></div>
+        <div class="fld"><label>Start date</label><input type="date" id="m-start"></div></div>
+      <div class="fld"><label>End date</label><input type="date" id="m-end"></div>`,
       ()=>{const title=$("#m-title").value.trim();if(!title){$("#m-title").focus();return false;}
         const st=$("#m-start").value,en=$("#m-end").value,d=dayspan(st,en);
-        tasks.push({id:nextTaskId(),proj:p.id,title,type:$("#m-type").value,owner:$("#m-owner").value,pmo:$("#m-pmo").value,bu:$("#m-bu").value,
+        tasks.push({id:nextTaskId(),proj:p.id,title,type:$("#m-type").value,owner:$("#m-owner").value,pmo:$("#m-pmo").value,bu:$("#m-bu").value,buOwner:$("#m-buOwner").value,team:[...team],
           size:d?sizeFromDays(d):"M",prio:$("#m-prio").value,status:$("#m-status").value,start:st,end:en,comment:""});
         renderProjSubs(p);});
+    renderChips($("#m-team"),team);
   }
   $("#addProj").addEventListener("click",()=>{
+    const team=[];
     const svku=["S","V","K","R","U"].map(k=>`<div class="fld"><label>${k}</label><select id="m-${k}">${opt(["1","2","3","4","5"],"3")}</select></div>`).join("");
     openModal("เพิ่ม Project ใหม่",`
       <div class="fld"><label>ชื่อโปรเจกต์</label><input id="m-name" placeholder="เช่น Fraud Detection Model"></div>
       <div class="fld"><label>PMO ผู้ดูแล (เว้นว่างได้)</label><select id="m-pmo"><option value="" selected>— ระบุภายหลัง —</option>${PMO_LIST.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("")}</select></div>
       <div class="fld"><label>Owner (คนทำ)</label><input list="ownerlist" id="m-owner" placeholder="พิมพ์ชื่อ / เลือก"></div>
       <div class="grid2"><div class="fld"><label>Impact scope</label><select id="m-scope">${opt(["Corporate","BU"],"Corporate")}</select></div>
-        <div class="fld"><label>BU</label><select id="m-bu">${opt(BUS,BUS[0])}</select></div></div>
+        <div class="fld"><label>BU/ฝ่าย (ที่มาขอ)</label><select id="m-bu">${opt(BUS,BUS[0])}</select></div></div>
+      <div class="fld"><label>BU Assign (เจ้าของงาน)</label><select id="m-buOwner"><option value="" selected>— ไม่ระบุ —</option>${opt(BUS,"")}</select></div>
+      <div class="fld"><label>ทีมร่วม (คนที่ทำด้วย)</label><div id="m-team" class="chip-box"></div></div>
+      <div class="fld"><label>สถานะโปรเจกต์</label><select id="m-status">${opt(PROJ_STAT,"Not started")}</select></div>
       <div class="grid2"><div class="fld"><label>Start date</label><input type="date" id="m-start"></div>
         <div class="fld"><label>End date</label><input type="date" id="m-end"></div></div>
       <div class="fld"><label>เวลาที่ใช้ (auto จาก start–end)</label><input id="m-spent" value="0 วัน" readonly></div>
@@ -630,18 +656,19 @@
         const base=((name.match(/[A-Za-z]/g)||[]).join("").slice(0,3).toUpperCase())||"PRJ";
         const id=uniqId(base,x=>projById(x));
         const scope=$("#m-scope").value; const st=$("#m-start").value,en=$("#m-end").value; const d=dayspan(st,en);
-        projects.push({id,name,pmo:$("#m-pmo").value,owner:$("#m-owner").value||OWNERS[0],scope,bu:scope==="BU"?$("#m-bu").value:"",statusOverride:"",start:st,end:en,size:d?sizeFromDays(d):"M",S:+$("#m-S").value,V:+$("#m-V").value,K:+$("#m-K").value,R:+$("#m-R").value,U:+$("#m-U").value});
+        projects.push({id,name,pmo:$("#m-pmo").value,owner:$("#m-owner").value||OWNERS[0],scope,bu:scope==="BU"?$("#m-bu").value:"",buOwner:$("#m-buOwner").value,team:[...team],status:$("#m-status").value,start:st,end:en,size:d?sizeFromDays(d):"M",S:+$("#m-S").value,V:+$("#m-V").value,K:+$("#m-K").value,R:+$("#m-R").value,U:+$("#m-U").value});
         openProjectDetail(id);});
+    renderChips($("#m-team"),team);
   });
 
   function dl(blob,name){const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);}
   function exportJSON(){dl(new Blob([JSON.stringify({projects,tasks},null,2)],{type:"application/json"}),"prio-board-backup.json");}
   function exportExcel(){
     const cx=s=>String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-    const head=["Project","ชื่อโปรเจกต์","PMO","Scope","BU (project)","Project PI","Project Status","Task ID","Sub-task","Owner assign","Task PMO","Task BU","Type","Priority","Status","Start","End","Days","Comment"];
+    const head=["Project","ชื่อโปรเจกต์","PMO","Scope","BU (ที่มาขอ)","BU Assign","Project Team","Project PI","Project Status","Task ID","Sub-task","Owner assign","Task PMO","Task BU","Task BU Assign","Task Team","Type","Priority","Status","Start","End","Days","Comment"];
     let h='<table border="1"><thead><tr>'+head.map(x=>`<th>${cx(x)}</th>`).join("")+'</tr></thead><tbody>';
     tasks.forEach(t=>{const p=projById(t.proj)||{};
-      const row=[t.proj,p.name,p.pmo,p.scope,p.bu,p.S!==undefined?pindex(p).toFixed(2):"",projStatus(t.proj),t.id,t.title,t.owner,t.pmo,t.bu,t.type,t.prio,t.status,t.start,t.end,spentOf(t),t.comment];
+      const row=[t.proj,p.name,p.pmo,p.scope,p.bu,p.buOwner,(p.team||[]).join(", "),p.S!==undefined?pindex(p).toFixed(2):"",projStatus(t.proj),t.id,t.title,t.owner,t.pmo,t.bu,t.buOwner,(t.team||[]).join(", "),t.type,t.prio,t.status,t.start,t.end,spentOf(t),t.comment];
       h+='<tr>'+row.map(c=>`<td>${cx(c)}</td>`).join("")+'</tr>';});
     h+='</tbody></table>';
     dl(new Blob(['﻿<html><head><meta charset="utf-8"></head><body>'+h+'</body></html>'],{type:"application/vnd.ms-excel"}),"prio-board.xls");
