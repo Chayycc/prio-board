@@ -338,7 +338,7 @@
   }
   function normAll(){
     projects.forEach(p=>{if(!p.pmo)p.pmo="Chay";if(!p.status){var so=p.statusOverride;if(so==="Approved")so="Project Approved";p.status=(so&&PROJ_STAT.indexOf(so)>=0)?so:"Not started";}if(PROJ_STAT.indexOf(p.status)<0)p.status="Not started";if(!Array.isArray(p.assigns)){p.assigns=(p.buOwner||(Array.isArray(p.team)&&p.team.length))?[{bu:p.buOwner||"",members:p.team||[]}]:[];}});
-    tasks.forEach(t=>{if(!t.pmo)t.pmo=(projById(t.proj)||{}).pmo||"Chay";if(t.status==="Approved")t.status="Task Approved";if(TASK_STAT.indexOf(t.status)<0)t.status="Not started";if(!t.type)t.type="Project";if(!Array.isArray(t.team))t.team=[];if(t.buOwner===undefined)t.buOwner="";});
+    tasks.forEach(t=>{if(!t.pmo)t.pmo=(projById(t.proj)||{}).pmo||"Chay";if(t.status==="Approved")t.status="Task Approved";if(TASK_STAT.indexOf(t.status)<0)t.status="Not started";if(!t.type)t.type="Project";if(!Array.isArray(t.assigns)){t.assigns=(t.buOwner||(Array.isArray(t.team)&&t.team.length))?[{bu:t.buOwner||"",members:t.team||[]}]:[];}});
   }
 
   let savedTimer=null, sbOK=false, lastSeen=null, pushTimer=null, skipPush=false;
@@ -603,9 +603,8 @@
           <div class="fld"><label>Type</label><select id="f-type">${opt(TYPES,t.type)}</select></div></div>
         <div class="grid2"><div class="fld"><label>Owner assign</label><input list="ownerlist" id="f-owner" value="${esc(t.owner)}" placeholder="พิมพ์ชื่อ / เลือก"></div>
           <div class="fld"><label>PMO</label><select id="f-pmo"><option value=""${t.pmo?"":" selected"}>— ยังไม่เลือก —</option>${opt(PMO_LIST,t.pmo||"")}</select></div></div>
-        <div class="grid2"><div class="fld"><label>BU/ฝ่าย (ที่มาขอ)</label><select id="f-bu">${opt(BUS,t.bu)}</select></div>
-          <div class="fld"><label>BU Assign (เจ้าของงาน)</label><select id="f-buOwner"><option value=""${t.buOwner?"":" selected"}>— ไม่ระบุ —</option>${opt(BUS,t.buOwner||"")}</select></div></div>
-        <div class="fld"><label>ทีมร่วม (คนที่ทำด้วย)</label><div id="f-team" class="chip-box"></div></div>
+        <div class="fld"><label>BU/ฝ่าย (ที่มาขอ)</label><select id="f-bu">${opt(BUS,t.bu)}</select></div>
+        <div class="fld"><label>เจ้าของงานร่วม (ทีมร่วม + BU Assign) — เพิ่มได้หลายคน</label><div id="f-assigns"></div></div>
         <div class="grid2"><div class="fld"><label>Status</label><select id="f-status">${opt(TASK_STAT,t.status)}</select></div>
           <div class="fld"><label>Priority</label><select id="f-prio">${opt(PRIO.map(x=>x.k),t.prio)}</select></div></div>
         <div class="grid2"><div class="fld"><label>Start date</label><input type="date" id="f-start" value="${esc(t.start)}"></div>
@@ -618,8 +617,8 @@
     drawer.querySelector("#dw-close").addEventListener("click",closeDetail);
     const bind=(sel,fn)=>drawer.querySelector(sel).addEventListener("input",e=>{fn(e.target.value);render();});
     bind("#f-title",v=>t.title=v);bind("#f-proj",v=>t.proj=v);bind("#f-type",v=>t.type=v);bind("#f-owner",v=>t.owner=v);bind("#f-pmo",v=>t.pmo=v);bind("#f-bu",v=>t.bu=v);
-    bind("#f-status",v=>t.status=v);bind("#f-prio",v=>t.prio=v);bind("#f-size",v=>t.size=v);bind("#f-comment",v=>t.comment=v);bind("#f-buOwner",v=>t.buOwner=v);
-    if(!Array.isArray(t.team))t.team=[];renderChips(drawer.querySelector("#f-team"),t.team,render);
+    bind("#f-status",v=>t.status=v);bind("#f-prio",v=>t.prio=v);bind("#f-size",v=>t.size=v);bind("#f-comment",v=>t.comment=v);
+    if(!Array.isArray(t.assigns))t.assigns=[];renderAssigns(drawer.querySelector("#f-assigns"),t.assigns,render);
     const rs=()=>{const d=dayspan(t.start,t.end);const f=drawer.querySelector("#f-spent");if(f)f.value=d+" วัน";if(d){t.size=sizeFromDays(d);const sz=drawer.querySelector("#f-size");if(sz)sz.value=t.size;}};
     drawer.querySelector("#f-start").addEventListener("input",e=>{t.start=e.target.value;rs();render();});
     drawer.querySelector("#f-end").addEventListener("input",e=>{t.end=e.target.value;rs();render();});
@@ -640,25 +639,24 @@
   function uniqId(base,exists){let id=base||"P",n=1;while(exists(id)){id=(base||"P")+(++n);}return id;}
 
   function openAddSub(p){
-    const team=[];
+    const assigns=[];
     openModal("เพิ่ม Sub-task",`
       <div class="fld"><label>ชื่อ sub-task</label><input id="m-title" placeholder="เช่น เตรียมข้อมูล"></div>
+      <div class="grid2"><div class="fld"><label>PMO</label><select id="m-pmo"><option value=""${p.pmo?"":" selected"}>— ยังไม่เลือก —</option>${opt(PMO_LIST,p.pmo||"")}</select></div>
+        <div class="fld"><label>Type</label><select id="m-type">${opt(TYPES,"Project")}</select></div></div>
       <div class="grid2"><div class="fld"><label>Owner assign</label><input list="ownerlist" id="m-owner" value="${esc(p.owner)}"></div>
-        <div class="fld"><label>PMO</label><select id="m-pmo"><option value=""${p.pmo?"":" selected"}>— ยังไม่เลือก —</option>${opt(PMO_LIST,p.pmo||"")}</select></div></div>
-      <div class="fld"><label>ทีมร่วม (คนที่ทำด้วย)</label><div id="m-team" class="chip-box"></div></div>
-      <div class="grid2"><div class="fld"><label>BU/ฝ่าย (ที่มาขอ)</label><select id="m-bu">${opt(BUS,BUS[0])}</select></div>
-        <div class="fld"><label>BU Assign (เจ้าของงาน)</label><select id="m-buOwner"><option value="" selected>— ไม่ระบุ —</option>${opt(BUS,"")}</select></div></div>
-      <div class="grid2"><div class="fld"><label>Type</label><select id="m-type">${opt(TYPES,"Project")}</select></div>
-        <div class="fld"><label>Priority</label><select id="m-prio">${opt(PRIO.map(x=>x.k),"Med")}</select></div></div>
-      <div class="grid2"><div class="fld"><label>Status</label><select id="m-status">${opt(TASK_STAT,"Not started")}</select></div>
-        <div class="fld"><label>Start date</label><input type="date" id="m-start"></div></div>
-      <div class="fld"><label>End date</label><input type="date" id="m-end"></div>`,
+        <div class="fld"><label>BU/ฝ่าย (ที่มาขอ)</label><select id="m-bu">${opt(BUS,BUS[0])}</select></div></div>
+      <div class="fld"><label>เจ้าของงานร่วม (ทีมร่วม + BU Assign) — เพิ่มได้หลายคน</label><div id="m-assigns"></div></div>
+      <div class="grid2"><div class="fld"><label>Priority</label><select id="m-prio">${opt(PRIO.map(x=>x.k),"Med")}</select></div>
+        <div class="fld"><label>Status</label><select id="m-status">${opt(TASK_STAT,"Not started")}</select></div></div>
+      <div class="grid2"><div class="fld"><label>Start date</label><input type="date" id="m-start"></div>
+        <div class="fld"><label>End date</label><input type="date" id="m-end"></div></div>`,
       ()=>{const title=$("#m-title").value.trim();if(!title){$("#m-title").focus();return false;}
         const st=$("#m-start").value,en=$("#m-end").value,d=dayspan(st,en);
-        tasks.push({id:nextTaskId(),proj:p.id,title,type:$("#m-type").value,owner:$("#m-owner").value,pmo:$("#m-pmo").value,bu:$("#m-bu").value,buOwner:$("#m-buOwner").value,team:[...team],
+        tasks.push({id:nextTaskId(),proj:p.id,title,type:$("#m-type").value,owner:$("#m-owner").value,pmo:$("#m-pmo").value,bu:$("#m-bu").value,assigns:assigns.filter(g=>g.bu||(g.members&&g.members.length)).map(g=>({bu:g.bu,members:[...(g.members||[])]})),
           size:d?sizeFromDays(d):"M",prio:$("#m-prio").value,status:$("#m-status").value,start:st,end:en,comment:""});
         renderProjSubs(p);});
-    renderChips($("#m-team"),team);
+    renderAssigns($("#m-assigns"),assigns,null);
   }
   $("#addProj").addEventListener("click",()=>{
     const assigns=[];
@@ -691,7 +689,7 @@
     const head=["Project","ชื่อโปรเจกต์","PMO","Scope","BU (ที่มาขอ)","BU Assign","Project Team","Project PI","Project Status","Task ID","Sub-task","Owner assign","Task PMO","Task BU","Task BU Assign","Task Team","Type","Priority","Status","Start","End","Days","Comment"];
     let h='<table border="1"><thead><tr>'+head.map(x=>`<th>${cx(x)}</th>`).join("")+'</tr></thead><tbody>';
     tasks.forEach(t=>{const p=projById(t.proj)||{};
-      const row=[t.proj,p.name,p.pmo,p.scope,p.bu,(p.assigns||[]).map(g=>g.bu).filter(Boolean).join(", "),(p.assigns||[]).map(g=>g.bu+((g.members&&g.members.length)?" ("+g.members.join("/")+")":"")).join("; "),p.S!==undefined?pindex(p).toFixed(2):"",projStatus(t.proj),t.id,t.title,t.owner,t.pmo,t.bu,t.buOwner,(t.team||[]).join(", "),t.type,t.prio,t.status,t.start,t.end,spentOf(t),t.comment];
+      const row=[t.proj,p.name,p.pmo,p.scope,p.bu,(p.assigns||[]).map(g=>g.bu).filter(Boolean).join(", "),(p.assigns||[]).map(g=>g.bu+((g.members&&g.members.length)?" ("+g.members.join("/")+")":"")).join("; "),p.S!==undefined?pindex(p).toFixed(2):"",projStatus(t.proj),t.id,t.title,t.owner,t.pmo,t.bu,(t.assigns||[]).map(g=>g.bu).filter(Boolean).join(", "),(t.assigns||[]).map(g=>g.bu+((g.members&&g.members.length)?" ("+g.members.join("/")+")":"")).join("; "),t.type,t.prio,t.status,t.start,t.end,spentOf(t),t.comment];
       h+='<tr>'+row.map(c=>`<td>${cx(c)}</td>`).join("")+'</tr>';});
     h+='</tbody></table>';
     dl(new Blob(['﻿<html><head><meta charset="utf-8"></head><body>'+h+'</body></html>'],{type:"application/vnd.ms-excel"}),"prio-board.xls");
