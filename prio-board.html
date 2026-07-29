@@ -218,6 +218,82 @@
   .file-chip{font-size:.6rem;font-weight:800;padding:2px 7px;border-radius:99px;white-space:nowrap;color:var(--accent-ink);background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 25%,transparent)}
   .subtable .flink{color:var(--accent-ink);text-decoration:none;margin-left:6px;font-size:.72rem}
   .subtable .flink:hover{text-decoration:underline}
+  #ownerFilter,#pmoFilter{max-width:150px}
+  /* ── planning view (capacity + gate) ── */
+  .plan{display:flex;flex-direction:column;gap:22px}
+  .plan-sub h3{margin:0 0 3px;font-size:.98rem;font-weight:800}
+  .plan-sub .pnote{margin:0 0 12px;font-size:.8rem;color:var(--ink-soft)}
+  .cap-list{display:flex;flex-direction:column;gap:9px}
+  .cap-row{display:grid;grid-template-columns:120px 1fr auto;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:10px 14px}
+  .cap-row .who{display:flex;align-items:center;gap:8px;font-weight:700;font-size:.84rem;min-width:0}
+  .cap-row .who .av{width:26px;height:26px;border-radius:99px;display:grid;place-items:center;font-size:.7rem;font-weight:800;color:#fff;flex:none}
+  .cap-row .who .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .cap-bw{display:flex;flex-direction:column;gap:4px;min-width:0}
+  .cap-track{position:relative;height:15px;border-radius:8px;background:var(--surface-3);overflow:hidden}
+  .cap-fill{position:absolute;left:0;top:0;bottom:0;border-radius:8px}
+  .cap-fill.ok{background:var(--st-done)} .cap-fill.mid{background:var(--md)} .cap-fill.over{background:var(--hi)}
+  .cap-budget{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--ink);opacity:.5}
+  .cap-detail{display:flex;gap:8px;flex-wrap:wrap;font-family:var(--mono);font-size:.66rem;color:var(--ink-soft)}
+  .cap-detail .o{color:var(--hi);font-weight:700}
+  .cap-wip{display:flex;flex-direction:column;align-items:flex-end;font-family:var(--mono)}
+  .cap-wip .n{font-size:1.05rem;font-weight:800}
+  .cap-wip.bad .n{color:var(--hi)}
+  .cap-wip .l{font-size:.56rem;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-soft)}
+  .wipflag{font-size:.56rem;font-weight:800;color:var(--hi);background:var(--hi-soft);border-radius:99px;padding:1px 6px}
+  .gate-ctl{display:flex;gap:12px;flex-wrap:wrap;align-items:center;background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--copper);border-radius:0 12px 12px 0;padding:11px 15px;margin-bottom:12px}
+  .gate-ctl .t{font-size:.64rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--copper)}
+  .gate-ctl input[type=range]{accent-color:var(--accent);width:150px;vertical-align:middle}
+  .gate-ctl .thv{font-family:var(--mono);font-weight:800;color:var(--accent-ink)}
+  .gate-ctl .note{font-size:.72rem;color:var(--ink-soft)}
+  .gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
+  .gcard{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:13px 14px 12px;overflow:hidden;box-shadow:var(--shadow)}
+  .gcard .gstripe{position:absolute;left:0;top:0;bottom:0;width:4px}
+  .gcard.corp .gstripe{background:var(--accent)} .gcard.bu .gstripe{background:var(--copper)}
+  .gtop{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:7px;padding-left:6px}
+  .gbadge{font-size:.58rem;font-weight:800;padding:2px 8px;border-radius:99px;white-space:nowrap}
+  .gbadge.pass{color:var(--accent-ink);background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent)}
+  .gbadge.fail{color:var(--ink-soft);background:var(--surface-2);border:1px dashed var(--line)}
+  .gcard h4{margin:0 0 8px 6px;font-size:.9rem;font-weight:700;line-height:1.25}
+  .gsc{display:flex;gap:14px;padding-left:6px}
+  .gsc .m b{font-family:var(--mono);font-size:1.3rem;font-weight:800;line-height:.9;font-variant-numeric:tabular-nums}
+  .gsc .m.vs b{color:var(--copper)} .gsc .m.pi b{color:var(--accent-ink)}
+  .gsc .m span{display:block;font-size:.58rem;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-soft);font-weight:600;margin-top:2px}
+  .backlog{margin-top:12px;border:1px dashed var(--line);border-radius:12px;padding:12px 14px;background:color-mix(in srgb,var(--surface-2) 55%,transparent)}
+  .backlog h5{margin:0 0 8px;font-size:.78rem;font-weight:800}
+  .bl-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:7px 0;border-top:1px solid var(--line);font-size:.82rem}
+  .bl-row:first-of-type{border-top:0}
+  .bl-row .bn{font-weight:600;flex:1;min-width:120px}
+  /* ── gantt timeline ── */
+  .gantt{border:1px solid var(--line);border-radius:14px;background:var(--surface);overflow:hidden}
+  .gantt-scroll{overflow-x:auto}
+  .gantt-inner{min-width:800px}
+  .g-head{display:grid;grid-template-columns:var(--gcols);border-bottom:1px solid var(--line);background:var(--surface-2)}
+  .g-head>div{padding:8px 12px;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-soft);white-space:nowrap}
+  .g-th{position:relative;border-left:1px solid var(--line)}
+  .g-tick{position:absolute;top:0;font-family:var(--mono);font-size:.58rem;color:var(--ink-soft);padding:8px 0 0 4px;border-left:1px solid var(--line);height:100%}
+  .g-row{display:grid;grid-template-columns:var(--gcols);border-bottom:1px solid var(--line)}
+  .g-row:last-child{border-bottom:0}
+  .g-row.sub{background:color-mix(in srgb,var(--surface-2) 40%,transparent)}
+  .g-nm{padding:8px 12px;font-size:.8rem;font-weight:600;display:flex;align-items:center;gap:7px;min-width:0}
+  .g-nm.sub{padding-left:24px;font-weight:500;font-size:.76rem;color:var(--ink-soft)}
+  .g-nm .exp{border:0;background:transparent;color:var(--ink-soft);cursor:pointer;font-size:.7rem;font-family:var(--mono);width:13px;flex:none;padding:0}
+  .g-nm .dot{width:8px;height:8px;border-radius:99px;flex:none}
+  .g-nm .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+  .g-nm .nm:hover{color:var(--accent-ink)}
+  .g-st{padding:8px 8px;display:flex;align-items:center}
+  .g-stp{font-size:.58rem;font-weight:800;padding:2px 7px;border-radius:6px;white-space:nowrap}
+  .g-dt{padding:8px 10px;font-family:var(--mono);font-size:.68rem;color:var(--ink-soft);display:flex;align-items:center;white-space:nowrap}
+  .g-dt.over{color:var(--hi);font-weight:700}
+  .g-tr{position:relative;border-left:1px solid var(--line);min-height:36px}
+  .g-gl{position:absolute;top:0;bottom:0;width:1px;background:var(--line);opacity:.5}
+  .g-today{position:absolute;top:0;bottom:0;width:2px;background:var(--hi);z-index:3}
+  .g-today .lb{position:absolute;top:2px;left:3px;font-family:var(--mono);font-size:.52rem;font-weight:700;color:var(--hi);white-space:nowrap}
+  .g-bar{position:absolute;top:8px;height:20px;border-radius:6px;display:flex;align-items:center;gap:5px;padding:0 8px;color:#fff;font-size:.64rem;font-weight:700;white-space:nowrap;overflow:hidden;box-shadow:var(--shadow);z-index:2;cursor:pointer;border:0}
+  .g-bar.done{opacity:.6}
+  .g-bar .bd{width:5px;height:5px;border-radius:99px;background:rgba(255,255,255,.9);flex:none}
+  .g-legend{display:flex;gap:11px;flex-wrap:wrap;padding:9px 14px;border-top:1px solid var(--line);font-size:.66rem;color:var(--ink-soft);align-items:center}
+  .g-legend .lg{display:flex;align-items:center;gap:5px}
+  .g-legend .sw{width:11px;height:11px;border-radius:3px}
   .modal-scrim{position:fixed;inset:0;background:rgba(15,17,21,.42);display:none;align-items:center;justify-content:center;z-index:60;padding:20px}
   .modal-scrim.show{display:flex}
   .modal{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:16px;width:min(460px,96vw);max-height:90vh;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,.34)}
@@ -247,6 +323,7 @@
     <div class="seg" role="group" aria-label="มุมมอง">
       <button id="v-prio" aria-pressed="true">Priority</button>
       <button id="v-stat" aria-pressed="false">Status</button>
+      <button id="v-plan" aria-pressed="false">Planning</button>
       <button id="v-time" aria-pressed="false">Timeline</button>
     </div>
   </header>
@@ -256,6 +333,8 @@
       <span id="impCount" class="count-badge"></span>
       <span class="spacer"></span>
       <select id="buFilter" class="ghost"><option value="">BU: ทั้งหมด</option></select>
+      <select id="ownerFilter" class="ghost"><option value="">Owner: ทั้งหมด</option></select>
+      <select id="pmoFilter" class="ghost"><option value="">PMO: ทั้งหมด</option></select>
       <button class="addbtn" id="addProj">＋ เพิ่ม Project</button></div>
     <div class="impact" id="impact"></div>
   </section>
@@ -315,17 +394,27 @@
   const projTasks=id=>tasks.filter(t=>t.proj===id);
   function projDone(p){const ts=projTasks(p.id);if(!ts.length)return 0;return ts.filter(t=>t.status==="Done").length/ts.length;}
   function projStatus(id){return (projById(id)||{}).status||"Not started";}
+  const PHASES=["Intake","Setup","Execution","Review/UAT","Sign-off","Close"];
+  const PHASE_COLOR={"Intake":"--st-todo","Setup":"--st-prog","Execution":"--st-uat","Review/UAT":"--st-rev","Sign-off":"--st-done","Close":"--lo"};
+  const DAYS_OF={XS:1.5,S:5,M:10,L:20,XL:20}, CAP_BUDGET=12;
+  function phaseOf(t){if(t.phase&&PHASES.indexOf(t.phase)>=0)return t.phase;const m={"Done":"Close","UAT":"Review/UAT","In progress":"Execution","Review":"Review/UAT","Task Approved":"Setup"};return m[t.status]||"Intake";}
+  function dueMeta(o){if(!o||!o.end)return{cls:"none",txt:""};const e=new Date(o.end);if(isNaN(e))return{cls:"none",txt:""};const now=new Date();now.setHours(0,0,0,0);const left=Math.round((e-now)/864e5);const done=o.status==="Done";if(!done&&left<0)return{cls:"over",txt:"🔴 เลย "+(-left)+"ว"};if(!done&&left<=3)return{cls:"soon",txt:"⚠️ "+left+"ว"};return{cls:"ok",txt:left+"ว"};}
 
-  let view="prio", filterProj=null, filterBU="", selId=null, locked=false;
+  let view="prio", filterProj=null, filterBU="", filterOwner="", filterPmo="", selId=null, locked=false, TH=3.0, ganttExp=null;
   try{locked=localStorage.getItem("em_prio_lock")==="1";}catch(e){}
   const projMatchesBU=p=>!filterBU||p.bu===filterBU||projTasks(p.id).some(t=>t.bu===filterBU);
+  const taskHasOwner=(t,o)=>t.owner===o||(t.assigns||[]).some(g=>(g.members||[]).indexOf(o)>=0);
+  const projMatchesOwner=p=>!filterOwner||p.owner===filterOwner||(p.assigns||[]).some(g=>(g.members||[]).indexOf(filterOwner)>=0)||projTasks(p.id).some(t=>taskHasOwner(t,filterOwner));
+  const projMatchesPmo=p=>!filterPmo||p.pmo===filterPmo||projTasks(p.id).some(t=>t.pmo===filterPmo);
+  const projMatches=p=>projMatchesBU(p)&&projMatchesOwner(p)&&projMatchesPmo(p);
+  const taskMatches=t=>{if(filterBU&&t.bu!==filterBU)return false;if(filterOwner&&!taskHasOwner(t,filterOwner))return false;if(filterPmo&&t.pmo!==filterPmo)return false;if(filterProj&&t.proj!==filterProj)return false;return true;};
   const $=s=>document.querySelector(s), el=(t,c)=>{const e=document.createElement(t);if(c)e.className=c;return e;};
   const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
   const fmt=d=>{const x=new Date(d);return isNaN(x)?"—":(x.getDate()+"/"+(x.getMonth()+1));};
   const opt=(list,cur)=>list.map(v=>`<option value="${esc(v)}"${String(v)===String(cur)?" selected":""}>${esc(v)}</option>`).join("");
 
   function refreshOwners(){const set=new Set(OWNERS);projects.forEach(p=>p.owner&&set.add(p.owner));tasks.forEach(t=>t.owner&&set.add(t.owner));$("#ownerlist").innerHTML=[...set].map(o=>`<option value="${esc(o)}"></option>`).join("");}
-  function allPeople(){const set=new Set(OWNERS);projects.forEach(p=>{p.owner&&set.add(p.owner);(p.team||[]).forEach(x=>set.add(x));});tasks.forEach(t=>{t.owner&&set.add(t.owner);(t.team||[]).forEach(x=>set.add(x));});return [...set];}
+  function allPeople(){const set=new Set(OWNERS);const addA=x=>{x.owner&&set.add(x.owner);(x.assigns||[]).forEach(g=>(g.members||[]).forEach(m=>m&&set.add(m)));(x.team||[]).forEach(m=>m&&set.add(m));};projects.forEach(addA);tasks.forEach(addA);return [...set];}
   function renderChips(box,arr,onChange){
     if(!box)return;
     box.innerHTML=arr.map((n,i)=>`<span class="chip2">${esc(n)}<button class="cx" data-i="${i}" type="button" aria-label="ลบ">✕</button></span>`).join("")
@@ -370,7 +459,7 @@
   }
   function normAll(){
     projects.forEach(p=>{if(!p.pmo)p.pmo="Chay";if(!p.status){var so=p.statusOverride;if(so==="Approved")so="Project Approved";p.status=(so&&PROJ_STAT.indexOf(so)>=0)?so:"Not started";}if(PROJ_STAT.indexOf(p.status)<0)p.status="Not started";if(!Array.isArray(p.assigns)){p.assigns=(p.buOwner||(Array.isArray(p.team)&&p.team.length))?[{bu:p.buOwner||"",members:p.team||[]}]:[];}if(!Array.isArray(p.files))p.files=[];});
-    tasks.forEach(t=>{if(!t.pmo)t.pmo=(projById(t.proj)||{}).pmo||"Chay";if(t.status==="Approved")t.status="Task Approved";if(TASK_STAT.indexOf(t.status)<0)t.status="Not started";if(!t.type)t.type="Project";if(!Array.isArray(t.assigns)){t.assigns=(t.buOwner||(Array.isArray(t.team)&&t.team.length))?[{bu:t.buOwner||"",members:t.team||[]}]:[];}if(!Array.isArray(t.files))t.files=[];});
+    tasks.forEach(t=>{if(!t.pmo)t.pmo=(projById(t.proj)||{}).pmo||"Chay";if(t.status==="Approved")t.status="Task Approved";if(TASK_STAT.indexOf(t.status)<0)t.status="Not started";if(!t.type)t.type="Project";if(!Array.isArray(t.assigns)){t.assigns=(t.buOwner||(Array.isArray(t.team)&&t.team.length))?[{bu:t.buOwner||"",members:t.team||[]}]:[];}if(!Array.isArray(t.files))t.files=[];t.phase=phaseOf(t);});
   }
 
   let savedTimer=null, sbOK=false, lastSeen=null, pushTimer=null, skipPush=false;
@@ -405,7 +494,7 @@
       <span class="stat-chip"><span class="pd" style="background:var(${statColor(projStatus(p.id))})"></span>${esc(projStatus(p.id))}</span>
       <span class="pf" style="border-color:${pcolor(p.id)};color:${pcolor(p.id)}">${esc(p.id)}</span></div>
       <h3>${esc(p.name)}</h3>
-      <div class="pi"><b>${pindex(p).toFixed(2)}</b><span>Priority Index</span></div>
+      <div class="pi"><b>${pindex(p).toFixed(2)}</b><span>Priority Index</span><span style="margin-left:auto;align-self:center;font-family:var(--mono);font-size:.72rem;font-weight:700;color:var(--copper);background:var(--copper-soft);border-radius:99px;padding:3px 9px" title="Value Score — ใช้คัดเข้า Gate (≥3.0)">Value ${vscore(p).toFixed(2)}</span></div>
       <div class="vbar"><i style="width:${(vscore(p)/5*100).toFixed(0)}%"></i></div>
       <div class="pmeta"><span class="chip">${esc(p.size)}</span><span>${esc(p.owner)}</span>${(()=>{const n=(p.assigns||[]).reduce((a,g)=>a+((g.members||[]).length),0);return n?`<span class="team-chip">👥 ${n}</span>`:"";})()}${(()=>{const fn=(p.files||[]).length;return fn?`<span class="file-chip">📎 ${fn}</span>`:"";})()}
       <span class="prog"><i style="width:${projDone(p)*100}%"></i></span><span style="font-family:var(--mono)">${Math.round(projDone(p)*100)}%</span></div>`;
@@ -419,9 +508,9 @@
   }
   function renderImpact(){
     const wrap=$("#impact"); wrap.innerHTML="";
-    const base=[...projects].sort((a,b)=>pindex(b)-pindex(a)).filter(projMatchesBU);
+    const base=[...projects].sort((a,b)=>pindex(b)-pindex(a)).filter(projMatches);
     $("#impCount").textContent="Total "+base.length+" projects";
-    if(!base.length){const e=el("div","empty");e.textContent=filterBU?"ไม่มีโปรเจกต์ตรงตัวกรอง":"ยังไม่มีโปรเจกต์ — กด ＋ เพิ่ม Project";wrap.appendChild(e);return;}
+    if(!base.length){const e=el("div","empty");e.textContent=(filterBU||filterOwner||filterPmo)?"ไม่มีโปรเจกต์ตรงตัวกรอง":"ยังไม่มีโปรเจกต์ — กด ＋ เพิ่ม Project";wrap.appendChild(e);return;}
     [{key:"Corporate",label:"🏢 Corporate"},{key:"BU",label:"🏬 BU"}].forEach(g=>{
       const items=base.filter(p=>(p.scope||"Corporate")===g.key);
       const grp=el("div","igroup");
@@ -438,7 +527,7 @@
 
   function renderProjBoard(){
     const board=$("#projboard"); board.innerHTML="";
-    const base=projects.filter(projMatchesBU);
+    const base=projects.filter(projMatches);
     PROJ_STAT.forEach(k=>{
       const items=base.filter(p=>projStatus(p.id)===k).sort((a,b)=>pindex(b)-pindex(a));
       const c=el("div","col");
@@ -513,51 +602,112 @@
     wrap.appendChild(board); main.appendChild(wrap);
   }
 
-  function renderTimeline(list){
+  function renderTimeline(){
     const main=$("#main"); main.innerHTML="";
-    const box=el("div","tl"), inner=el("div","tl-inner");
-    const ds=list.flatMap(t=>[new Date(t.start),new Date(t.end)]).filter(d=>!isNaN(d));
-    if(!ds.length){const e=el("div","empty");e.textContent="ไม่มีงาน (ที่มีวันที่) ในมุมมองนี้";box.appendChild(e);main.appendChild(box);return;}
-    let min=new Date(Math.min(...ds)), max=new Date(Math.max(...ds));
-    const span=Math.max(max-min,864e5);
-    const axis=el("div","tl-axis");
-    for(let d=new Date(min); d<=max; d.setDate(d.getDate()+7)){const tk=el("div","tl-tick");tk.style.left=((d-min)/span*100)+"%";tk.textContent=d.getDate()+"/"+(d.getMonth()+1);axis.appendChild(tk);}
-    inner.appendChild(axis);
-    const pids=[...new Set(list.map(t=>t.proj))];
-    const lanes=pids.map(pid=>{const its=list.filter(t=>t.proj===pid&&!isNaN(new Date(t.start)));const ms=its.map(t=>+new Date(t.start));return {pid,its,min:ms.length?Math.min(...ms):Infinity};}).filter(l=>l.its.length).sort((a,b)=>a.min-b.min);
-    lanes.forEach(l=>{
-      const pj=projById(l.pid)||{name:l.pid};
-      const lane=el("div","tl-lane");
-      lane.innerHTML=`<div class="tl-lname"><span class="dot" style="background:${pcolor(l.pid)}"></span>${esc(l.pid)} · ${esc(pj.name||"")}</div>`;
-      const track=el("div","tl-track"); let vi=0;
-      l.its.sort((a,b)=>+new Date(a.start)-+new Date(b.start)).forEach(t=>{const s=new Date(t.start),e=new Date(t.end);if(isNaN(e)||e<s)return;
-        const bar=el("button","tl-bar");bar.type="button";
-        bar.style.left=((s-min)/span*100)+"%";bar.style.width=Math.max((e-s)/span*100,3)+"%";
-        bar.style.background=cssVal(prioMeta(t.prio).c)||"#888";bar.style.top=(5+vi*30)+"px";vi++;
-        bar.innerHTML=`<span class="bd"></span>${esc(t.id)} · ${esc(t.title)}`;
-        bar.title=`${t.title}\n${fmt(t.start)} → ${fmt(t.end)} · ${t.owner} · ${t.status}`;
-        bar.addEventListener("click",()=>openTaskDetail(t.id));track.appendChild(bar);});
-      track.style.minHeight=(Math.max(vi,1)*30+10)+"px";lane.appendChild(track);inner.appendChild(lane);
+    if(ganttExp===null){ganttExp={};projects.forEach(p=>ganttExp[p.id]=true);}
+    const projs=projects.filter(projMatches);
+    const dates=[];
+    const collect=o=>{const s=new Date(o.start),e=new Date(o.end);if(!isNaN(s))dates.push(s);if(!isNaN(e))dates.push(e);};
+    projs.forEach(p=>{collect(p);projTasks(p.id).filter(taskMatches).forEach(collect);});
+    const box=el("div","gantt");
+    if(!dates.length){const e=el("div","empty");e.style.margin="16px";e.textContent="ไม่มีงานที่มีวันที่ในตัวกรองนี้";box.appendChild(e);main.appendChild(box);return;}
+    let min=new Date(Math.min(...dates)), max=new Date(Math.max(...dates));
+    min=new Date(+min-3*864e5); max=new Date(+max+3*864e5);
+    const span=Math.max(max-min,7*864e5);
+    const pos=d=>{const x=new Date(d);return isNaN(x)?0:(x-min)/span*100;};
+    const gcols="minmax(180px,1.4fr) 88px 62px 62px 3fr";
+    let ticks="",gl="";
+    for(let d=new Date(min); d<=max; d.setDate(d.getDate()+7)){const L=pos(d);ticks+=`<div class="g-tick" style="left:${L}%">${d.getDate()+"/"+(d.getMonth()+1)}</div>`;gl+=`<div class="g-gl" style="left:${L}%"></div>`;}
+    const today=new Date();today.setHours(0,0,0,0);
+    const tline=(today>=min&&today<=max)?`<div class="g-today" style="left:${pos(today)}%"><span class="lb">วันนี้</span></div>`:"";
+    const bar=(o,color,isSub)=>{const s=new Date(o.start),e=new Date(o.end);if(isNaN(s)||isNaN(e)||e<s)return "";const left=pos(s),w=Math.max((e-s+864e5)/span*100,1.4);const done=o.status==="Done";return `<button class="g-bar ${done?"done":""}" data-id="${esc(o.id)}"${isSub?' data-sub="1"':''} style="left:${left}%;width:${w}%;background:${color}" title="${esc(fmt(o.start))} → ${esc(fmt(o.end))}"><span class="bd"></span>${isSub?esc(phaseOf(o)):esc(o.id)}</button>`;};
+    let rows="";
+    projs.forEach(p=>{
+      const subs=projTasks(p.id).filter(taskMatches);
+      const exp=ganttExp[p.id]!==false;
+      const di=dueMeta(p), stc=statColor(p.status), col=pcolor(p.id);
+      rows+=`<div class="g-row"><div class="g-nm"><button class="exp" data-tid="${esc(p.id)}">${subs.length?(exp?"▾":"▸"):""}</button><span class="dot" style="background:${col}"></span><span class="nm" data-pid="${esc(p.id)}">${esc(p.name)}</span></div>
+        <div class="g-st"><span class="g-stp" style="color:var(${stc});background:color-mix(in srgb,var(${stc}) 15%,transparent)">${esc(p.status)}</span></div>
+        <div class="g-dt">${p.start?fmt(p.start):"—"}</div>
+        <div class="g-dt ${di.cls==="over"?"over":""}">${p.end?fmt(p.end):"—"}</div>
+        <div class="g-tr">${gl}${tline}${bar(p,col,false)}</div></div>`;
+      if(exp)subs.forEach(t=>{const di2=dueMeta(t),stc2=statColor(t.status),phc="var("+(PHASE_COLOR[phaseOf(t)]||"--st-todo")+")";
+        rows+=`<div class="g-row sub"><div class="g-nm sub"><span class="dot" style="background:${phc}"></span><span class="nm" data-tid2="${esc(t.id)}">${esc(t.title)}</span></div>
+          <div class="g-st"><span class="g-stp" style="color:${phc};background:color-mix(in srgb,${phc} 16%,transparent)">${esc(t.status)}</span></div>
+          <div class="g-dt">${t.start?fmt(t.start):"—"}</div>
+          <div class="g-dt ${di2.cls==="over"?"over":""}">${t.end?fmt(t.end):"—"}</div>
+          <div class="g-tr">${gl}${tline}${bar(t,phc,true)}</div></div>`;});
     });
-    box.appendChild(inner); main.appendChild(box);
+    box.innerHTML=`<div class="gantt-scroll"><div class="gantt-inner" style="--gcols:${gcols}">
+      <div class="g-head"><div>Project / งาน</div><div>Status</div><div>Start</div><div>Due</div><div class="g-th">${ticks}</div></div>
+      <div>${rows}</div>
+      <div class="g-legend">${PHASES.map(p=>`<span class="lg"><span class="sw" style="background:var(${PHASE_COLOR[p]})"></span>${esc(p)}</span>`).join("")}<span class="lg" style="margin-left:auto"><span class="sw" style="background:var(--hi)"></span>เส้นวันนี้ · แท่งจาง=Done</span></div>
+    </div></div>`;
+    main.appendChild(box);
+    box.querySelectorAll(".exp").forEach(b=>b.addEventListener("click",()=>{const id=b.dataset.tid;ganttExp[id]=ganttExp[id]===false?true:false;renderTimeline();}));
+    box.querySelectorAll("[data-pid]").forEach(n=>n.addEventListener("click",()=>openProjectDetail(n.dataset.pid)));
+    box.querySelectorAll("[data-tid2]").forEach(n=>n.addEventListener("click",()=>openTaskDetail(n.dataset.tid2)));
+    box.querySelectorAll(".g-bar").forEach(b=>b.addEventListener("click",()=>{if(b.dataset.sub)openTaskDetail(b.dataset.id);else openProjectDetail(b.dataset.id);}));
+  }
+  function capData(){
+    const map={};
+    const add=(who,size,status)=>{if(!who)return;if(!map[who])map[who]={who,days:0,wip:0};map[who].days+=(DAYS_OF[size]||0);if(["M","L","XL"].indexOf(size)>=0&&status!=="Done")map[who].wip++;};
+    tasks.filter(taskMatches).forEach(t=>{add(t.owner,t.size,t.status);(t.assigns||[]).forEach(g=>(g.members||[]).forEach(m=>add(m,t.size,t.status)));});
+    return Object.values(map).sort((a,b)=>b.days-a.days);
+  }
+  function gateCard(p){const vs=vscore(p),pi=pindex(p),sc=p.scope==="Corporate"?"corp":"bu";
+    return `<div class="gcard ${sc}"><span class="gstripe"></span>
+      <div class="gtop"><span class="scope-chip ${sc}">${p.scope==="Corporate"?"🏢 Corporate":"🏬 BU"}</span><span class="gbadge pass">🟦 รับ</span><span class="chip">${esc(p.bu||"—")}</span></div>
+      <h4>${esc(p.name)}</h4>
+      <div class="gsc"><div class="m vs"><b>${vs.toFixed(2)}</b><span>Value Score</span></div><div class="m pi"><b>${pi.toFixed(2)}</b><span>Priority Index</span></div><div class="m"><b style="font-size:1rem;color:var(--ink)">${esc(p.size)}</b><span>Size</span></div></div>
+    </div>`;
+  }
+  function renderPlanning(){
+    const main=$("#main"); main.innerHTML="";
+    const wrap=el("div","plan");
+    const projs=projects.filter(projMatches).slice().sort((a,b)=>pindex(b)-pindex(a));
+    const pass=projs.filter(p=>vscore(p)>=TH), fail=projs.filter(p=>vscore(p)<TH);
+    const gsec=el("div","plan-sub");
+    gsec.innerHTML=`<h3>⚖️ Gate / Value Score</h3><p class="pnote">Value Score ≥ threshold = 🟦 รับ · เรียงตาม Priority Index · weight ตาม Playbook (S30 · V25 · K15 · R15 · U15)</p>
+      <div class="gate-ctl"><span class="t">Gate threshold</span> <input type="range" id="thr" min="2" max="4" step="0.1" value="${TH}"> <span class="thv" id="thrv">${TH.toFixed(1)}</span><span class="note">งานต่ำกว่านี้ตกไป Backlog</span></div>
+      <div class="gate-grid">${pass.map(gateCard).join("")||'<div class="empty" style="grid-column:1/-1">ไม่มีโปรเจกต์ที่ผ่าน threshold นี้</div>'}</div>
+      <div class="backlog"><h5>⬜ Backlog / ตกเกณฑ์ (${fail.length})</h5>${fail.map(p=>`<div class="bl-row"><span class="bn">${esc(p.name)}</span><span class="chip">${esc(p.bu||p.scope||"—")}</span><span class="chip" style="font-family:var(--mono)">${esc(p.size)}</span><span style="font-family:var(--mono);color:var(--ink-soft)">Value ${vscore(p).toFixed(2)}</span><span class="gbadge fail">⬜ &lt; ${TH.toFixed(1)}</span></div>`).join("")||'<div style="font-size:.8rem;color:var(--ink-soft)">— ทุกโปรเจกต์ผ่าน threshold —</div>'}</div>`;
+    wrap.appendChild(gsec);
+    const csec=el("div","plan-sub");
+    const cap=capData();
+    csec.innerHTML=`<h3>👥 Capacity / Workload</h3><p class="pnote">วันจาก Size ของ sub-task (owner + ทีมร่วม) เทียบ budget ${CAP_BUDGET} วัน/เดือน · เส้นดำ = 100% · WIP = งาน M+ ที่ยังไม่ Done (เตือนแดง >2)</p>
+      <div class="cap-list">${cap.map(x=>{const pct=Math.round(x.days/CAP_BUDGET*100),fill=Math.min(pct,100),cls=pct>100?"over":pct>85?"mid":"ok",bad=x.wip>2;
+        return `<div class="cap-row"><div class="who"><span class="av" style="background:${pcolor(x.who)}">${esc(x.who.slice(0,1))}</span><span class="nm">${esc(x.who)}</span></div>
+          <div class="cap-bw"><div class="cap-track"><div class="cap-fill ${cls}" style="width:${fill}%"></div><div class="cap-budget" style="left:100%"></div></div>
+          <div class="cap-detail"><span class="${pct>100?"o":""}">${x.days.toFixed(1)} / ${CAP_BUDGET} วัน (${pct}%)</span>${bad?'<span class="wipflag">WIP เกิน 2</span>':''}</div></div>
+          <div class="cap-wip ${bad?"bad":""}"><span class="n">${x.wip}</span><span class="l">งาน M+</span></div></div>`;}).join("")||'<div class="empty">ไม่มีคนที่ถูก assign ในตัวกรองนี้</div>'}</div>`;
+    wrap.appendChild(csec);
+    main.appendChild(wrap);
+    const thr=$("#thr");if(thr)thr.addEventListener("input",e=>{TH=+e.target.value;const v=$("#thrv");if(v)v.textContent=TH.toFixed(1);renderPlanning();});
   }
 
   function render(){
     $("#v-prio").setAttribute("aria-pressed",view==="prio");
     $("#v-stat").setAttribute("aria-pressed",view==="stat");
+    $("#v-plan").setAttribute("aria-pressed",view==="planning");
     $("#v-time").setAttribute("aria-pressed",view==="timeline");
-    $("#z3").textContent=view==="timeline"?"Task Timeline":"Task Priority";
+    $("#z3").textContent=view==="timeline"?"Task Timeline":view==="planning"?"Planning · Capacity + Gate/Value":"Task Priority";
     $("#buFilter").value=filterBU;
     const lk=$("#lock"); lk.innerHTML=locked?"🔒 Locked":"🔓 Unlocked"; lk.classList.toggle("on",locked);
     document.querySelector(".app").classList.toggle("locked",locked);
     $("#addProj").disabled=locked; $("#imp").disabled=locked;
     if(filterProj&&!projById(filterProj))filterProj=null;
-    $("#reset").hidden=!filterProj&&!filterBU;
-    refreshOwners();
-    const list=tasks.filter(t=>{if(filterBU&&t.bu!==filterBU)return false;if(filterProj&&t.proj!==filterProj)return false;return true;});
+    $("#reset").hidden=!filterProj&&!filterBU&&!filterOwner&&!filterPmo;
+    refreshOwners(); refreshFilterOpts();
+    const list=tasks.filter(taskMatches);
     renderImpact(); renderProjBoard();
-    if(view==="timeline")renderTimeline(list); else renderBoard(list);
+    if(view==="timeline")renderTimeline(); else if(view==="planning")renderPlanning(); else renderBoard(list);
     save();
+  }
+  function refreshFilterOpts(){
+    const ppl=allPeople().sort();
+    const os=$("#ownerFilter"); if(os)os.innerHTML=`<option value="">Owner: ทั้งหมด</option>`+ppl.map(o=>`<option value="${esc(o)}"${o===filterOwner?" selected":""}>${esc(o)}</option>`).join("");
+    const ps=$("#pmoFilter"); if(ps)ps.innerHTML=`<option value="">PMO: ทั้งหมด</option>`+PMO_LIST.map(o=>`<option value="${esc(o)}"${o===filterPmo?" selected":""}>${esc(o)}</option>`).join("");
   }
 
   /* ---- drawer ---- */
@@ -639,6 +789,7 @@
           <div class="fld"><label>PMO</label><select id="f-pmo"><option value=""${t.pmo?"":" selected"}>— ยังไม่เลือก —</option>${opt(PMO_LIST,t.pmo||"")}</select></div></div>
         <div class="fld"><label>BU/ฝ่าย (ที่มาขอ)</label><select id="f-bu">${opt(BUS,t.bu)}</select></div>
         <div class="fld"><label>เจ้าของงานร่วม (ทีมร่วม + BU Assign) — เพิ่มได้หลายคน</label><div id="f-assigns"></div></div>
+        <div class="fld"><label>เฟส (delivery loop)</label><select id="f-phase">${opt(PHASES,phaseOf(t))}</select></div>
         <div class="grid2"><div class="fld"><label>Status</label><select id="f-status">${opt(TASK_STAT,t.status)}</select></div>
           <div class="fld"><label>Priority</label><select id="f-prio">${opt(PRIO.map(x=>x.k),t.prio)}</select></div></div>
         <div class="grid2"><div class="fld"><label>Start date</label><input type="date" id="f-start" value="${esc(t.start)}"></div>
@@ -652,7 +803,7 @@
     drawer.querySelector("#dw-close").addEventListener("click",closeDetail);
     const bind=(sel,fn)=>drawer.querySelector(sel).addEventListener("input",e=>{fn(e.target.value);render();});
     bind("#f-title",v=>t.title=v);bind("#f-proj",v=>t.proj=v);bind("#f-type",v=>t.type=v);bind("#f-owner",v=>t.owner=v);bind("#f-pmo",v=>t.pmo=v);bind("#f-bu",v=>t.bu=v);
-    bind("#f-status",v=>t.status=v);bind("#f-prio",v=>t.prio=v);bind("#f-size",v=>t.size=v);bind("#f-comment",v=>t.comment=v);
+    bind("#f-status",v=>t.status=v);bind("#f-prio",v=>t.prio=v);bind("#f-size",v=>t.size=v);bind("#f-comment",v=>t.comment=v);bind("#f-phase",v=>t.phase=v);
     if(!Array.isArray(t.assigns))t.assigns=[];renderAssigns(drawer.querySelector("#f-assigns"),t.assigns,render);
     if(!Array.isArray(t.files))t.files=[];renderFiles(drawer.querySelector("#f-files"),t.files,render);
     const rs=()=>{const d=dayspan(t.start,t.end);const f=drawer.querySelector("#f-spent");if(f)f.value=d+" วัน";if(d){t.size=sizeFromDays(d);const sz=drawer.querySelector("#f-size");if(sz)sz.value=t.size;}};
@@ -683,8 +834,9 @@
       <div class="grid2"><div class="fld"><label>Owner assign</label><input list="ownerlist" id="m-owner" value="${esc(p.owner)}"></div>
         <div class="fld"><label>BU/ฝ่าย (ที่มาขอ)</label><select id="m-bu">${opt(BUS,BUS[0])}</select></div></div>
       <div class="fld"><label>เจ้าของงานร่วม (ทีมร่วม + BU Assign) — เพิ่มได้หลายคน</label><div id="m-assigns"></div></div>
-      <div class="grid2"><div class="fld"><label>Priority</label><select id="m-prio">${opt(PRIO.map(x=>x.k),"Med")}</select></div>
-        <div class="fld"><label>Status</label><select id="m-status">${opt(TASK_STAT,"Not started")}</select></div></div>
+      <div class="grid2"><div class="fld"><label>เฟส (delivery loop)</label><select id="m-phase">${opt(PHASES,"Setup")}</select></div>
+        <div class="fld"><label>Priority</label><select id="m-prio">${opt(PRIO.map(x=>x.k),"Med")}</select></div></div>
+      <div class="fld"><label>Status</label><select id="m-status">${opt(TASK_STAT,"Not started")}</select></div>
       <div class="grid2"><div class="fld"><label>Start date</label><input type="date" id="m-start"></div>
         <div class="fld"><label>End date</label><input type="date" id="m-end"></div></div>
       <div class="fld"><label>📎 ไฟล์แนบ (ลิงก์)</label><div class="files-box" id="m-files"></div></div>`,
@@ -692,7 +844,7 @@
         const st=$("#m-start").value,en=$("#m-end").value,d=dayspan(st,en);
         tasks.push({id:nextTaskId(),proj:p.id,title,type:$("#m-type").value,owner:$("#m-owner").value,pmo:$("#m-pmo").value,bu:$("#m-bu").value,assigns:assigns.filter(g=>g.bu||(g.members&&g.members.length)).map(g=>({bu:g.bu,members:[...(g.members||[])]})),
           files:files.filter(f=>(f.url||"").trim()||(f.name||"").trim()).map(f=>({name:f.name||"",url:f.url||""})),
-          size:d?sizeFromDays(d):"M",prio:$("#m-prio").value,status:$("#m-status").value,start:st,end:en,comment:""});
+          phase:$("#m-phase").value,size:d?sizeFromDays(d):"M",prio:$("#m-prio").value,status:$("#m-status").value,start:st,end:en,comment:""});
         renderProjSubs(p);});
     renderAssigns($("#m-assigns"),assigns,null);
     renderFiles($("#m-files"),files,null);
@@ -728,10 +880,10 @@
   function exportExcel(){
     const cx=s=>String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
     const fjoin=arr=>(arr||[]).map(f=>{const u=(f.url||"").trim();const n=(f.name||"").trim();return n&&u?n+": "+u:(u||n);}).filter(Boolean).join(" | ");
-    const head=["Project","ชื่อโปรเจกต์","PMO","Scope","BU (ที่มาขอ)","BU Assign","Project Team","Project PI","Project Status","Project Files","Task ID","Sub-task","Owner assign","Task PMO","Task BU","Task BU Assign","Task Team","Type","Priority","Status","Start","End","Days","Comment","Task Files"];
+    const head=["Project","ชื่อโปรเจกต์","PMO","Scope","BU (ที่มาขอ)","BU Assign","Project Team","Project Value","Project PI","Project Status","Project Files","Task ID","Sub-task","Owner assign","Task PMO","Task BU","Task BU Assign","Task Team","Type","Phase","Priority","Status","Start","End","Days","Comment","Task Files"];
     let h='<table border="1"><thead><tr>'+head.map(x=>`<th>${cx(x)}</th>`).join("")+'</tr></thead><tbody>';
     tasks.forEach(t=>{const p=projById(t.proj)||{};
-      const row=[t.proj,p.name,p.pmo,p.scope,p.bu,(p.assigns||[]).map(g=>g.bu).filter(Boolean).join(", "),(p.assigns||[]).map(g=>g.bu+((g.members&&g.members.length)?" ("+g.members.join("/")+")":"")).join("; "),p.S!==undefined?pindex(p).toFixed(2):"",projStatus(t.proj),fjoin(p.files),t.id,t.title,t.owner,t.pmo,t.bu,(t.assigns||[]).map(g=>g.bu).filter(Boolean).join(", "),(t.assigns||[]).map(g=>g.bu+((g.members&&g.members.length)?" ("+g.members.join("/")+")":"")).join("; "),t.type,t.prio,t.status,t.start,t.end,spentOf(t),t.comment,fjoin(t.files)];
+      const row=[t.proj,p.name,p.pmo,p.scope,p.bu,(p.assigns||[]).map(g=>g.bu).filter(Boolean).join(", "),(p.assigns||[]).map(g=>g.bu+((g.members&&g.members.length)?" ("+g.members.join("/")+")":"")).join("; "),p.S!==undefined?vscore(p).toFixed(2):"",p.S!==undefined?pindex(p).toFixed(2):"",projStatus(t.proj),fjoin(p.files),t.id,t.title,t.owner,t.pmo,t.bu,(t.assigns||[]).map(g=>g.bu).filter(Boolean).join(", "),(t.assigns||[]).map(g=>g.bu+((g.members&&g.members.length)?" ("+g.members.join("/")+")":"")).join("; "),t.type,phaseOf(t),t.prio,t.status,t.start,t.end,spentOf(t),t.comment,fjoin(t.files)];
       h+='<tr>'+row.map(c=>`<td>${cx(c)}</td>`).join("")+'</tr>';});
     h+='</tbody></table>';
     dl(new Blob(['﻿<html><head><meta charset="utf-8"></head><body>'+h+'</body></html>'],{type:"application/vnd.ms-excel"}),"prio-board.xls");
@@ -749,9 +901,12 @@
 
   $("#v-prio").addEventListener("click",()=>{view="prio";render();});
   $("#v-stat").addEventListener("click",()=>{view="stat";render();});
+  $("#v-plan").addEventListener("click",()=>{view="planning";render();});
   $("#v-time").addEventListener("click",()=>{view="timeline";render();});
-  $("#reset").addEventListener("click",()=>{filterProj=null;filterBU="";render();});
+  $("#reset").addEventListener("click",()=>{filterProj=null;filterBU="";filterOwner="";filterPmo="";render();});
   $("#buFilter").addEventListener("change",e=>{filterBU=e.target.value;filterProj=null;render();});
+  $("#ownerFilter").addEventListener("change",e=>{filterOwner=e.target.value;filterProj=null;render();});
+  $("#pmoFilter").addEventListener("change",e=>{filterPmo=e.target.value;filterProj=null;render();});
   $("#lock").addEventListener("click",()=>{locked=!locked;try{localStorage.setItem("em_prio_lock",locked?"1":"0");}catch(e){}closeDetail();render();});
   $("#buFilter").insertAdjacentHTML("beforeend",BUS.map(b=>`<option value="${esc(b)}">${esc(b)}</option>`).join(""));
 
