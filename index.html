@@ -37,7 +37,7 @@
     --st-todo:#6b7482; --st-prog:#2f6df0; --st-rev:#b0761a; --st-appr:#1f8f80; --st-uat:#6b5bd0; --st-done:#2e7d5b;
     --shadow:0 1px 2px rgba(20,25,40,.05),0 4px 14px rgba(20,25,40,.05);
   }
-  *{box-sizing:border-box} body{margin:0}
+  *{box-sizing:border-box} body{margin:0;font-family:var(--font);color:var(--ink)}
   .app{background:var(--paper);color:var(--ink);font-family:var(--font);min-height:100vh;padding:0 clamp(14px,3vw,32px) 40px;-webkit-font-smoothing:antialiased}
   .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
   .bar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 0;margin-bottom:6px}
@@ -402,8 +402,8 @@
   const pindex=p=>vscore(p)/(EMAP[p.size]||3);
   const projById=id=>projects.find(p=>p.id===id);
   const PRIO=[{k:"High",c:"--hi",s:"--hi-soft"},{k:"Med",c:"--md",s:"--md-soft"},{k:"Low",c:"--lo",s:"--lo-soft"}];
-  const TASK_STAT=["Not started","Review","Task Approved","In progress","On Hold","Blocked","UAT","Done","Cancelled"];
-  const PROJ_STAT=["Not started","Review","Project Approved","In progress","On Hold","Blocked","UAT","Done","Cancelled"];
+  const TASK_STAT=["Not started","Review","Task Approved","In progress","On Hold","Blocked","UAT","Done"];
+  const PROJ_STAT=["Not started","Review","Project Approved","In progress","On Hold","Blocked","UAT","Done"];
   const STCOLOR={"Not started":"--st-todo","Review":"--st-rev","Task Approved":"--st-appr","Project Approved":"--st-appr","In progress":"--st-prog","On Hold":"--md","Blocked":"--hi","UAT":"--st-uat","Done":"--st-done","Cancelled":"--lo"};
   const WIP_EXCLUDE=["Done","Cancelled","On Hold","Blocked"];
   const statColor=k=>STCOLOR[k]||"--st-todo";
@@ -696,14 +696,14 @@
     const projs=projects.filter(projMatches).slice().sort((a,b)=>pindex(b)-pindex(a));
     const pass=projs.filter(p=>vscore(p)>=TH), fail=projs.filter(p=>vscore(p)<TH);
     const gsec=el("div","plan-sub");
-    gsec.innerHTML=`<h3>⚖️ Gate / Value Score</h3><p class="pnote">Value Score ≥ threshold = 🟦 รับ · เรียงตาม Priority Index · weight ตาม Playbook (S30 · V25 · K15 · R15 · U15)</p>
+    gsec.innerHTML=`<h3>⚖️ Gate / Value Score</h3><p class="pnote">Value Score ≥ threshold = 🟦 รับ · เรียงตาม Priority Index</p>
       <div class="gate-ctl"><span class="t">Gate threshold</span> <input type="range" id="thr" min="2" max="4" step="0.1" value="${TH}"> <span class="thv" id="thrv">${TH.toFixed(1)}</span><span class="note">งานต่ำกว่านี้ตกไป Backlog</span></div>
       <div class="gate-grid">${pass.map(gateCard).join("")||'<div class="empty" style="grid-column:1/-1">ไม่มีโปรเจกต์ที่ผ่าน threshold นี้</div>'}</div>
       <div class="backlog"><h5>⬜ Backlog / ตกเกณฑ์ (${fail.length})</h5>${fail.map(p=>`<div class="bl-row"><span class="bn">${esc(p.name)}</span><span class="chip">${esc(p.bu||p.scope||"—")}</span><span class="chip" style="font-family:var(--mono)">${esc(p.size)}</span><span style="font-family:var(--mono);color:var(--ink-soft)">Value ${vscore(p).toFixed(2)}</span><span class="gbadge fail">⬜ &lt; ${TH.toFixed(1)}</span></div>`).join("")||'<div style="font-size:.8rem;color:var(--ink-soft)">— ทุกโปรเจกต์ผ่าน threshold —</div>'}</div>`;
     wrap.appendChild(gsec);
     const csec=el("div","plan-sub");
     const cap=capData();
-    csec.innerHTML=`<h3>👥 Capacity / Workload</h3><p class="pnote">วันจาก Size ของ sub-task (เฉพาะ owner ที่รับผิดชอบ) เทียบ budget ${CAP_BUDGET} วัน/เดือน · เส้นดำ = 100% · WIP = งาน M+ ที่ทำอยู่จริง (ไม่นับ Done/Blocked/On Hold/Cancelled · เตือนแดง >2) · <b>กดชื่อดูรายละเอียด</b></p>
+    csec.innerHTML=`<h3>👥 Capacity / Workload</h3><p class="pnote">วันจาก Size ของ sub-task (เฉพาะ owner ที่รับผิดชอบ)</p>
       <div class="cap-list">${cap.map(x=>{const pct=Math.round(x.days/CAP_BUDGET*100),fill=Math.min(pct,100),cls=pct>100?"over":pct>85?"mid":"ok",bad=x.wip>2;
         return `<div class="cap-row" data-who="${esc(x.who)}" tabindex="0" role="button"><div class="who"><span class="av" style="background:${pcolor(x.who)}">${esc(x.who.slice(0,1))}</span><span class="nm">${esc(x.who)}</span></div>
           <div class="cap-bw"><div class="cap-track"><div class="cap-fill ${cls}" style="width:${fill}%"></div><div class="cap-budget" style="left:100%"></div></div>
