@@ -203,6 +203,21 @@
   .subtable .dcol{font-family:var(--mono);text-align:center}
   .dw-del{margin:4px 0 0;border:1px solid var(--line);background:transparent;color:var(--hi);font:inherit;font-size:.8rem;font-weight:600;border-radius:9px;padding:8px;cursor:pointer}
   .dw-del:hover{background:var(--hi-soft);border-color:var(--hi)}
+  .files-box{display:flex;flex-direction:column;gap:6px}
+  .file-row{display:flex;gap:6px;align-items:center}
+  .file-row input{font:inherit;font-size:.78rem;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:6px 8px;min-width:0}
+  .file-row .f-name{flex:0 0 34%}
+  .file-row .f-url{flex:1}
+  .file-row .f-open{border:1px solid var(--line);background:var(--surface-2);border-radius:8px;text-decoration:none;font-size:.85rem;padding:5px 8px;line-height:1}
+  .file-row .f-open.off{opacity:.35;pointer-events:none}
+  .file-row .fx{border:0;background:transparent;color:var(--ink-soft);cursor:pointer;font-size:.85rem;padding:2px 5px}
+  .file-row .fx:hover{color:var(--hi)}
+  .file-list{display:flex;flex-direction:column;gap:2px;margin:2px 0 0}
+  .file-list a{color:var(--accent-ink);text-decoration:none;font-size:.72rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  .file-list a:hover{text-decoration:underline}
+  .file-chip{font-size:.6rem;font-weight:800;padding:2px 7px;border-radius:99px;white-space:nowrap;color:var(--accent-ink);background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 25%,transparent)}
+  .subtable .flink{color:var(--accent-ink);text-decoration:none;margin-left:6px;font-size:.72rem}
+  .subtable .flink:hover{text-decoration:underline}
   .modal-scrim{position:fixed;inset:0;background:rgba(15,17,21,.42);display:none;align-items:center;justify-content:center;z-index:60;padding:20px}
   .modal-scrim.show{display:flex}
   .modal{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:16px;width:min(460px,96vw);max-height:90vh;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,.34)}
@@ -336,9 +351,26 @@
     });
     box.querySelector(".a-add").addEventListener("click",()=>{arr.push({bu:"",members:[]});renderAssigns(box,arr,onChange);onChange&&onChange();});
   }
+  function fileHref(u){u=(u||"").trim();if(!u)return"";return /^(https?:|mailto:)/i.test(u)?u:"https://"+u;}
+  function renderFiles(box,arr,onChange){
+    if(!box)return;
+    box.innerHTML=arr.map((f,i)=>{const href=fileHref(f.url);return `<div class="file-row" data-i="${i}">
+        <input class="f-name" placeholder="ชื่อไฟล์" value="${esc(f.name||"")}">
+        <input class="f-url" placeholder="วางลิงก์ (URL)" value="${esc(f.url||"")}">
+        <a class="f-open${href?"":" off"}" href="${esc(href)}" target="_blank" rel="noopener" title="เปิดลิงก์">↗</a>
+        <button class="fx" type="button" aria-label="ลบไฟล์">✕</button></div>`;}).join("")
+      +`<button class="addbtn file-add" type="button" style="align-self:flex-start">＋ เพิ่มไฟล์</button>`;
+    box.querySelectorAll(".file-row").forEach(row=>{
+      const i=+row.dataset.i;
+      row.querySelector(".f-name").addEventListener("input",e=>{arr[i].name=e.target.value;onChange&&onChange();});
+      row.querySelector(".f-url").addEventListener("input",e=>{arr[i].url=e.target.value;const a=row.querySelector(".f-open");const href=fileHref(e.target.value);a.href=href;a.classList.toggle("off",!href);onChange&&onChange();});
+      row.querySelector(".fx").addEventListener("click",()=>{arr.splice(i,1);renderFiles(box,arr,onChange);onChange&&onChange();});
+    });
+    box.querySelector(".file-add").addEventListener("click",()=>{arr.push({name:"",url:""});renderFiles(box,arr,onChange);const ni=box.querySelectorAll(".f-name");if(ni.length)ni[ni.length-1].focus();onChange&&onChange();});
+  }
   function normAll(){
-    projects.forEach(p=>{if(!p.pmo)p.pmo="Chay";if(!p.status){var so=p.statusOverride;if(so==="Approved")so="Project Approved";p.status=(so&&PROJ_STAT.indexOf(so)>=0)?so:"Not started";}if(PROJ_STAT.indexOf(p.status)<0)p.status="Not started";if(!Array.isArray(p.assigns)){p.assigns=(p.buOwner||(Array.isArray(p.team)&&p.team.length))?[{bu:p.buOwner||"",members:p.team||[]}]:[];}});
-    tasks.forEach(t=>{if(!t.pmo)t.pmo=(projById(t.proj)||{}).pmo||"Chay";if(t.status==="Approved")t.status="Task Approved";if(TASK_STAT.indexOf(t.status)<0)t.status="Not started";if(!t.type)t.type="Project";if(!Array.isArray(t.assigns)){t.assigns=(t.buOwner||(Array.isArray(t.team)&&t.team.length))?[{bu:t.buOwner||"",members:t.team||[]}]:[];}});
+    projects.forEach(p=>{if(!p.pmo)p.pmo="Chay";if(!p.status){var so=p.statusOverride;if(so==="Approved")so="Project Approved";p.status=(so&&PROJ_STAT.indexOf(so)>=0)?so:"Not started";}if(PROJ_STAT.indexOf(p.status)<0)p.status="Not started";if(!Array.isArray(p.assigns)){p.assigns=(p.buOwner||(Array.isArray(p.team)&&p.team.length))?[{bu:p.buOwner||"",members:p.team||[]}]:[];}if(!Array.isArray(p.files))p.files=[];});
+    tasks.forEach(t=>{if(!t.pmo)t.pmo=(projById(t.proj)||{}).pmo||"Chay";if(t.status==="Approved")t.status="Task Approved";if(TASK_STAT.indexOf(t.status)<0)t.status="Not started";if(!t.type)t.type="Project";if(!Array.isArray(t.assigns)){t.assigns=(t.buOwner||(Array.isArray(t.team)&&t.team.length))?[{bu:t.buOwner||"",members:t.team||[]}]:[];}if(!Array.isArray(t.files))t.files=[];});
   }
 
   let savedTimer=null, sbOK=false, lastSeen=null, pushTimer=null, skipPush=false;
@@ -375,7 +407,7 @@
       <h3>${esc(p.name)}</h3>
       <div class="pi"><b>${pindex(p).toFixed(2)}</b><span>Priority Index</span></div>
       <div class="vbar"><i style="width:${(vscore(p)/5*100).toFixed(0)}%"></i></div>
-      <div class="pmeta"><span class="chip">${esc(p.size)}</span><span>${esc(p.owner)}</span>${(()=>{const n=(p.assigns||[]).reduce((a,g)=>a+((g.members||[]).length),0);return n?`<span class="team-chip">👥 ${n}</span>`:"";})()}
+      <div class="pmeta"><span class="chip">${esc(p.size)}</span><span>${esc(p.owner)}</span>${(()=>{const n=(p.assigns||[]).reduce((a,g)=>a+((g.members||[]).length),0);return n?`<span class="team-chip">👥 ${n}</span>`:"";})()}${(()=>{const fn=(p.files||[]).length;return fn?`<span class="file-chip">📎 ${fn}</span>`:"";})()}
       <span class="prog"><i style="width:${projDone(p)*100}%"></i></span><span style="font-family:var(--mono)">${Math.round(projDone(p)*100)}%</span></div>`;
     b.querySelector(".pedit").addEventListener("click",ev=>{ev.stopPropagation();openProjectDetail(p.id);});
     const flt=()=>{filterProj=filterProj===p.id?null:p.id;render();};
@@ -450,7 +482,7 @@
       <div class="top"><span class="ptag"><span class="pd" style="background:${pcolor(t.proj)}"></span>${esc(t.proj)}</span>${adHtml}<span class="tid">${esc(t.id)}</span></div>
       <p class="ttl">${esc(t.title)}</p>${cmtHtml}
       <div class="foot"><span class="av" style="background:${pcolor(t.proj)}">${esc((t.owner||"?").slice(0,1))}</span>
-      <span class="who">${esc(t.owner)}</span><span class="chip">${esc(t.size)}</span>${labHtml}<span class="spent">⏱ ${spentOf(t)}d</span></div>`;
+      <span class="who">${esc(t.owner)}</span><span class="chip">${esc(t.size)}</span>${labHtml}<span class="spent">⏱ ${spentOf(t)}d</span>${(t.files||[]).length?`<span class="file-chip">📎 ${t.files.length}</span>`:""}</div>`;
     c.addEventListener("dragstart",e=>{e.dataTransfer.setData("text/plain",t.id);e.dataTransfer.effectAllowed="move";c.classList.add("dragging");});
     c.addEventListener("dragend",()=>c.classList.remove("dragging"));
     c.addEventListener("click",()=>openTaskDetail(t.id));
@@ -543,7 +575,7 @@
     box.innerHTML=`<div class="subwrap-box"><table class="subtable"><thead><tr>
       <th>Sub-task</th><th>Owner</th><th>PMO</th><th>BU</th><th>Status</th><th class="dcol">วัน</th><th></th></tr></thead><tbody>${
       ts.map(t=>`<tr>
-        <td><a href="#" class="slink" data-id="${esc(t.id)}">${esc(t.title)}</a></td>
+        <td><a href="#" class="slink" data-id="${esc(t.id)}">${esc(t.title)}</a>${(t.files||[]).map(f=>{const h=fileHref(f.url);return h?`<a class="flink" href="${esc(h)}" target="_blank" rel="noopener" title="${esc(f.name||f.url)}">📎</a>`:"";}).join("")}</td>
         <td>${esc(t.owner||"—")}</td><td>${esc(t.pmo||"—")}</td><td>${esc(t.bu||"—")}</td>
         <td><select class="ss" data-id="${esc(t.id)}">${opt(TASK_STAT,t.status)}</select></td>
         <td class="dcol">${spentOf(t)||"—"}</td>
@@ -575,6 +607,7 @@
         <div class="fld"><div class="subhead"><label>Sub-tasks (แสดงบน Task Priority)</label><span class="pct" id="psubcount"></span></div>
           <div id="psubs"></div>
           <button class="addbtn" id="p-addsub" type="button" style="align-self:flex-start;margin-top:6px">＋ เพิ่ม sub-task</button></div>
+        <div class="fld"><label>📎 ไฟล์แนบ (ลิงก์)</label><div class="files-box" id="p-files"></div></div>
         <button class="dw-del" id="p-del">🗑 ลบโปรเจกต์ (และ sub-task ทั้งหมด)</button>
       </div>`;
     drawer.querySelector("#dw-close").addEventListener("click",closeDetail);
@@ -583,6 +616,7 @@
     bindP("#p-scope",v=>p.scope=v);bindP("#p-bu",v=>p.bu=v);bindP("#p-size",v=>p.size=v);
     ["S","V","K","R","U"].forEach(k=>bindP("#p-"+k,v=>p[k]=+v));
     if(!Array.isArray(p.assigns))p.assigns=[];renderAssigns(drawer.querySelector("#p-assigns"),p.assigns,render);
+    if(!Array.isArray(p.files))p.files=[];renderFiles(drawer.querySelector("#p-files"),p.files,render);
     const pupd=()=>{const d=dayspan(p.start,p.end);const sp=drawer.querySelector("#p-spent");if(sp)sp.value=d+" วัน";if(d){p.size=sizeFromDays(d);const sz=drawer.querySelector("#p-size");if(sz)sz.value=p.size;}drawer.querySelector("#p-pi").textContent=p.id+" · PI "+pindex(p).toFixed(2);render();};
     drawer.querySelector("#p-start").addEventListener("input",e=>{p.start=e.target.value;pupd();});
     drawer.querySelector("#p-end").addEventListener("input",e=>{p.end=e.target.value;pupd();});
@@ -612,6 +646,7 @@
         <div class="grid2"><div class="fld"><label>Size</label><select id="f-size">${opt(["XS","S","M","L","XL"],t.size)}</select></div>
           <div class="fld"><label>เวลาที่ใช้ (auto)</label><input id="f-spent" value="${spentOf(t)} วัน" readonly></div></div>
         <div class="fld"><label>Comment</label><textarea id="f-comment">${esc(t.comment)}</textarea></div>
+        <div class="fld"><label>📎 ไฟล์แนบ (ลิงก์)</label><div class="files-box" id="f-files"></div></div>
         <button class="dw-del" id="f-del">🗑 ลบ sub-task นี้</button>
       </div>`;
     drawer.querySelector("#dw-close").addEventListener("click",closeDetail);
@@ -619,6 +654,7 @@
     bind("#f-title",v=>t.title=v);bind("#f-proj",v=>t.proj=v);bind("#f-type",v=>t.type=v);bind("#f-owner",v=>t.owner=v);bind("#f-pmo",v=>t.pmo=v);bind("#f-bu",v=>t.bu=v);
     bind("#f-status",v=>t.status=v);bind("#f-prio",v=>t.prio=v);bind("#f-size",v=>t.size=v);bind("#f-comment",v=>t.comment=v);
     if(!Array.isArray(t.assigns))t.assigns=[];renderAssigns(drawer.querySelector("#f-assigns"),t.assigns,render);
+    if(!Array.isArray(t.files))t.files=[];renderFiles(drawer.querySelector("#f-files"),t.files,render);
     const rs=()=>{const d=dayspan(t.start,t.end);const f=drawer.querySelector("#f-spent");if(f)f.value=d+" วัน";if(d){t.size=sizeFromDays(d);const sz=drawer.querySelector("#f-size");if(sz)sz.value=t.size;}};
     drawer.querySelector("#f-start").addEventListener("input",e=>{t.start=e.target.value;rs();render();});
     drawer.querySelector("#f-end").addEventListener("input",e=>{t.end=e.target.value;rs();render();});
@@ -639,7 +675,7 @@
   function uniqId(base,exists){let id=base||"P",n=1;while(exists(id)){id=(base||"P")+(++n);}return id;}
 
   function openAddSub(p){
-    const assigns=[];
+    const assigns=[]; const files=[];
     openModal("เพิ่ม Sub-task",`
       <div class="fld"><label>ชื่อ sub-task</label><input id="m-title" placeholder="เช่น เตรียมข้อมูล"></div>
       <div class="grid2"><div class="fld"><label>PMO</label><select id="m-pmo"><option value=""${p.pmo?"":" selected"}>— ยังไม่เลือก —</option>${opt(PMO_LIST,p.pmo||"")}</select></div>
@@ -650,16 +686,19 @@
       <div class="grid2"><div class="fld"><label>Priority</label><select id="m-prio">${opt(PRIO.map(x=>x.k),"Med")}</select></div>
         <div class="fld"><label>Status</label><select id="m-status">${opt(TASK_STAT,"Not started")}</select></div></div>
       <div class="grid2"><div class="fld"><label>Start date</label><input type="date" id="m-start"></div>
-        <div class="fld"><label>End date</label><input type="date" id="m-end"></div></div>`,
+        <div class="fld"><label>End date</label><input type="date" id="m-end"></div></div>
+      <div class="fld"><label>📎 ไฟล์แนบ (ลิงก์)</label><div class="files-box" id="m-files"></div></div>`,
       ()=>{const title=$("#m-title").value.trim();if(!title){$("#m-title").focus();return false;}
         const st=$("#m-start").value,en=$("#m-end").value,d=dayspan(st,en);
         tasks.push({id:nextTaskId(),proj:p.id,title,type:$("#m-type").value,owner:$("#m-owner").value,pmo:$("#m-pmo").value,bu:$("#m-bu").value,assigns:assigns.filter(g=>g.bu||(g.members&&g.members.length)).map(g=>({bu:g.bu,members:[...(g.members||[])]})),
+          files:files.filter(f=>(f.url||"").trim()||(f.name||"").trim()).map(f=>({name:f.name||"",url:f.url||""})),
           size:d?sizeFromDays(d):"M",prio:$("#m-prio").value,status:$("#m-status").value,start:st,end:en,comment:""});
         renderProjSubs(p);});
     renderAssigns($("#m-assigns"),assigns,null);
+    renderFiles($("#m-files"),files,null);
   }
   $("#addProj").addEventListener("click",()=>{
-    const assigns=[];
+    const assigns=[]; const files=[];
     const svku=["S","V","K","R","U"].map(k=>`<div class="fld"><label>${k}</label><select id="m-${k}">${opt(["1","2","3","4","5"],"3")}</select></div>`).join("");
     openModal("เพิ่ม Project ใหม่",`
       <div class="fld"><label>ชื่อโปรเจกต์</label><input id="m-name" placeholder="เช่น Fraud Detection Model"></div>
@@ -672,24 +711,27 @@
       <div class="grid2"><div class="fld"><label>Start date</label><input type="date" id="m-start"></div>
         <div class="fld"><label>End date</label><input type="date" id="m-end"></div></div>
       <div class="fld"><label>เวลาที่ใช้ (auto จาก start–end)</label><input id="m-spent" value="0 วัน" readonly></div>
-      <div class="fld"><label>คะแนน Impact (1–5)</label><div class="grid5">${svku}</div></div>`,
+      <div class="fld"><label>คะแนน Impact (1–5)</label><div class="grid5">${svku}</div></div>
+      <div class="fld"><label>📎 ไฟล์แนบ (ลิงก์)</label><div class="files-box" id="m-files"></div></div>`,
       ()=>{const name=$("#m-name").value.trim();if(!name){$("#m-name").focus();return false;}
         const base=((name.match(/[A-Za-z]/g)||[]).join("").slice(0,3).toUpperCase())||"PRJ";
         const id=uniqId(base,x=>projById(x));
         const scope=$("#m-scope").value; const st=$("#m-start").value,en=$("#m-end").value; const d=dayspan(st,en);
-        projects.push({id,name,pmo:$("#m-pmo").value,owner:$("#m-owner").value||OWNERS[0],scope,bu:scope==="BU"?$("#m-bu").value:"",assigns:assigns.filter(g=>g.bu||(g.members&&g.members.length)).map(g=>({bu:g.bu,members:[...(g.members||[])]})),status:$("#m-status").value,start:st,end:en,size:d?sizeFromDays(d):"M",S:+$("#m-S").value,V:+$("#m-V").value,K:+$("#m-K").value,R:+$("#m-R").value,U:+$("#m-U").value});
+        projects.push({id,name,pmo:$("#m-pmo").value,owner:$("#m-owner").value||OWNERS[0],scope,bu:scope==="BU"?$("#m-bu").value:"",assigns:assigns.filter(g=>g.bu||(g.members&&g.members.length)).map(g=>({bu:g.bu,members:[...(g.members||[])]})),files:files.filter(f=>(f.url||"").trim()||(f.name||"").trim()).map(f=>({name:f.name||"",url:f.url||""})),status:$("#m-status").value,start:st,end:en,size:d?sizeFromDays(d):"M",S:+$("#m-S").value,V:+$("#m-V").value,K:+$("#m-K").value,R:+$("#m-R").value,U:+$("#m-U").value});
         openProjectDetail(id);});
     renderAssigns($("#m-assigns"),assigns,null);
+    renderFiles($("#m-files"),files,null);
   });
 
   function dl(blob,name){const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);}
   function exportJSON(){dl(new Blob([JSON.stringify({projects,tasks},null,2)],{type:"application/json"}),"prio-board-backup.json");}
   function exportExcel(){
     const cx=s=>String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-    const head=["Project","ชื่อโปรเจกต์","PMO","Scope","BU (ที่มาขอ)","BU Assign","Project Team","Project PI","Project Status","Task ID","Sub-task","Owner assign","Task PMO","Task BU","Task BU Assign","Task Team","Type","Priority","Status","Start","End","Days","Comment"];
+    const fjoin=arr=>(arr||[]).map(f=>{const u=(f.url||"").trim();const n=(f.name||"").trim();return n&&u?n+": "+u:(u||n);}).filter(Boolean).join(" | ");
+    const head=["Project","ชื่อโปรเจกต์","PMO","Scope","BU (ที่มาขอ)","BU Assign","Project Team","Project PI","Project Status","Project Files","Task ID","Sub-task","Owner assign","Task PMO","Task BU","Task BU Assign","Task Team","Type","Priority","Status","Start","End","Days","Comment","Task Files"];
     let h='<table border="1"><thead><tr>'+head.map(x=>`<th>${cx(x)}</th>`).join("")+'</tr></thead><tbody>';
     tasks.forEach(t=>{const p=projById(t.proj)||{};
-      const row=[t.proj,p.name,p.pmo,p.scope,p.bu,(p.assigns||[]).map(g=>g.bu).filter(Boolean).join(", "),(p.assigns||[]).map(g=>g.bu+((g.members&&g.members.length)?" ("+g.members.join("/")+")":"")).join("; "),p.S!==undefined?pindex(p).toFixed(2):"",projStatus(t.proj),t.id,t.title,t.owner,t.pmo,t.bu,(t.assigns||[]).map(g=>g.bu).filter(Boolean).join(", "),(t.assigns||[]).map(g=>g.bu+((g.members&&g.members.length)?" ("+g.members.join("/")+")":"")).join("; "),t.type,t.prio,t.status,t.start,t.end,spentOf(t),t.comment];
+      const row=[t.proj,p.name,p.pmo,p.scope,p.bu,(p.assigns||[]).map(g=>g.bu).filter(Boolean).join(", "),(p.assigns||[]).map(g=>g.bu+((g.members&&g.members.length)?" ("+g.members.join("/")+")":"")).join("; "),p.S!==undefined?pindex(p).toFixed(2):"",projStatus(t.proj),fjoin(p.files),t.id,t.title,t.owner,t.pmo,t.bu,(t.assigns||[]).map(g=>g.bu).filter(Boolean).join(", "),(t.assigns||[]).map(g=>g.bu+((g.members&&g.members.length)?" ("+g.members.join("/")+")":"")).join("; "),t.type,t.prio,t.status,t.start,t.end,spentOf(t),t.comment,fjoin(t.files)];
       h+='<tr>'+row.map(c=>`<td>${cx(c)}</td>`).join("")+'</tr>';});
     h+='</tbody></table>';
     dl(new Blob(['﻿<html><head><meta charset="utf-8"></head><body>'+h+'</body></html>'],{type:"application/vnd.ms-excel"}),"prio-board.xls");
