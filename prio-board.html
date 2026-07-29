@@ -294,6 +294,19 @@
   .g-legend{display:flex;gap:11px;flex-wrap:wrap;padding:9px 14px;border-top:1px solid var(--line);font-size:.66rem;color:var(--ink-soft);align-items:center}
   .g-legend .lg{display:flex;align-items:center;gap:5px}
   .g-legend .sw{width:11px;height:11px;border-radius:3px}
+  .cap-row[data-who]{cursor:pointer;transition:border-color .12s,transform .12s}
+  .cap-row[data-who]:hover{border-color:var(--accent);transform:translateY(-1px)}
+  .help-dot{width:17px;height:17px;border-radius:99px;border:1px solid var(--ink-soft);background:transparent;color:var(--ink-soft);font-size:.64rem;font-weight:800;cursor:pointer;display:inline-grid;place-items:center;padding:0;line-height:1;flex:none;vertical-align:middle}
+  .help-dot:hover{border-color:var(--accent);color:var(--accent-ink);background:var(--accent-soft)}
+  .info-b h4{margin:15px 0 4px;font-size:.92rem;font-weight:800}
+  .info-b h4:first-child{margin-top:0}
+  .info-b p{margin:0 0 8px;font-size:.86rem;color:var(--ink-soft)}
+  .info-b code{font-family:var(--mono);font-size:.85em;color:var(--accent-ink);background:var(--surface-2);padding:1px 5px;border-radius:5px}
+  .info-fx{font-family:var(--mono);font-size:.84rem;background:var(--surface-2);border:1px solid var(--line);border-left:3px solid var(--copper);border-radius:0 8px 8px 0;padding:9px 12px;margin:8px 0;color:var(--ink);overflow-x:auto;white-space:nowrap}
+  .info-tbl{width:100%;border-collapse:collapse;font-size:.82rem;margin:6px 0}
+  .info-tbl th,.info-tbl td{text-align:left;padding:6px 9px;border-bottom:1px solid var(--line);white-space:nowrap}
+  .info-tbl th{font-size:.6rem;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-soft);background:var(--surface-2)}
+  .info-tbl td.num{font-family:var(--mono);text-align:right}
   .modal-scrim{position:fixed;inset:0;background:rgba(15,17,21,.42);display:none;align-items:center;justify-content:center;z-index:60;padding:20px}
   .modal-scrim.show{display:flex}
   .modal{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:16px;width:min(460px,96vw);max-height:90vh;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,.34)}
@@ -317,6 +330,7 @@
     <span class="spacer"></span>
     <button class="ghost" id="lock">🔓 Unlocked</button>
     <button class="ghost" id="reset" hidden>× ล้าง filter</button>
+    <button class="ghost" id="calcBtn" title="วิธีคิดคะแนน + ตารางคำนวณ">🧮 วิธีคิดคะแนน</button>
     <select id="expsel" class="ghost" title="ดาวน์โหลด"><option value="">⬇ Export</option><option value="xls">Excel (รายงาน)</option><option value="json">JSON (backup)</option></select>
     <button class="ghost" id="imp" title="โหลด JSON กลับ">Import</button>
     <button class="ghost icon" id="theme" aria-label="สลับธีม">🌙</button>
@@ -330,6 +344,7 @@
 
   <section class="zone" aria-labelledby="z1">
     <div class="zlab"><span class="n">1</span><h2 id="z1">Corporate Impact</h2>
+      <button class="help-dot" id="scoreHelp" title="Value Score / Priority คืออะไร" aria-label="อธิบาย Value Score และ Priority">?</button>
       <span id="impCount" class="count-badge"></span>
       <span class="spacer"></span>
       <select id="buFilter" class="ghost"><option value="">BU: ทั้งหมด</option></select>
@@ -359,6 +374,12 @@
     <div class="modal-f"><button class="btn-cancel" id="modalCancel">ยกเลิก</button><button class="btn-primary" id="modalSave">บันทึก</button></div>
   </div>
 </div>
+<div class="modal-scrim" id="infoScrim">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="infoTitle">
+    <div class="modal-h"><span id="infoTitle"></span><button class="close" id="infoClose" aria-label="ปิด">✕</button></div>
+    <div class="modal-b info-b" id="infoBody"></div>
+  </div>
+</div>
 <input type="file" id="impfile" accept="application/json" hidden>
 <datalist id="ownerlist"></datalist>
 
@@ -381,9 +402,10 @@
   const pindex=p=>vscore(p)/(EMAP[p.size]||3);
   const projById=id=>projects.find(p=>p.id===id);
   const PRIO=[{k:"High",c:"--hi",s:"--hi-soft"},{k:"Med",c:"--md",s:"--md-soft"},{k:"Low",c:"--lo",s:"--lo-soft"}];
-  const TASK_STAT=["Not started","Review","Task Approved","In progress","UAT","Done"];
-  const PROJ_STAT=["Not started","Review","Project Approved","In progress","UAT","Done"];
-  const STCOLOR={"Not started":"--st-todo","Review":"--st-rev","Task Approved":"--st-appr","Project Approved":"--st-appr","In progress":"--st-prog","UAT":"--st-uat","Done":"--st-done"};
+  const TASK_STAT=["Not started","Review","Task Approved","In progress","On Hold","Blocked","UAT","Done","Cancelled"];
+  const PROJ_STAT=["Not started","Review","Project Approved","In progress","On Hold","Blocked","UAT","Done","Cancelled"];
+  const STCOLOR={"Not started":"--st-todo","Review":"--st-rev","Task Approved":"--st-appr","Project Approved":"--st-appr","In progress":"--st-prog","On Hold":"--md","Blocked":"--hi","UAT":"--st-uat","Done":"--st-done","Cancelled":"--lo"};
+  const WIP_EXCLUDE=["Done","Cancelled","On Hold","Blocked"];
   const statColor=k=>STCOLOR[k]||"--st-todo";
   const prioMeta=k=>PRIO.find(p=>p.k===k)||PRIO[2];
   const cssVal=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
@@ -611,13 +633,20 @@
     projs.forEach(p=>{collect(p);projTasks(p.id).filter(taskMatches).forEach(collect);});
     const box=el("div","gantt");
     if(!dates.length){const e=el("div","empty");e.style.margin="16px";e.textContent="ไม่มีงานที่มีวันที่ในตัวกรองนี้";box.appendChild(e);main.appendChild(box);return;}
+    const fmtY=s=>{const x=new Date(s);return isNaN(x)?"—":(String(x.getDate()).padStart(2,"0")+"/"+String(x.getMonth()+1).padStart(2,"0")+"/"+x.getFullYear());};
     let min=new Date(Math.min(...dates)), max=new Date(Math.max(...dates));
-    min=new Date(+min-3*864e5); max=new Date(+max+3*864e5);
-    const span=Math.max(max-min,7*864e5);
+    min=new Date(+min-3*864e5);
+    const AXIS_END=new Date("2027-12-31");            // ยืดถึงสิ้นปี 2027
+    max=new Date(Math.max(+max+3*864e5,+AXIS_END));
+    min.setHours(0,0,0,0); max.setHours(0,0,0,0);
+    const totalDays=Math.max(Math.round((max-min)/864e5),30);
+    const span=max-min;
     const pos=d=>{const x=new Date(d);return isNaN(x)?0:(x-min)/span*100;};
-    const gcols="minmax(180px,1.4fr) 88px 62px 62px 3fr";
+    const PX_PER_DAY=5, trackPx=Math.max(Math.round(totalDays*PX_PER_DAY),700);
+    const gcols=`minmax(180px,220px) 118px 88px 88px ${trackPx}px`;
+    // tick + gridline รายเดือน (วันที่ 1 ของแต่ละเดือน)
     let ticks="",gl="";
-    for(let d=new Date(min); d<=max; d.setDate(d.getDate()+7)){const L=pos(d);ticks+=`<div class="g-tick" style="left:${L}%">${d.getDate()+"/"+(d.getMonth()+1)}</div>`;gl+=`<div class="g-gl" style="left:${L}%"></div>`;}
+    for(let d=new Date(min.getFullYear(),min.getMonth(),1); d<=max; d.setMonth(d.getMonth()+1)){if(d<min)continue;const L=pos(d);const yy=String(d.getFullYear()).slice(2);ticks+=`<div class="g-tick" style="left:${L}%">${(d.getMonth()+1)+"/"+yy}</div>`;gl+=`<div class="g-gl" style="left:${L}%"></div>`;}
     const today=new Date();today.setHours(0,0,0,0);
     const tline=(today>=min&&today<=max)?`<div class="g-today" style="left:${pos(today)}%"><span class="lb">วันนี้</span></div>`:"";
     const bar=(o,color,isSub)=>{const s=new Date(o.start),e=new Date(o.end);if(isNaN(s)||isNaN(e)||e<s)return "";const left=pos(s),w=Math.max((e-s+864e5)/span*100,1.4);const done=o.status==="Done";return `<button class="g-bar ${done?"done":""}" data-id="${esc(o.id)}"${isSub?' data-sub="1"':''} style="left:${left}%;width:${w}%;background:${color}" title="${esc(fmt(o.start))} → ${esc(fmt(o.end))}"><span class="bd"></span>${isSub?esc(phaseOf(o)):esc(o.id)}</button>`;};
@@ -628,14 +657,14 @@
       const di=dueMeta(p), stc=statColor(p.status), col=pcolor(p.id);
       rows+=`<div class="g-row"><div class="g-nm"><button class="exp" data-tid="${esc(p.id)}">${subs.length?(exp?"▾":"▸"):""}</button><span class="dot" style="background:${col}"></span><span class="nm" data-pid="${esc(p.id)}">${esc(p.name)}</span></div>
         <div class="g-st"><span class="g-stp" style="color:var(${stc});background:color-mix(in srgb,var(${stc}) 15%,transparent)">${esc(p.status)}</span></div>
-        <div class="g-dt">${p.start?fmt(p.start):"—"}</div>
-        <div class="g-dt ${di.cls==="over"?"over":""}">${p.end?fmt(p.end):"—"}</div>
+        <div class="g-dt">${p.start?fmtY(p.start):"—"}</div>
+        <div class="g-dt ${di.cls==="over"?"over":""}">${p.end?fmtY(p.end):"—"}</div>
         <div class="g-tr">${gl}${tline}${bar(p,col,false)}</div></div>`;
       if(exp)subs.forEach(t=>{const di2=dueMeta(t),stc2=statColor(t.status),phc="var("+(PHASE_COLOR[phaseOf(t)]||"--st-todo")+")";
         rows+=`<div class="g-row sub"><div class="g-nm sub"><span class="dot" style="background:${phc}"></span><span class="nm" data-tid2="${esc(t.id)}">${esc(t.title)}</span></div>
           <div class="g-st"><span class="g-stp" style="color:${phc};background:color-mix(in srgb,${phc} 16%,transparent)">${esc(t.status)}</span></div>
-          <div class="g-dt">${t.start?fmt(t.start):"—"}</div>
-          <div class="g-dt ${di2.cls==="over"?"over":""}">${t.end?fmt(t.end):"—"}</div>
+          <div class="g-dt">${t.start?fmtY(t.start):"—"}</div>
+          <div class="g-dt ${di2.cls==="over"?"over":""}">${t.end?fmtY(t.end):"—"}</div>
           <div class="g-tr">${gl}${tline}${bar(t,phc,true)}</div></div>`;});
     });
     box.innerHTML=`<div class="gantt-scroll"><div class="gantt-inner" style="--gcols:${gcols}">
@@ -651,8 +680,7 @@
   }
   function capData(){
     const map={};
-    const add=(who,size,status)=>{if(!who)return;if(!map[who])map[who]={who,days:0,wip:0};map[who].days+=(DAYS_OF[size]||0);if(["M","L","XL"].indexOf(size)>=0&&status!=="Done")map[who].wip++;};
-    tasks.filter(taskMatches).forEach(t=>{add(t.owner,t.size,t.status);(t.assigns||[]).forEach(g=>(g.members||[]).forEach(m=>add(m,t.size,t.status)));});
+    tasks.filter(taskMatches).forEach(t=>{const who=t.owner;if(!who)return;if(!map[who])map[who]={who,days:0,wip:0};map[who].days+=(DAYS_OF[t.size]||0);if(["M","L","XL"].indexOf(t.size)>=0&&WIP_EXCLUDE.indexOf(t.status)<0)map[who].wip++;});
     return Object.values(map).sort((a,b)=>b.days-a.days);
   }
   function gateCard(p){const vs=vscore(p),pi=pindex(p),sc=p.scope==="Corporate"?"corp":"bu";
@@ -675,15 +703,16 @@
     wrap.appendChild(gsec);
     const csec=el("div","plan-sub");
     const cap=capData();
-    csec.innerHTML=`<h3>👥 Capacity / Workload</h3><p class="pnote">วันจาก Size ของ sub-task (owner + ทีมร่วม) เทียบ budget ${CAP_BUDGET} วัน/เดือน · เส้นดำ = 100% · WIP = งาน M+ ที่ยังไม่ Done (เตือนแดง >2)</p>
+    csec.innerHTML=`<h3>👥 Capacity / Workload</h3><p class="pnote">วันจาก Size ของ sub-task (เฉพาะ owner ที่รับผิดชอบ) เทียบ budget ${CAP_BUDGET} วัน/เดือน · เส้นดำ = 100% · WIP = งาน M+ ที่ทำอยู่จริง (ไม่นับ Done/Blocked/On Hold/Cancelled · เตือนแดง >2) · <b>กดชื่อดูรายละเอียด</b></p>
       <div class="cap-list">${cap.map(x=>{const pct=Math.round(x.days/CAP_BUDGET*100),fill=Math.min(pct,100),cls=pct>100?"over":pct>85?"mid":"ok",bad=x.wip>2;
-        return `<div class="cap-row"><div class="who"><span class="av" style="background:${pcolor(x.who)}">${esc(x.who.slice(0,1))}</span><span class="nm">${esc(x.who)}</span></div>
+        return `<div class="cap-row" data-who="${esc(x.who)}" tabindex="0" role="button"><div class="who"><span class="av" style="background:${pcolor(x.who)}">${esc(x.who.slice(0,1))}</span><span class="nm">${esc(x.who)}</span></div>
           <div class="cap-bw"><div class="cap-track"><div class="cap-fill ${cls}" style="width:${fill}%"></div><div class="cap-budget" style="left:100%"></div></div>
           <div class="cap-detail"><span class="${pct>100?"o":""}">${x.days.toFixed(1)} / ${CAP_BUDGET} วัน (${pct}%)</span>${bad?'<span class="wipflag">WIP เกิน 2</span>':''}</div></div>
-          <div class="cap-wip ${bad?"bad":""}"><span class="n">${x.wip}</span><span class="l">งาน M+</span></div></div>`;}).join("")||'<div class="empty">ไม่มีคนที่ถูก assign ในตัวกรองนี้</div>'}</div>`;
+          <div class="cap-wip ${bad?"bad":""}"><span class="n">${x.wip}</span><span class="l">งาน M+</span></div></div>`;}).join("")||'<div class="empty">ไม่มี owner ในตัวกรองนี้</div>'}</div>`;
     wrap.appendChild(csec);
     main.appendChild(wrap);
     const thr=$("#thr");if(thr)thr.addEventListener("input",e=>{TH=+e.target.value;const v=$("#thrv");if(v)v.textContent=TH.toFixed(1);renderPlanning();});
+    main.querySelectorAll(".cap-row[data-who]").forEach(r=>{const go=()=>openPersonDetail(r.dataset.who);r.addEventListener("click",go);r.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();go();}});});
   }
 
   function render(){
@@ -715,7 +744,7 @@
   function closeDetail(){selId=null;drawer.classList.remove("open");drawer.setAttribute("aria-hidden","true");scrim.classList.remove("show");render();}
   function applyLock(){if(!locked)return;drawer.querySelectorAll("input,select,textarea,button").forEach(x=>{if(x.id!=="dw-close")x.disabled=true;});}
   scrim.addEventListener("click",closeDetail);
-  document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(mScrim.classList.contains("show"))closeModal();else closeDetail();}});
+  document.addEventListener("keydown",e=>{if(e.key==="Escape"){if($("#infoScrim").classList.contains("show"))$("#infoScrim").classList.remove("show");else if(mScrim.classList.contains("show"))closeModal();else closeDetail();}});
 
   function renderProjSubs(p){
     const box=drawer.querySelector("#psubs"); if(!box)return;
@@ -812,6 +841,30 @@
     drawer.querySelector("#f-del").addEventListener("click",()=>{if(confirm("ลบ "+t.id+" ?")){tasks=tasks.filter(x=>x.id!==t.id);closeDetail();}});
     drawer.classList.add("open");drawer.setAttribute("aria-hidden","false");scrim.classList.add("show");applyLock();render();
   }
+  function openPersonDetail(name){
+    selId=null;
+    const owned=tasks.filter(t=>t.owner===name);
+    const coOwned=tasks.filter(t=>t.owner!==name&&(t.assigns||[]).some(g=>(g.members||[]).indexOf(name)>=0));
+    const days=owned.reduce((s,t)=>s+(DAYS_OF[t.size]||0),0);
+    const wip=owned.filter(t=>["M","L","XL"].indexOf(t.size)>=0&&WIP_EXCLUDE.indexOf(t.status)<0).length;
+    const pct=Math.round(days/CAP_BUDGET*100);
+    const trow=t=>{const pj=projById(t.proj)||{};const stc=statColor(t.status);const di=dueMeta(t);
+      return `<tr><td><a href="#" class="slink" data-id="${esc(t.id)}">${esc(t.title)}</a></td><td>${esc(pj.name?pj.name.slice(0,14):t.proj)}</td><td class="dcol">${esc(t.size)}</td><td class="dcol">${(DAYS_OF[t.size]||0)}</td><td><span style="font-size:.62rem;font-weight:700;color:var(${stc})">${esc(t.status)}</span>${di.cls==="over"?' 🔴':di.cls==="soon"?' ⚠️':''}</td></tr>`;};
+    const table=list=>list.length?`<div class="subwrap-box"><table class="subtable"><thead><tr><th>งาน</th><th>โปรเจกต์</th><th class="dcol">Size</th><th class="dcol">วัน</th><th>Status</th></tr></thead><tbody>${list.map(trow).join("")}</tbody></table></div>`:`<div class="empty">— ไม่มี —</div>`;
+    drawer.innerHTML=`
+      <div class="dw-h"><span class="ptag-ro"><span class="pd" style="background:${pcolor(name)}"></span>👤 ${esc(name)}</span><button class="close" id="dw-close">✕</button></div>
+      <div class="dw-body">
+        <div style="display:flex;gap:12px;align-items:center;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:11px 14px">
+          <div class="cap-bw" style="flex:1"><div class="cap-track"><div class="cap-fill ${pct>100?"over":pct>85?"mid":"ok"}" style="width:${Math.min(pct,100)}%"></div><div class="cap-budget" style="left:100%"></div></div>
+          <div class="cap-detail"><span class="${pct>100?"o":""}">${days.toFixed(1)} / ${CAP_BUDGET} วัน (${pct}%)</span></div></div>
+          <div class="cap-wip ${wip>2?"bad":""}"><span class="n">${wip}</span><span class="l">งาน M+</span></div></div>
+        <div class="fld"><label>งานที่รับผิดชอบ (owner) — ${owned.length} งาน</label>${table(owned)}</div>
+        ${coOwned.length?`<div class="fld"><label>ร่วมทีม (ไม่นับใน load) — ${coOwned.length} งาน</label>${table(coOwned)}</div>`:""}
+      </div>`;
+    drawer.querySelector("#dw-close").addEventListener("click",closeDetail);
+    drawer.querySelectorAll(".slink").forEach(a=>a.addEventListener("click",e=>{e.preventDefault();openTaskDetail(a.dataset.id);}));
+    drawer.classList.add("open");drawer.setAttribute("aria-hidden","false");scrim.classList.add("show");
+  }
 
   /* ---- modal ---- */
   const mScrim=$("#modalScrim"); let modalSaveFn=null;
@@ -822,6 +875,46 @@
   $("#modalCancel").addEventListener("click",closeModal);
   mScrim.addEventListener("click",e=>{if(e.target===mScrim)closeModal();});
   $("#modalSave").addEventListener("click",()=>{if(modalSaveFn&&modalSaveFn()!==false){closeModal();render();}});
+
+  /* ---- info popups (? = นิยาม, 🧮 = ตารางคำนวณ) ---- */
+  const infoScrim=$("#infoScrim");
+  function openInfo(title,html){$("#infoTitle").innerHTML=title;$("#infoBody").innerHTML=html;infoScrim.classList.add("show");}
+  function closeInfo(){infoScrim.classList.remove("show");}
+  $("#infoClose").addEventListener("click",closeInfo);
+  infoScrim.addEventListener("click",e=>{if(e.target===infoScrim)closeInfo();});
+  const INFO_CONCEPT=`
+    <h4>⚖️ Value Score (1.00–5.00)</h4>
+    <p>คะแนน "ความสำคัญต่อบริษัท" รวมจาก 5 เกณฑ์ (ให้ 1–5 แล้วถ่วงน้ำหนัก) — ใช้ <b>คัดรับงาน</b>: ผ่าน Gate ที่ <code>≥ 3.0</code> = PMO รับ, ต่ำกว่านั้นให้ฝ่ายทำเอง</p>
+    <h4>🎯 Priority Index</h4>
+    <p><code>Value Score ÷ Effort</code> — ใช้ <b>เรียงลำดับก่อน/หลัง</b>: งาน value เท่ากัน งานเล็ก (Effort น้อย) คุ้มแรงกว่า จึงทำก่อน (หลัก WSJF)</p>
+    <h4>🚦 Priority (High / Med / Low) ของ sub-task</h4>
+    <p>ระดับความเร่งด่วนของงานย่อยที่ตั้งเอง ใช้จัดคอลัมน์ในมุมมอง Priority — ต่างจาก Priority Index (ที่คำนวณจากคะแนนของทั้งโปรเจกต์)</p>
+    <p style="margin-top:10px">กดปุ่ม <b>🧮 วิธีคิดคะแนน</b> ด้านบนเพื่อดูสูตร + ตารางน้ำหนักเต็ม</p>`;
+  function calcInfoHTML(){
+    return `
+    <h4>สูตรคำนวณ</h4>
+    <div class="info-fx">Value Score = 0.30·S + 0.25·V + 0.15·K + 0.15·R + 0.15·U</div>
+    <div class="info-fx">Priority Index = Value Score ÷ Effort (E)</div>
+    <p>ให้คะแนนแต่ละเกณฑ์ <b>1–5</b> · Gate รับเมื่อ Value Score <code>≥ 3.0</code></p>
+    <h4>น้ำหนักเกณฑ์ (รวม 100%)</h4>
+    <table class="info-tbl"><thead><tr><th>เกณฑ์</th><th class="num">น้ำหนัก</th><th>ความหมาย (5 = สูงสุด)</th></tr></thead><tbody>
+      <tr><td>S — Strategic</td><td class="num">30%</td><td>ตรง OKR / กลยุทธ์บริษัท</td></tr>
+      <tr><td>V — Value</td><td class="num">25%</td><td>มูลค่าเงิน / รายได้-ประหยัด</td></tr>
+      <tr><td>K — Risk</td><td class="num">15%</td><td>ความเสี่ยง / compliance</td></tr>
+      <tr><td>R — Reach</td><td class="num">15%</td><td>กระทบหลายฝ่าย / ทั้งบริษัท</td></tr>
+      <tr><td>U — Urgency</td><td class="num">15%</td><td>ความเร่งด่วน / deadline</td></tr>
+    </tbody></table>
+    <h4>Size → Effort (E)</h4>
+    <table class="info-tbl"><thead><tr><th>Size</th><th>เวลา</th><th class="num">E</th></tr></thead><tbody>
+      <tr><td>XS</td><td>1–2 วัน</td><td class="num">1</td></tr>
+      <tr><td>S</td><td>~1 สัปดาห์</td><td class="num">2</td></tr>
+      <tr><td>M</td><td>~2 สัปดาห์</td><td class="num">3</td></tr>
+      <tr><td>L</td><td>~1 เดือน</td><td class="num">4</td></tr>
+      <tr><td>XL</td><td>&gt; 1 เดือน (ควรหั่นเฟส)</td><td class="num">5</td></tr>
+    </tbody></table>`;
+  }
+  $("#scoreHelp").addEventListener("click",()=>openInfo("Value Score / Priority คืออะไร",INFO_CONCEPT));
+  $("#calcBtn").addEventListener("click",()=>openInfo("🧮 วิธีคิดคะแนน + ตารางคำนวณ",calcInfoHTML()));
   function nextTaskId(){let n=tasks.reduce((m,t)=>{const x=parseInt((String(t.id).match(/\d+/)||[0])[0],10)||0;return Math.max(m,x);},0);return "TSK-"+(n+1);}
   function uniqId(base,exists){let id=base||"P",n=1;while(exists(id)){id=(base||"P")+(++n);}return id;}
 
