@@ -563,7 +563,7 @@
         <div class="grid2"><div class="fld"><label>อยู่โปรเจกต์</label><select id="f-proj">${projects.map(p=>`<option value="${esc(p.id)}"${p.id===t.proj?" selected":""}>${esc(p.id)}</option>`).join("")}</select></div>
           <div class="fld"><label>Type</label><select id="f-type">${opt(TYPES,t.type)}</select></div></div>
         <div class="grid2"><div class="fld"><label>Owner assign</label><input list="ownerlist" id="f-owner" value="${esc(t.owner)}" placeholder="พิมพ์ชื่อ / เลือก"></div>
-          <div class="fld"><label>PMO</label><select id="f-pmo">${opt(PMO_LIST,t.pmo||"Chay")}</select></div></div>
+          <div class="fld"><label>PMO</label><select id="f-pmo"><option value=""${t.pmo?"":" selected"}>— ยังไม่เลือก —</option>${opt(PMO_LIST,t.pmo||"")}</select></div></div>
         <div class="fld"><label>BU / ฝ่าย</label><select id="f-bu">${opt(BUS,t.bu)}</select></div>
         <div class="grid2"><div class="fld"><label>Status</label><select id="f-status">${opt(TASK_STAT,t.status)}</select></div>
           <div class="fld"><label>Priority</label><select id="f-prio">${opt(PRIO.map(x=>x.k),t.prio)}</select></div></div>
@@ -598,10 +598,10 @@
   function uniqId(base,exists){let id=base||"P",n=1;while(exists(id)){id=(base||"P")+(++n);}return id;}
 
   function openAddSub(p){
-    openModal("เพิ่ม Sub-task ใน "+p.id,`
+    openModal("เพิ่ม Sub-task",`
       <div class="fld"><label>ชื่อ sub-task</label><input id="m-title" placeholder="เช่น เตรียมข้อมูล"></div>
       <div class="grid2"><div class="fld"><label>Owner assign</label><input list="ownerlist" id="m-owner" value="${esc(p.owner)}"></div>
-        <div class="fld"><label>PMO</label><select id="m-pmo">${opt(PMO_LIST,p.pmo||"Chay")}</select></div></div>
+        <div class="fld"><label>PMO</label><select id="m-pmo"><option value=""${p.pmo?"":" selected"}>— ยังไม่เลือก —</option>${opt(PMO_LIST,p.pmo||"")}</select></div></div>
       <div class="grid2"><div class="fld"><label>BU / ฝ่าย</label><select id="m-bu">${opt(BUS,BUS[0])}</select></div>
         <div class="fld"><label>Type</label><select id="m-type">${opt(TYPES,"Project")}</select></div></div>
       <div class="grid2"><div class="fld"><label>Priority</label><select id="m-prio">${opt(PRIO.map(x=>x.k),"Med")}</select></div>
