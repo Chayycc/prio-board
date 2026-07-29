@@ -91,6 +91,7 @@
   .chip-inwrap{display:inline-flex;gap:4px}
   .chip-in{font:inherit;font-size:.8rem;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:5px 8px;width:130px}
   .chip-addbtn{border:1px solid var(--line);background:var(--surface-2);color:var(--accent-ink);border-radius:8px;font-weight:700;cursor:pointer;padding:0 10px}
+  button.a-add{max-width:100%;white-space:normal;line-height:1.3}
   .assign-row{border:1px solid var(--line);background:var(--surface-2);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px;margin-bottom:8px}
   .assign-head{display:flex;gap:8px;align-items:center}
   .assign-head .a-bu{flex:1;font:inherit;font-size:.86rem;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:7px 9px}
@@ -175,10 +176,10 @@
   .dw-h .did{font-family:var(--mono);font-size:.72rem;color:var(--ink-soft)}
   .dw-h .close{margin-left:auto;width:32px;height:32px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink-soft);cursor:pointer;font-size:1rem;display:grid;place-items:center}
   .dw-h .close:hover{border-color:var(--accent);color:var(--accent-ink)}
-  .dw-body{padding:16px 18px;overflow-y:auto;display:flex;flex-direction:column;gap:14px}
+  .dw-body{padding:16px 18px;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:14px}
   .fld{display:flex;flex-direction:column;gap:5px}
   .fld label{font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;font-weight:700;color:var(--ink-soft)}
-  .fld input,.fld select,.fld textarea{font:inherit;font-size:.86rem;color:var(--ink);background:var(--surface-2);border:1px solid var(--line);border-radius:9px;padding:8px 10px;width:100%}
+  .fld input,.fld select,.fld textarea{font:inherit;font-size:.86rem;color:var(--ink);background:var(--surface-2);border:1px solid var(--line);border-radius:9px;padding:8px 10px;width:100%;min-width:0}
   .fld input:focus,.fld select:focus,.fld textarea:focus{outline:2px solid var(--accent);outline-offset:0;border-color:var(--accent)}
   .fld input[readonly]{opacity:.7;cursor:default}
   .fld textarea{resize:vertical;min-height:62px}
@@ -266,14 +267,19 @@
   /* ── gantt timeline ── */
   .gantt{border:1px solid var(--line);border-radius:14px;background:var(--surface);overflow:hidden}
   .gantt-scroll{overflow-x:auto}
-  .gantt-inner{min-width:800px}
-  .g-head{display:grid;grid-template-columns:var(--gcols);border-bottom:1px solid var(--line);background:var(--surface-2)}
-  .g-head>div{padding:8px 12px;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-soft);white-space:nowrap}
-  .g-th{position:relative;border-left:1px solid var(--line)}
-  .g-tick{position:absolute;top:0;font-family:var(--mono);font-size:.58rem;color:var(--ink-soft);padding:8px 0 0 4px;border-left:1px solid var(--line);height:100%}
-  .g-row{display:grid;grid-template-columns:var(--gcols);border-bottom:1px solid var(--line)}
+  .gantt-inner{min-width:0}
+  .g-head{display:flex;border-bottom:1px solid var(--line);background:var(--surface-2);width:max-content;min-width:100%}
+  .g-row{display:flex;border-bottom:1px solid var(--line);width:max-content;min-width:100%}
   .g-row:last-child{border-bottom:0}
   .g-row.sub{background:color-mix(in srgb,var(--surface-2) 40%,transparent)}
+  .g-left,.g-left-h{flex:none;display:grid;grid-template-columns:200px 118px 84px 84px;position:sticky;left:0;z-index:5;box-shadow:1px 0 0 var(--line)}
+  .g-left{background:var(--surface)}
+  .g-row.sub .g-left{background:var(--surface-2)}
+  .g-left-h{z-index:6;background:var(--surface-2)}
+  .g-left-h>div{padding:8px 12px;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-soft);white-space:nowrap;display:flex;align-items:center}
+  .g-th,.g-tr{flex:none;width:var(--trackpx,700px);position:relative;border-left:1px solid var(--line)}
+  .g-tr{min-height:36px}
+  .g-tick{position:absolute;top:0;font-family:var(--mono);font-size:.58rem;color:var(--ink-soft);padding:8px 0 0 4px;border-left:1px solid var(--line);height:100%}
   .g-nm{padding:8px 12px;font-size:.8rem;font-weight:600;display:flex;align-items:center;gap:7px;min-width:0}
   .g-nm.sub{padding-left:24px;font-weight:500;font-size:.76rem;color:var(--ink-soft)}
   .g-nm .exp{border:0;background:transparent;color:var(--ink-soft);cursor:pointer;font-size:.7rem;font-family:var(--mono);width:13px;flex:none;padding:0}
@@ -281,10 +287,9 @@
   .g-nm .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
   .g-nm .nm:hover{color:var(--accent-ink)}
   .g-st{padding:8px 8px;display:flex;align-items:center}
-  .g-stp{font-size:.58rem;font-weight:800;padding:2px 7px;border-radius:6px;white-space:nowrap}
+  .g-stp{font-size:.58rem;font-weight:800;padding:2px 7px;border-radius:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
   .g-dt{padding:8px 10px;font-family:var(--mono);font-size:.68rem;color:var(--ink-soft);display:flex;align-items:center;white-space:nowrap}
   .g-dt.over{color:var(--hi);font-weight:700}
-  .g-tr{position:relative;border-left:1px solid var(--line);min-height:36px}
   .g-gl{position:absolute;top:0;bottom:0;width:1px;background:var(--line);opacity:.5}
   .g-today{position:absolute;top:0;bottom:0;width:2px;background:var(--hi);z-index:3}
   .g-today .lb{position:absolute;top:2px;left:3px;font-family:var(--mono);font-size:.52rem;font-weight:700;color:var(--hi);white-space:nowrap}
@@ -643,7 +648,6 @@
     const span=max-min;
     const pos=d=>{const x=new Date(d);return isNaN(x)?0:(x-min)/span*100;};
     const PX_PER_DAY=5, trackPx=Math.max(Math.round(totalDays*PX_PER_DAY),700);
-    const gcols=`minmax(180px,220px) 118px 88px 88px ${trackPx}px`;
     // tick + gridline รายเดือน (วันที่ 1 ของแต่ละเดือน)
     let ticks="",gl="";
     for(let d=new Date(min.getFullYear(),min.getMonth(),1); d<=max; d.setMonth(d.getMonth()+1)){if(d<min)continue;const L=pos(d);const yy=String(d.getFullYear()).slice(2);ticks+=`<div class="g-tick" style="left:${L}%">${(d.getMonth()+1)+"/"+yy}</div>`;gl+=`<div class="g-gl" style="left:${L}%"></div>`;}
@@ -655,20 +659,20 @@
       const subs=projTasks(p.id).filter(taskMatches);
       const exp=ganttExp[p.id]!==false;
       const di=dueMeta(p), stc=statColor(p.status), col=pcolor(p.id);
-      rows+=`<div class="g-row"><div class="g-nm"><button class="exp" data-tid="${esc(p.id)}">${subs.length?(exp?"▾":"▸"):""}</button><span class="dot" style="background:${col}"></span><span class="nm" data-pid="${esc(p.id)}">${esc(p.name)}</span></div>
+      rows+=`<div class="g-row"><div class="g-left"><div class="g-nm"><button class="exp" data-tid="${esc(p.id)}">${subs.length?(exp?"▾":"▸"):""}</button><span class="dot" style="background:${col}"></span><span class="nm" data-pid="${esc(p.id)}">${esc(p.name)}</span></div>
         <div class="g-st"><span class="g-stp" style="color:var(${stc});background:color-mix(in srgb,var(${stc}) 15%,transparent)">${esc(p.status)}</span></div>
         <div class="g-dt">${p.start?fmtY(p.start):"—"}</div>
-        <div class="g-dt ${di.cls==="over"?"over":""}">${p.end?fmtY(p.end):"—"}</div>
+        <div class="g-dt ${di.cls==="over"?"over":""}">${p.end?fmtY(p.end):"—"}</div></div>
         <div class="g-tr">${gl}${tline}${bar(p,col,false)}</div></div>`;
       if(exp)subs.forEach(t=>{const di2=dueMeta(t),stc2=statColor(t.status),phc="var("+(PHASE_COLOR[phaseOf(t)]||"--st-todo")+")";
-        rows+=`<div class="g-row sub"><div class="g-nm sub"><span class="dot" style="background:${phc}"></span><span class="nm" data-tid2="${esc(t.id)}">${esc(t.title)}</span></div>
+        rows+=`<div class="g-row sub"><div class="g-left"><div class="g-nm sub"><span class="dot" style="background:${phc}"></span><span class="nm" data-tid2="${esc(t.id)}">${esc(t.title)}</span></div>
           <div class="g-st"><span class="g-stp" style="color:${phc};background:color-mix(in srgb,${phc} 16%,transparent)">${esc(t.status)}</span></div>
           <div class="g-dt">${t.start?fmtY(t.start):"—"}</div>
-          <div class="g-dt ${di2.cls==="over"?"over":""}">${t.end?fmtY(t.end):"—"}</div>
+          <div class="g-dt ${di2.cls==="over"?"over":""}">${t.end?fmtY(t.end):"—"}</div></div>
           <div class="g-tr">${gl}${tline}${bar(t,phc,true)}</div></div>`;});
     });
-    box.innerHTML=`<div class="gantt-scroll"><div class="gantt-inner" style="--gcols:${gcols}">
-      <div class="g-head"><div>Project / งาน</div><div>Status</div><div>Start</div><div>Due</div><div class="g-th">${ticks}</div></div>
+    box.innerHTML=`<div class="gantt-scroll"><div class="gantt-inner" style="--trackpx:${trackPx}px">
+      <div class="g-head"><div class="g-left-h"><div>Project / งาน</div><div>Status</div><div>Start</div><div>Due</div></div><div class="g-th">${ticks}</div></div>
       <div>${rows}</div>
       <div class="g-legend">${PHASES.map(p=>`<span class="lg"><span class="sw" style="background:var(${PHASE_COLOR[p]})"></span>${esc(p)}</span>`).join("")}<span class="lg" style="margin-left:auto"><span class="sw" style="background:var(--hi)"></span>เส้นวันนี้ · แท่งจาง=Done</span></div>
     </div></div>`;
