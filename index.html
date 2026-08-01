@@ -220,6 +220,19 @@
   .file-chip{font-size:.6rem;font-weight:800;padding:2px 7px;border-radius:99px;white-space:nowrap;color:var(--accent-ink);background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 25%,transparent)}
   .subtable .flink{color:var(--accent-ink);text-decoration:none;margin-left:6px;font-size:.72rem}
   .subtable .flink:hover{text-decoration:underline}
+  .cmt-thread{display:flex;flex-direction:column;gap:8px}
+  .cmt-item{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:8px 11px}
+  .cmt-item .ch{display:flex;align-items:center;gap:8px;margin-bottom:3px}
+  .cmt-by{font-size:.72rem;font-weight:800;color:var(--accent-ink)}
+  .cmt-at{font-family:var(--mono);font-size:.62rem;color:var(--ink-soft)}
+  .cmt-item .cdel{margin-left:auto;border:0;background:transparent;color:var(--ink-soft);cursor:pointer;font-size:.78rem;padding:0 2px;line-height:1}
+  .cmt-item .cdel:hover{color:var(--hi)}
+  .cmt-item .ctext{font-size:.82rem;color:var(--ink);white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.45}
+  .cmt-add{display:flex;flex-direction:column;gap:6px;border:1px dashed var(--line);border-radius:10px;padding:8px}
+  .cmt-add .c-row{display:flex;gap:6px;align-items:flex-end}
+  .cmt-add .c-by{font:inherit;font-size:.78rem;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:6px 8px;width:100%;min-width:0}
+  .cmt-add .c-text{flex:1;font:inherit;font-size:.8rem;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:6px 8px;min-width:0;resize:vertical;min-height:34px}
+  .cmt-add .c-send{white-space:nowrap;align-self:stretch}
   #ownerFilter,#pmoFilter{max-width:150px}
   /* ── planning view (capacity + gate) ── */
   .plan{display:flex;flex-direction:column;gap:22px}
@@ -485,9 +498,20 @@
     });
     box.querySelector(".file-add").addEventListener("click",()=>{arr.push({name:"",url:""});renderFiles(box,arr,onChange);const ni=box.querySelectorAll(".f-name");if(ni.length)ni[ni.length-1].focus();onChange&&onChange();});
   }
+  function fmtTS(iso){if(!iso)return "";const d=new Date(iso);if(isNaN(d))return "";const p=n=>String(n).padStart(2,"0");return p(d.getDate())+"/"+p(d.getMonth()+1)+" "+p(d.getHours())+":"+p(d.getMinutes());}
+  function renderComments(box,arr,onChange){
+    if(!box)return;
+    box.innerHTML=arr.map((c,i)=>`<div class="cmt-item"><div class="ch"><span class="cmt-by">${esc(c.by||"—")}</span><span class="cmt-at">${esc(fmtTS(c.at))}</span><button class="cdel" data-i="${i}" type="button" aria-label="ลบคอมเมนต์">✕</button></div><div class="ctext">${esc(c.text)}</div></div>`).join("")
+      +`<div class="cmt-add"><input class="c-by" list="ownerlist" placeholder="ชื่อผู้คอมเมนต์"><div class="c-row"><textarea class="c-text" rows="1" placeholder="เขียนคอมเมนต์… เช่น ติด IT รออนุมัติ"></textarea><button class="addbtn c-send" type="button">＋ ส่ง</button></div></div>`;
+    const byI=box.querySelector(".c-by"), txt=box.querySelector(".c-text");
+    const add=()=>{const v=txt.value.trim();if(!v)return;arr.push({by:byI.value.trim(),text:v,at:new Date().toISOString()});const keep=byI.value;renderComments(box,arr,onChange);const nb=box.querySelector(".c-by");if(nb){nb.value=keep;const nt=box.querySelector(".c-text");if(nt)nt.focus();}onChange&&onChange();};
+    box.querySelector(".c-send").addEventListener("click",add);
+    txt.addEventListener("keydown",e=>{if(e.key==="Enter"&&(e.metaKey||e.ctrlKey)){e.preventDefault();add();}});
+    box.querySelectorAll(".cdel").forEach(b=>b.addEventListener("click",e=>{arr.splice(+e.currentTarget.dataset.i,1);renderComments(box,arr,onChange);onChange&&onChange();}));
+  }
   function normAll(){
-    projects.forEach(p=>{if(!p.pmo)p.pmo="Chay";if(!p.status){var so=p.statusOverride;if(so==="Approved")so="Project Approved";p.status=(so&&PROJ_STAT.indexOf(so)>=0)?so:"Not started";}if(PROJ_STAT.indexOf(p.status)<0)p.status="Not started";if(!Array.isArray(p.assigns)){p.assigns=(p.buOwner||(Array.isArray(p.team)&&p.team.length))?[{bu:p.buOwner||"",members:p.team||[]}]:[];}if(!Array.isArray(p.files))p.files=[];});
-    tasks.forEach(t=>{if(!t.pmo)t.pmo=(projById(t.proj)||{}).pmo||"Chay";if(t.status==="Approved")t.status="Task Approved";if(TASK_STAT.indexOf(t.status)<0)t.status="Not started";if(!t.type)t.type="Project";if(!Array.isArray(t.assigns)){t.assigns=(t.buOwner||(Array.isArray(t.team)&&t.team.length))?[{bu:t.buOwner||"",members:t.team||[]}]:[];}if(!Array.isArray(t.files))t.files=[];t.phase=phaseOf(t);});
+    projects.forEach(p=>{if(!p.pmo)p.pmo="Chay";if(!p.status){var so=p.statusOverride;if(so==="Approved")so="Project Approved";p.status=(so&&PROJ_STAT.indexOf(so)>=0)?so:"Not started";}if(PROJ_STAT.indexOf(p.status)<0)p.status="Not started";if(!Array.isArray(p.assigns)){p.assigns=(p.buOwner||(Array.isArray(p.team)&&p.team.length))?[{bu:p.buOwner||"",members:p.team||[]}]:[];}if(!Array.isArray(p.files))p.files=[];if(!Array.isArray(p.comments))p.comments=[];});
+    tasks.forEach(t=>{if(!t.pmo)t.pmo=(projById(t.proj)||{}).pmo||"Chay";if(t.status==="Approved")t.status="Task Approved";if(TASK_STAT.indexOf(t.status)<0)t.status="Not started";if(!t.type)t.type="Project";if(!Array.isArray(t.assigns)){t.assigns=(t.buOwner||(Array.isArray(t.team)&&t.team.length))?[{bu:t.buOwner||"",members:t.team||[]}]:[];}if(!Array.isArray(t.files))t.files=[];if(!Array.isArray(t.comments)){t.comments=(t.comment&&t.comment.trim())?[{by:"",text:t.comment,at:""}]:[];}t.phase=phaseOf(t);});
   }
 
   let savedTimer=null, sbOK=false, lastSeen=null, pushTimer=null, skipPush=false;
@@ -524,7 +548,7 @@
       <h3>${esc(p.name)}</h3>
       <div class="pi"><b>${pindex(p).toFixed(2)}</b><span>Priority Index</span><span style="margin-left:auto;align-self:center;font-family:var(--mono);font-size:.72rem;font-weight:700;color:var(--copper);background:var(--copper-soft);border-radius:99px;padding:3px 9px" title="Value Score — ใช้คัดเข้า Gate (≥3.0)">Value ${vscore(p).toFixed(2)}</span></div>
       <div class="vbar"><i style="width:${(vscore(p)/5*100).toFixed(0)}%"></i></div>
-      <div class="pmeta"><span class="chip">${esc(p.size)}</span><span>${esc(p.owner)}</span>${(()=>{const n=(p.assigns||[]).reduce((a,g)=>a+((g.members||[]).length),0);return n?`<span class="team-chip">👥 ${n}</span>`:"";})()}${(()=>{const fn=(p.files||[]).length;return fn?`<span class="file-chip">📎 ${fn}</span>`:"";})()}
+      <div class="pmeta"><span class="chip">${esc(p.size)}</span><span>${esc(p.owner)}</span>${(()=>{const n=(p.assigns||[]).reduce((a,g)=>a+((g.members||[]).length),0);return n?`<span class="team-chip">👥 ${n}</span>`:"";})()}${(()=>{const fn=(p.files||[]).length;return fn?`<span class="file-chip">📎 ${fn}</span>`:"";})()}${(()=>{const cn=(p.comments||[]).length;return cn?`<span class="file-chip">💬 ${cn}</span>`:"";})()}
       <span class="prog"><i style="width:${projDone(p)*100}%"></i></span><span style="font-family:var(--mono)">${Math.round(projDone(p)*100)}%</span></div>`;
     b.querySelector(".pedit").addEventListener("click",ev=>{ev.stopPropagation();openProjectDetail(p.id);});
     const flt=()=>{filterProj=filterProj===p.id?null:p.id;render();};
@@ -593,7 +617,8 @@
     const labHtml=view==="prio"
       ? `<span class="lab" style="color:var(${sc});background:color-mix(in srgb,var(${sc}) 14%,transparent)">${esc(t.status)}</span>`
       : `<span class="lab" style="color:var(${pm.c});background:var(${pm.s})">${esc(t.prio)}</span>`;
-    const cmtHtml=t.comment?`<p class="cmt">💬 ${esc(t.comment)}</p>`:"";
+    const cs=t.comments||[], lastC=cs[cs.length-1];
+    const cmtHtml=lastC?`<p class="cmt">💬 ${cs.length>1?`(${cs.length}) `:""}${lastC.by?esc(lastC.by)+": ":""}${esc(lastC.text)}</p>`:"";
     const adHtml=t.type==="Ad-hoc"?`<span class="adhoc">⚡ ad-hoc</span>`:"";
     c.innerHTML=`<span class="stripe" style="background:${stripe}"></span>
       <div class="top"><span class="ptag"><span class="pd" style="background:${pcolor(t.proj)}"></span>${esc(t.proj)}</span>${adHtml}<span class="tid">${esc(t.id)}</span></div>
@@ -793,6 +818,7 @@
           <div id="psubs"></div>
           <button class="addbtn" id="p-addsub" type="button" style="align-self:flex-start;margin-top:6px">＋ เพิ่ม sub-task</button></div>
         <div class="fld"><label>📎 ไฟล์แนบ (ลิงก์)</label><div class="files-box" id="p-files"></div></div>
+        <div class="fld"><label>💬 คอมเมนต์ (เพิ่มได้หลายอัน · tag ผู้เขียน)</label><div class="cmt-thread" id="p-comments"></div></div>
         <button class="dw-del" id="p-del">🗑 ลบโปรเจกต์ (และ sub-task ทั้งหมด)</button>
       </div>`;
     drawer.querySelector("#dw-close").addEventListener("click",closeDetail);
@@ -802,6 +828,7 @@
     ["S","V","K","R","U"].forEach(k=>bindP("#p-"+k,v=>p[k]=+v));
     if(!Array.isArray(p.assigns))p.assigns=[];renderAssigns(drawer.querySelector("#p-assigns"),p.assigns,render);
     if(!Array.isArray(p.files))p.files=[];renderFiles(drawer.querySelector("#p-files"),p.files,render);
+    if(!Array.isArray(p.comments))p.comments=[];renderComments(drawer.querySelector("#p-comments"),p.comments,render);
     const pupd=()=>{const d=dayspan(p.start,p.end);const sp=drawer.querySelector("#p-spent");if(sp)sp.value=d+" วัน";if(d){p.size=sizeFromDays(d);const sz=drawer.querySelector("#p-size");if(sz)sz.value=p.size;}drawer.querySelector("#p-pi").textContent=p.id+" · PI "+pindex(p).toFixed(2);render();};
     drawer.querySelector("#p-start").addEventListener("input",e=>{p.start=e.target.value;pupd();});
     drawer.querySelector("#p-end").addEventListener("input",e=>{p.end=e.target.value;pupd();});
@@ -831,14 +858,15 @@
           <div class="fld"><label>End date</label><input type="date" id="f-end" value="${esc(t.end)}"></div></div>
         <div class="grid2"><div class="fld"><label>Size</label><select id="f-size">${opt(["XS","S","M","L","XL"],t.size)}</select></div>
           <div class="fld"><label>เวลาที่ใช้ (auto)</label><input id="f-spent" value="${spentOf(t)} วัน" readonly></div></div>
-        <div class="fld"><label>Comment</label><textarea id="f-comment">${esc(t.comment)}</textarea></div>
+        <div class="fld"><label>💬 คอมเมนต์ (เพิ่มได้หลายอัน · tag ผู้เขียน)</label><div class="cmt-thread" id="f-comments"></div></div>
         <div class="fld"><label>📎 ไฟล์แนบ (ลิงก์)</label><div class="files-box" id="f-files"></div></div>
         <button class="dw-del" id="f-del">🗑 ลบ sub-task นี้</button>
       </div>`;
     drawer.querySelector("#dw-close").addEventListener("click",closeDetail);
     const bind=(sel,fn)=>drawer.querySelector(sel).addEventListener("input",e=>{fn(e.target.value);render();});
     bind("#f-title",v=>t.title=v);bind("#f-proj",v=>t.proj=v);bind("#f-type",v=>t.type=v);bind("#f-owner",v=>t.owner=v);bind("#f-pmo",v=>t.pmo=v);bind("#f-bu",v=>t.bu=v);
-    bind("#f-status",v=>t.status=v);bind("#f-prio",v=>t.prio=v);bind("#f-size",v=>t.size=v);bind("#f-comment",v=>t.comment=v);bind("#f-phase",v=>t.phase=v);
+    bind("#f-status",v=>t.status=v);bind("#f-prio",v=>t.prio=v);bind("#f-size",v=>t.size=v);bind("#f-phase",v=>t.phase=v);
+    if(!Array.isArray(t.comments))t.comments=[];renderComments(drawer.querySelector("#f-comments"),t.comments,render);
     if(!Array.isArray(t.assigns))t.assigns=[];renderAssigns(drawer.querySelector("#f-assigns"),t.assigns,render);
     if(!Array.isArray(t.files))t.files=[];renderFiles(drawer.querySelector("#f-files"),t.files,render);
     const rs=()=>{const d=dayspan(t.start,t.end);const f=drawer.querySelector("#f-spent");if(f)f.value=d+" วัน";if(d){t.size=sizeFromDays(d);const sz=drawer.querySelector("#f-size");if(sz)sz.value=t.size;}};
@@ -968,7 +996,7 @@
         const st=$("#m-start").value,en=$("#m-end").value,d=dayspan(st,en);
         tasks.push({id:nextTaskId(),proj:p.id,title,type:$("#m-type").value,owner:$("#m-owner").value,pmo:$("#m-pmo").value,bu:$("#m-bu").value,assigns:assigns.filter(g=>g.bu||(g.members&&g.members.length)).map(g=>({bu:g.bu,members:[...(g.members||[])]})),
           files:files.filter(f=>(f.url||"").trim()||(f.name||"").trim()).map(f=>({name:f.name||"",url:f.url||""})),
-          phase:$("#m-phase").value,size:d?sizeFromDays(d):"M",prio:$("#m-prio").value,status:$("#m-status").value,start:st,end:en,comment:""});
+          phase:$("#m-phase").value,size:d?sizeFromDays(d):"M",prio:$("#m-prio").value,status:$("#m-status").value,start:st,end:en,comment:"",comments:[]});
         renderProjSubs(p);});
     renderAssigns($("#m-assigns"),assigns,null);
     renderFiles($("#m-files"),files,null);
@@ -993,7 +1021,7 @@
         const base=((name.match(/[A-Za-z]/g)||[]).join("").slice(0,3).toUpperCase())||"PRJ";
         const id=uniqId(base,x=>projById(x));
         const scope=$("#m-scope").value; const st=$("#m-start").value,en=$("#m-end").value; const d=dayspan(st,en);
-        projects.push({id,name,pmo:$("#m-pmo").value,owner:$("#m-owner").value||OWNERS[0],scope,bu:scope==="BU"?$("#m-bu").value:"",assigns:assigns.filter(g=>g.bu||(g.members&&g.members.length)).map(g=>({bu:g.bu,members:[...(g.members||[])]})),files:files.filter(f=>(f.url||"").trim()||(f.name||"").trim()).map(f=>({name:f.name||"",url:f.url||""})),status:$("#m-status").value,start:st,end:en,size:d?sizeFromDays(d):"M",S:+$("#m-S").value,V:+$("#m-V").value,K:+$("#m-K").value,R:+$("#m-R").value,U:+$("#m-U").value});
+        projects.push({id,name,pmo:$("#m-pmo").value,owner:$("#m-owner").value||OWNERS[0],scope,bu:scope==="BU"?$("#m-bu").value:"",assigns:assigns.filter(g=>g.bu||(g.members&&g.members.length)).map(g=>({bu:g.bu,members:[...(g.members||[])]})),files:files.filter(f=>(f.url||"").trim()||(f.name||"").trim()).map(f=>({name:f.name||"",url:f.url||""})),comments:[],status:$("#m-status").value,start:st,end:en,size:d?sizeFromDays(d):"M",S:+$("#m-S").value,V:+$("#m-V").value,K:+$("#m-K").value,R:+$("#m-R").value,U:+$("#m-U").value});
         openProjectDetail(id);});
     renderAssigns($("#m-assigns"),assigns,null);
     renderFiles($("#m-files"),files,null);
@@ -1007,7 +1035,7 @@
     const head=["Project","ชื่อโปรเจกต์","PMO","Scope","BU (ที่มาขอ)","BU Assign","Project Team","Project Value","Project PI","Project Status","Project Files","Task ID","Sub-task","Owner assign","Task PMO","Task BU","Task BU Assign","Task Team","Type","Phase","Priority","Status","Start","End","Days","Comment","Task Files"];
     let h='<table border="1"><thead><tr>'+head.map(x=>`<th>${cx(x)}</th>`).join("")+'</tr></thead><tbody>';
     tasks.forEach(t=>{const p=projById(t.proj)||{};
-      const row=[t.proj,p.name,p.pmo,p.scope,p.bu,(p.assigns||[]).map(g=>g.bu).filter(Boolean).join(", "),(p.assigns||[]).map(g=>g.bu+((g.members&&g.members.length)?" ("+g.members.join("/")+")":"")).join("; "),p.S!==undefined?vscore(p).toFixed(2):"",p.S!==undefined?pindex(p).toFixed(2):"",projStatus(t.proj),fjoin(p.files),t.id,t.title,t.owner,t.pmo,t.bu,(t.assigns||[]).map(g=>g.bu).filter(Boolean).join(", "),(t.assigns||[]).map(g=>g.bu+((g.members&&g.members.length)?" ("+g.members.join("/")+")":"")).join("; "),t.type,phaseOf(t),t.prio,t.status,t.start,t.end,spentOf(t),t.comment,fjoin(t.files)];
+      const row=[t.proj,p.name,p.pmo,p.scope,p.bu,(p.assigns||[]).map(g=>g.bu).filter(Boolean).join(", "),(p.assigns||[]).map(g=>g.bu+((g.members&&g.members.length)?" ("+g.members.join("/")+")":"")).join("; "),p.S!==undefined?vscore(p).toFixed(2):"",p.S!==undefined?pindex(p).toFixed(2):"",projStatus(t.proj),fjoin(p.files),t.id,t.title,t.owner,t.pmo,t.bu,(t.assigns||[]).map(g=>g.bu).filter(Boolean).join(", "),(t.assigns||[]).map(g=>g.bu+((g.members&&g.members.length)?" ("+g.members.join("/")+")":"")).join("; "),t.type,phaseOf(t),t.prio,t.status,t.start,t.end,spentOf(t),(t.comments||[]).map(c=>(c.by?c.by+": ":"")+c.text).join(" | "),fjoin(t.files)];
       h+='<tr>'+row.map(c=>`<td>${cx(c)}</td>`).join("")+'</tr>';});
     h+='</tbody></table>';
     dl(new Blob(['﻿<html><head><meta charset="utf-8"></head><body>'+h+'</body></html>'],{type:"application/vnd.ms-excel"}),"prio-board.xls");
