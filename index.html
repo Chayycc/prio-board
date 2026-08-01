@@ -190,6 +190,8 @@
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   .grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
   .grid5 .fld label{text-align:center}
+  .svku-desc{display:block;font-family:var(--mono);font-size:.55rem;font-weight:600;letter-spacing:.02em;text-transform:none;color:var(--ink-soft);margin-top:2px;line-height:1.1}
+  .fld.svku{cursor:help}
   .ptag-ro{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:700;color:var(--ink);background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:7px 10px;width:max-content}
   .ptag-ro .pd{width:8px;height:8px;border-radius:99px}
   .subhead{display:flex;align-items:center;justify-content:space-between}
@@ -511,6 +513,8 @@
     txt.addEventListener("keydown",e=>{if(e.key==="Enter"&&(e.metaKey||e.ctrlKey)){e.preventDefault();add();}});
     box.querySelectorAll(".cdel").forEach(b=>b.addEventListener("click",e=>{arr.splice(+e.currentTarget.dataset.i,1);renderComments(box,arr,onChange);onChange&&onChange();}));
   }
+  const IMPACT_DIM=[["S","Strategic","ตรง OKR / กลยุทธ์บริษัท"],["V","Value","มูลค่าเงิน / รายได้-ประหยัด"],["K","Risk","ความเสี่ยง / compliance"],["R","Reach","กระทบหลายฝ่าย / ทั้งบริษัท"],["U","Urgency","ความเร่งด่วน / deadline"]];
+  function svkuHTML(prefix,curFn){return IMPACT_DIM.map(([k,en,th])=>`<div class="fld svku" title="${esc(k)} — ${esc(en)}: ${esc(th)} (1 = ต่ำ → 5 = สูง)"><label>${k}<span class="svku-desc">${esc(en)}</span></label><select id="${esc(prefix)}-${k}">${opt(["1","2","3","4","5"],curFn(k))}</select></div>`).join("");}
   function normAll(){
     projects.forEach(p=>{if(!p.pmo)p.pmo="Chay";if(!p.status){var so=p.statusOverride;if(so==="Approved")so="Project Approved";p.status=(so&&PROJ_STAT.indexOf(so)>=0)?so:"Not started";}if(PROJ_STAT.indexOf(p.status)<0)p.status="Not started";if(!Array.isArray(p.assigns)){p.assigns=(p.buOwner||(Array.isArray(p.team)&&p.team.length))?[{bu:p.buOwner||"",members:p.team||[]}]:[];}if(!Array.isArray(p.files))p.files=[];if(!Array.isArray(p.comments))p.comments=[];});
     tasks.forEach(t=>{if(!t.pmo)t.pmo=(projById(t.proj)||{}).pmo||"Chay";if(t.status==="Approved")t.status="Task Approved";if(TASK_STAT.indexOf(t.status)<0)t.status="Not started";if(!t.type)t.type="Project";if(!Array.isArray(t.assigns)){t.assigns=(t.buOwner||(Array.isArray(t.team)&&t.team.length))?[{bu:t.buOwner||"",members:t.team||[]}]:[];}if(!Array.isArray(t.files))t.files=[];if(!Array.isArray(t.comments)){t.comments=(t.comment&&t.comment.trim())?[{by:"",text:t.comment,at:""}]:[];}t.phase=phaseOf(t);});
@@ -799,7 +803,7 @@
   }
   function openProjectDetail(id){
     const p=projById(id); if(!p)return; selId=null; filterProj=id;
-    const svku=["S","V","K","R","U"].map(k=>`<div class="fld"><label>${k}</label><select id="p-${k}">${opt(["1","2","3","4","5"],String(p[k]))}</select></div>`).join("");
+    const svku=svkuHTML("p",k=>String(p[k]));
     drawer.innerHTML=`
       <div class="dw-h"><span class="ptag-ro"><span class="pd" style="background:${pcolor(p.id)}"></span>Corporate Impact</span>
         <span class="did" id="p-pi">${esc(p.id)} · PI ${pindex(p).toFixed(2)}</span><button class="close" id="dw-close">✕</button></div>
@@ -815,7 +819,7 @@
         <div class="grid2"><div class="fld"><label>เวลาที่ใช้ (auto)</label><input id="p-spent" value="${dayspan(p.start,p.end)} วัน" readonly></div>
           <div class="fld"><label>Size (auto จากวันที่)</label><select id="p-size">${opt(["XS","S","M","L","XL"],p.size)}</select></div></div>
         <div class="fld"><label>สถานะโปรเจกต์ (ตั้งเอง)</label><select id="p-status">${opt(PROJ_STAT,p.status||"Not started")}</select></div>
-        <div class="fld"><label>คะแนน Impact (1–5): S=Strategic V=Value K=Risk R=Reach U=Urgency</label><div class="grid5">${svku}</div></div>
+        <div class="fld"><label>คะแนน Impact (1–5) · 1 = ต่ำ → 5 = สูง (ชี้ที่ช่องเพื่อดูคำอธิบาย)</label><div class="grid5">${svku}</div></div>
         <div class="fld"><div class="subhead"><label>Sub-tasks (แสดงบน Task Priority)</label><span class="pct" id="psubcount"></span></div>
           <div id="psubs"></div>
           <button class="addbtn" id="p-addsub" type="button" style="align-self:flex-start;margin-top:6px">＋ เพิ่ม sub-task</button></div>
@@ -1005,7 +1009,7 @@
   }
   $("#addProj").addEventListener("click",()=>{
     const assigns=[]; const files=[];
-    const svku=["S","V","K","R","U"].map(k=>`<div class="fld"><label>${k}</label><select id="m-${k}">${opt(["1","2","3","4","5"],"3")}</select></div>`).join("");
+    const svku=svkuHTML("m",()=>"3");
     openModal("เพิ่ม Project ใหม่",`
       <div class="fld"><label>ชื่อโปรเจกต์</label><input id="m-name" placeholder="เช่น Fraud Detection Model"></div>
       <div class="fld"><label>PMO ผู้ดูแล (เว้นว่างได้)</label><select id="m-pmo"><option value="" selected>— ระบุภายหลัง —</option>${PMO_LIST.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("")}</select></div>
@@ -1017,7 +1021,7 @@
       <div class="grid2"><div class="fld"><label>Start date</label><input type="date" id="m-start"></div>
         <div class="fld"><label>End date</label><input type="date" id="m-end"></div></div>
       <div class="fld"><label>เวลาที่ใช้ (auto จาก start–end)</label><input id="m-spent" value="0 วัน" readonly></div>
-      <div class="fld"><label>คะแนน Impact (1–5)</label><div class="grid5">${svku}</div></div>
+      <div class="fld"><label>คะแนน Impact (1–5) · 1 = ต่ำ → 5 = สูง</label><div class="grid5">${svku}</div></div>
       <div class="fld"><label>📎 ไฟล์แนบ (ลิงก์)</label><div class="files-box" id="m-files"></div></div>`,
       ()=>{const name=$("#m-name").value.trim();if(!name){$("#m-name").focus();return false;}
         const base=((name.match(/[A-Za-z]/g)||[]).join("").slice(0,3).toUpperCase())||"PRJ";
