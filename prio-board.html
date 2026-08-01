@@ -938,7 +938,11 @@
     <p>🟦 <b>PMO รับเต็ม</b> (Corp Impact) — รันครบ loop มี owner ชัด<br>
     🟨 <b>รับแบบคัดเฉพาะ</b> — งานฝ่ายเดียวแต่ impact สูง PMO เข้าไปช่วยบางงาน<br>
     ⬜ <b>ฝ่ายทำเอง</b> — ไม่ผ่านเกณฑ์ PMO ให้แค่ template + คำแนะนำ ("ไม่ผ่าน ≠ ไม่สำคัญ")</p>
-    <p>ผ่าน Gate แล้ว → เรียงคิวด้วย <b>Priority Index (Value ÷ Effort)</b> งานคุ้มแรงทำก่อน</p>`;
+    <p>ผ่าน Gate แล้ว → เรียงคิวด้วย <b>Priority Index (Value ÷ Effort)</b> งานคุ้มแรงทำก่อน</p>
+    <h4>จ่ายงานให้ใคร · โควตาต่อคน</h4>
+    <p>เลือกคนจาก <b>Skill</b> (ทำ type นี้เป็น) × <b>Availability</b> (ว่างพอ) × <b>Request</b> (เร่ง/ยาก — ต้องใช้ senior ไหม)</p>
+    <p>จ่ายงาน<b>ตาม ranking ของงาน (Priority Index)</b> — งานอันดับสูงทำก่อน · โดยประมาณ <b>3–5 งาน/คน/เดือน</b> ในนั้นเป็นงาน M ขึ้นไปได้ 1–2 งาน</p>
+    <div class="info-fx">WIP limit — 1 คนถือ ≤ 2 งาน active (นับเฉพาะ M ขึ้นไป)</div>`;
   }
   $("#scoreHelp").addEventListener("click",()=>openInfo("Value Score / Priority คืออะไร",INFO_CONCEPT));
   $("#calcBtn").addEventListener("click",()=>openInfo("🧮 วิธีคิดคะแนน + ตารางคำนวณ",calcInfoHTML()));
