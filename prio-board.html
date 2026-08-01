@@ -8,6 +8,7 @@
     --st-todo:#6b7482; --st-prog:#2f6df0; --st-rev:#b0761a; --st-appr:#1f8f80; --st-uat:#6b5bd0; --st-done:#2e7d5b;
     --font:system-ui,-apple-system,"Segoe UI","Helvetica Neue","Noto Sans Thai","Sarabun",sans-serif;
     --mono:ui-monospace,"SF Mono","JetBrains Mono","Menlo",monospace;
+    --serif:"Iowan Old Style","Palatino Linotype",Georgia,"Times New Roman",serif;
     --shadow:0 1px 2px rgba(20,25,40,.05),0 4px 14px rgba(20,25,40,.05);
   }
   @media (prefers-color-scheme:dark){:root{
@@ -44,7 +45,7 @@
   .logo{height:40px;width:40px;border-radius:9px;flex:none;box-shadow:var(--shadow);object-fit:cover}
   .brand{display:flex;flex-direction:column;gap:1px;min-width:0}
   .brand .kicker{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--copper);font-weight:700}
-  .brand h1{margin:0;font-size:clamp(1.05rem,.9rem+.7vw,1.4rem);font-weight:800;letter-spacing:-.02em}
+  .brand h1{margin:0;font-family:var(--serif);font-size:clamp(1.18rem,.95rem+.9vw,1.6rem);font-weight:700;letter-spacing:-.01em}
   .spacer{flex:1 1 auto}
   .seg{display:inline-flex;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px}
   .seg button{font:inherit;font-size:.82rem;font-weight:600;border:0;background:transparent;color:var(--ink-soft);padding:6px 12px;border-radius:7px;cursor:pointer;transition:.15s}
@@ -68,7 +69,7 @@
   .zone{padding:18px 0 4px}
   .zlab{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
   .zlab .n{font-family:var(--mono);font-size:.7rem;font-weight:700;color:var(--paper);background:var(--ink);width:20px;height:20px;border-radius:6px;display:grid;place-items:center;flex:none}
-  .zlab h2{margin:0;font-size:1.02rem;font-weight:800;letter-spacing:-.01em}
+  .zlab h2{margin:0;font-family:var(--serif);font-size:1.28rem;font-weight:600;letter-spacing:-.005em}
   .impact{display:flex;flex-direction:column;gap:16px}
   .impact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
   .igh{display:flex;align-items:center;gap:8px;margin-bottom:10px}
@@ -110,7 +111,7 @@
   .pcard h3{margin:0 0 12px;font-size:.96rem;font-weight:700;line-height:1.25;letter-spacing:-.01em}
   .pi{display:flex;align-items:flex-end;gap:6px;margin-bottom:8px}
   .pi b{font-family:var(--mono);font-size:1.55rem;font-weight:800;line-height:.9;color:var(--accent-ink);font-variant-numeric:tabular-nums}
-  .pi span{font-size:.66rem;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em;font-weight:600;padding-bottom:2px}
+  .pi span{font-family:var(--mono);font-size:.62rem;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.12em;font-weight:600;padding-bottom:2px}
   .vbar{height:7px;border-radius:99px;background:var(--surface-3);overflow:hidden;margin-bottom:11px}
   .vbar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--copper),var(--accent))}
   .pmeta{display:flex;align-items:center;gap:8px;font-size:.74rem;color:var(--ink-soft)}
@@ -700,7 +701,7 @@
     const projs=projects.filter(projMatches).slice().sort((a,b)=>pindex(b)-pindex(a));
     const pass=projs.filter(p=>vscore(p)>=TH), fail=projs.filter(p=>vscore(p)<TH);
     const gsec=el("div","plan-sub");
-    gsec.innerHTML=`<h3>⚖️ Gate / Value Score</h3><p class="pnote">Value Score ≥ threshold = 🟦 รับ · เรียงตาม Priority Index</p>
+    gsec.innerHTML=`<h3>⚖️ Gate / Value Score <button class="help-dot" id="gateHelp" title="การรับงานยังไง" aria-label="อธิบายการรับงาน (Intake Gate)">?</button></h3><p class="pnote">Value Score ≥ threshold = 🟦 รับ · เรียงตาม Priority Index</p>
       <div class="gate-ctl"><span class="t">Gate threshold</span> <input type="range" id="thr" min="2" max="4" step="0.1" value="${TH}"> <span class="thv" id="thrv">${TH.toFixed(1)}</span><span class="note">งานต่ำกว่านี้ตกไป Backlog</span></div>
       <div class="gate-grid">${pass.map(gateCard).join("")||'<div class="empty" style="grid-column:1/-1">ไม่มีโปรเจกต์ที่ผ่าน threshold นี้</div>'}</div>
       <div class="backlog"><h5>⬜ Backlog / ตกเกณฑ์ (${fail.length})</h5>${fail.map(p=>`<div class="bl-row"><span class="bn">${esc(p.name)}</span><span class="chip">${esc(p.bu||p.scope||"—")}</span><span class="chip" style="font-family:var(--mono)">${esc(p.size)}</span><span style="font-family:var(--mono);color:var(--ink-soft)">Value ${vscore(p).toFixed(2)}</span><span class="gbadge fail">⬜ &lt; ${TH.toFixed(1)}</span></div>`).join("")||'<div style="font-size:.8rem;color:var(--ink-soft)">— ทุกโปรเจกต์ผ่าน threshold —</div>'}</div>`;
@@ -716,6 +717,7 @@
     wrap.appendChild(csec);
     main.appendChild(wrap);
     const thr=$("#thr");if(thr)thr.addEventListener("input",e=>{TH=+e.target.value;const v=$("#thrv");if(v)v.textContent=TH.toFixed(1);renderPlanning();});
+    const gh=$("#gateHelp");if(gh)gh.addEventListener("click",()=>openInfo("การรับงาน — Intake Gate",gateInfoHTML()));
     main.querySelectorAll(".cap-row[data-who]").forEach(r=>{const go=()=>openPersonDetail(r.dataset.who);r.addEventListener("click",go);r.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();go();}});});
   }
 
@@ -916,6 +918,27 @@
       <tr><td>L</td><td>~1 เดือน</td><td class="num">4</td></tr>
       <tr><td>XL</td><td>&gt; 1 เดือน (ควรหั่นเฟส)</td><td class="num">5</td></tr>
     </tbody></table>`;
+  }
+  function gateInfoHTML(){
+    return `
+    <h4>Gate ทำหน้าที่อะไร</h4>
+    <p>คัดว่างานไหน <b>PMO รับทำ</b> งานไหนให้ <b>ฝ่ายทำเอง</b> — เพราะ PMO เป็น Strategic PMO ทีมเล็ก ไม่ใช่ service desk ที่รับทุกงาน</p>
+    <h4>เกณฑ์ตัดสิน</h4>
+    <div class="info-fx">Value Score ≥ 3.0 → 🟦 PMO รับ · &lt; 3.0 → ฝ่ายทำเอง</div>
+    <p>เลื่อน <b>threshold</b> ปรับความเข้มได้: งานล้น → ยกเป็น 3.5 (รับน้อยลง) · คนว่าง → ลดลง (รับมากขึ้น)</p>
+    <h4>เกณฑ์ Corp Impact — เข้า ≥ 2 ข้อ ถึงรับเต็ม</h4>
+    <table class="info-tbl"><tbody>
+      <tr><td>①</td><td>แตะ company OKR / กลยุทธ์บริษัท</td></tr>
+      <tr><td>②</td><td>cross-functional (≥ 2 ฝ่าย)</td></tr>
+      <tr><td>③</td><td>มูลค่า / ความเสี่ยงสูง (เงิน · กฎหมาย · ชื่อเสียง)</td></tr>
+      <tr><td>④</td><td>มี executive sponsor ระดับผู้บริหาร</td></tr>
+      <tr><td>⑤</td><td>ขนาดใหญ่ / visibility สูงทั้งองค์กร</td></tr>
+    </tbody></table>
+    <h4>3 ทางออกของงานที่เข้ามา</h4>
+    <p>🟦 <b>PMO รับเต็ม</b> (Corp Impact) — รันครบ loop มี owner ชัด<br>
+    🟨 <b>รับแบบคัดเฉพาะ</b> — งานฝ่ายเดียวแต่ impact สูง PMO เข้าไปช่วยบางงาน<br>
+    ⬜ <b>ฝ่ายทำเอง</b> — ไม่ผ่านเกณฑ์ PMO ให้แค่ template + คำแนะนำ ("ไม่ผ่าน ≠ ไม่สำคัญ")</p>
+    <p>ผ่าน Gate แล้ว → เรียงคิวด้วย <b>Priority Index (Value ÷ Effort)</b> งานคุ้มแรงทำก่อน</p>`;
   }
   $("#scoreHelp").addEventListener("click",()=>openInfo("Value Score / Priority คืออะไร",INFO_CONCEPT));
   $("#calcBtn").addEventListener("click",()=>openInfo("🧮 วิธีคิดคะแนน + ตารางคำนวณ",calcInfoHTML()));
