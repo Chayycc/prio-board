@@ -504,7 +504,7 @@
   function renderComments(box,arr,onChange){
     if(!box)return;
     box.innerHTML=arr.map((c,i)=>`<div class="cmt-item"><div class="ch"><span class="cmt-by">${esc(c.by||"—")}</span><span class="cmt-at">${esc(fmtTS(c.at))}</span><button class="cdel" data-i="${i}" type="button" aria-label="ลบคอมเมนต์">✕</button></div><div class="ctext">${esc(c.text)}</div></div>`).join("")
-      +`<div class="cmt-add"><input class="c-by" list="ownerlist" placeholder="ชื่อผู้คอมเมนต์"><div class="c-row"><textarea class="c-text" rows="1" placeholder="เขียนคอมเมนต์… เช่น ติด IT รออนุมัติ"></textarea><button class="addbtn c-send" type="button">＋ ส่ง</button></div></div>`;
+      +`<div class="cmt-add"><input class="c-by" list="ownerlist" placeholder="ชื่อผู้คอมเมนต์"><div class="c-row"><textarea class="c-text" rows="1" placeholder="เขียนคอมเมนต์… เช่น ติด IT รออนุมัติ"></textarea><button class="c-send btn-primary" type="button">ส่ง</button></div></div>`;
     const byI=box.querySelector(".c-by"), txt=box.querySelector(".c-text");
     const add=()=>{const v=txt.value.trim();if(!v)return;arr.push({by:byI.value.trim(),text:v,at:new Date().toISOString()});const keep=byI.value;renderComments(box,arr,onChange);const nb=box.querySelector(".c-by");if(nb){nb.value=keep;const nt=box.querySelector(".c-text");if(nt)nt.focus();}onChange&&onChange();};
     box.querySelector(".c-send").addEventListener("click",add);
