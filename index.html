@@ -330,6 +330,49 @@
   .info-tbl th,.info-tbl td{text-align:left;padding:6px 9px;border-bottom:1px solid var(--line);white-space:nowrap}
   .info-tbl th{font-size:.6rem;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-soft);background:var(--surface-2)}
   .info-tbl td.num{font-family:var(--mono);text-align:right}
+  /* ── timeline sub-toggle ── */
+  .tmode{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .seg2{display:inline-flex;background:var(--surface-2);border:1px solid var(--line);border-radius:9px;padding:3px;gap:2px}
+  .seg2 button{font:inherit;font-size:.8rem;font-weight:600;border:0;background:transparent;color:var(--ink-soft);padding:6px 12px;border-radius:6px;cursor:pointer;transition:.15s}
+  .seg2 button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+  /* ── project charter ── */
+  .pc{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface)}
+  .pc-scroll{overflow-x:auto}
+  .pc-inner{--wc:22px;--lw:690px;min-width:0;font-size:12px}
+  .pc-left,.pc-colhead{display:grid;grid-template-columns:40px 230px 140px 92px 74px 74px 40px}
+  .pc-left,.pc-left-h{width:var(--lw);flex:none;position:sticky;left:0;z-index:5;box-shadow:1px 0 0 var(--line)}
+  .pc-head{display:flex;width:max-content;min-width:100%;background:var(--surface-2)}
+  .pc-left-h{background:var(--surface-2);z-index:6}
+  .pc-title{height:30px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12.5px;color:var(--ink);border-bottom:1px solid var(--line)}
+  .pc-colhead>div{height:42px;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:700;font-size:10.5px;color:var(--ink-soft);padding:0 6px;border-right:1px solid var(--line);line-height:1.15}
+  .pc-colhead>div.act{justify-content:flex-start}
+  .pc-time-head{flex:none}
+  .pc-q-row,.pc-m-row,.pc-w-row{display:flex}
+  .pc-q{height:30px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:var(--ink);border-right:2px solid var(--line)}
+  .pc-m{width:calc(var(--wc)*4);height:22px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:10.5px;color:var(--ink-soft);border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .pc-w{width:var(--wc);height:20px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:8px;color:var(--ink-soft);border-right:1px solid var(--line);opacity:.75}
+  .pc-row{display:flex;width:max-content;min-width:100%;border-bottom:1px solid var(--line)}
+  .pc-row:last-child{border-bottom:0}
+  .pc-left{background:var(--surface)}
+  .pc-row.proj .pc-left{background:var(--accent-soft)}
+  .pc-left>div{min-height:34px;display:flex;align-items:center;padding:5px 8px;border-right:1px solid var(--line);font-size:12px;overflow:hidden;color:var(--ink)}
+  .pc-left>.c-no{justify-content:center;font-family:var(--mono);font-size:11px;color:var(--ink-soft)}
+  .pc-row.proj .c-act{font-weight:800}
+  .c-act .sub{color:var(--ink-soft);margin-right:5px}
+  .c-act .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+  .c-act .nm:hover{color:var(--accent-ink)}
+  .pc-left>.c-owner{font-size:11px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pc-left>.c-status{justify-content:center}
+  .pc-left>.c-date{justify-content:center;font-family:var(--mono);font-size:10.5px;color:var(--ink-soft)}
+  .pc-left>.c-days{justify-content:center;font-family:var(--mono);font-size:11px;color:var(--ink-soft)}
+  .pc-stp{font-size:9.5px;font-weight:800;color:#fff;border-radius:4px;padding:3px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  .pc-grid{display:flex;flex:none}
+  .pc-cell{width:var(--wc);min-height:34px;border-right:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex:none}
+  .pc-cell.qend{border-right:2px solid var(--line)}
+  .pc-cell .mk{width:14px;height:14px;border-radius:3px}
+  .pc-legend{display:flex;gap:12px;flex-wrap:wrap;padding:9px 14px;border-top:1px solid var(--line);font-size:.66rem;color:var(--ink-soft);align-items:center}
+  .pc-legend .lg{display:flex;align-items:center;gap:5px}
+  .pc-legend .sw{width:11px;height:11px;border-radius:3px}
   .modal-scrim{position:fixed;inset:0;background:rgba(15,17,21,.42);display:none;align-items:center;justify-content:center;z-index:60;padding:20px}
   .modal-scrim.show{display:flex}
   .modal{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:16px;width:min(460px,96vw);max-height:90vh;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,.34)}
@@ -383,7 +426,7 @@
   </section>
 
   <section class="zone" aria-labelledby="z3">
-    <div class="zlab"><span class="n">3</span><h2 id="z3">Task Priority</h2></div>
+    <div class="zlab"><span class="n">3</span><h2 id="z3">Task Priority</h2><span class="spacer"></span><span id="tmode" class="tmode" hidden></span></div>
     <div id="main"></div>
   </section>
 </div>
@@ -445,7 +488,7 @@
   function phaseOf(t){if(t.phase&&PHASES.indexOf(t.phase)>=0)return t.phase;const m={"Done":"Close","UAT":"Review/UAT","In progress":"Execution","Review":"Review/UAT","Task Approved":"Setup"};return m[t.status]||"Intake";}
   function dueMeta(o){if(!o||!o.end)return{cls:"none",txt:""};const e=new Date(o.end);if(isNaN(e))return{cls:"none",txt:""};const now=new Date();now.setHours(0,0,0,0);const left=Math.round((e-now)/864e5);const done=o.status==="Done";if(!done&&left<0)return{cls:"over",txt:"🔴 เลย "+(-left)+"ว"};if(!done&&left<=3)return{cls:"soon",txt:"⚠️ "+left+"ว"};return{cls:"ok",txt:left+"ว"};}
 
-  let view="prio", filterProj=null, filterBU="", filterOwner="", filterPmo="", selId=null, locked=false, TH=3.0, ganttExp=null;
+  let view="prio", filterProj=null, filterBU="", filterOwner="", filterPmo="", selId=null, locked=false, TH=3.0, ganttExp=null, timeMode="gantt";
   try{locked=localStorage.getItem("em_prio_lock")==="1";}catch(e){}
   const projMatchesBU=p=>!filterBU||p.bu===filterBU||projTasks(p.id).some(t=>t.bu===filterBU);
   const taskHasOwner=(t,o)=>t.owner===o||(t.assigns||[]).some(g=>(g.members||[]).indexOf(o)>=0);
@@ -714,6 +757,73 @@
     box.querySelectorAll("[data-tid2]").forEach(n=>n.addEventListener("click",()=>openTaskDetail(n.dataset.tid2)));
     box.querySelectorAll(".g-bar").forEach(b=>b.addEventListener("click",()=>{if(b.dataset.sub)openTaskDetail(b.dataset.id);else openProjectDetail(b.dataset.id);}));
   }
+  const CH_MONTHS=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const chFmtD=s=>{const x=new Date(s);return isNaN(x)?"":(String(x.getDate()).padStart(2,"0")+"/"+String(x.getMonth()+1).padStart(2,"0")+"/"+x.getFullYear());};
+  const chOwner=o=>[...new Set([o.owner].concat((o.assigns||[]).flatMap(g=>g.members||[])).filter(Boolean))].join(", ");
+  function chYears(){const projs=projects.filter(projMatches).slice().sort((a,b)=>pindex(b)-pindex(a));
+    const dates=[];const pushD=o=>{[o.start,o.end].forEach(x=>{const d=new Date(x);if(!isNaN(d))dates.push(d);});};
+    projs.forEach(p=>{pushD(p);projTasks(p.id).filter(taskMatches).forEach(pushD);});
+    if(!dates.length)return {projs,years:null};
+    const yMin=new Date(Math.min(...dates)).getFullYear(), yMax=new Date(Math.max(...dates)).getFullYear();
+    const years=[];for(let y=yMin;y<=yMax;y++)years.push(y);
+    const cellIdx=dstr=>{const d=new Date(dstr);if(isNaN(d))return null;const y=d.getFullYear();if(y<yMin||y>yMax)return null;return (y-yMin)*48+d.getMonth()*4+Math.min(3,Math.floor((d.getDate()-1)/7));};
+    const span=o=>{const a=cellIdx(o.start),b=cellIdx(o.end);if(a==null||b==null)return null;return [Math.min(a,b),Math.max(a,b)];};
+    return {projs,years,ncols:years.length*48,span};}
+  function renderCharter(){
+    const main=$("#main"); main.innerHTML="";
+    const D=chYears(), box=el("div","pc");
+    if(!D.years){const e=el("div","empty");e.style.margin="16px";e.textContent="ไม่มีงานที่มีวันที่ในตัวกรองนี้";box.appendChild(e);main.appendChild(box);return;}
+    const {projs,years,ncols,span}=D;
+    const QCOL=["color-mix(in srgb,#e05a5a 20%,var(--surface-2))","color-mix(in srgb,#e69a1e 22%,var(--surface-2))","color-mix(in srgb,#37a877 20%,var(--surface-2))","color-mix(in srgb,#3b6fd4 20%,var(--surface-2))"];
+    let qh="",mh="",wh="";
+    years.forEach(y=>{for(let q=0;q<4;q++)qh+=`<div class="pc-q" style="width:calc(var(--wc)*12);background:${QCOL[q]}">Q${q+1} ${y}</div>`;
+      CH_MONTHS.forEach(mn=>mh+=`<div class="pc-m">${mn}</div>`);for(let i=0;i<48;i++)wh+=`<div class="pc-w">W${(i%4)+1}</div>`;});
+    const rowHTML=(o,no,isSub)=>{const stc=statColor(o.status||"Not started"),sp=span(o);
+      let cells="";for(let i=0;i<ncols;i++){const on=sp&&i>=sp[0]&&i<=sp[1];cells+=`<div class="pc-cell${i%12===11?" qend":""}">${on?`<span class="mk" style="background:var(${stc})"></span>`:""}</div>`;}
+      return `<div class="pc-row ${isSub?"":"proj"}"><div class="pc-left">
+        <div class="c-no">${esc(no)}</div>
+        <div class="c-act">${isSub?'<span class="sub">↳</span>':""}<span class="nm" ${isSub?`data-tid2="${esc(o.id)}"`:`data-pid="${esc(o.id)}"`}>${esc(isSub?o.title:o.name)}</span></div>
+        <div class="c-owner" title="${esc(chOwner(o))}">${esc(chOwner(o))||"—"}</div>
+        <div class="c-status"><span class="pc-stp" style="background:var(${stc})">${esc(o.status||"—")}</span></div>
+        <div class="c-date">${o.start?esc(chFmtD(o.start)):""}</div>
+        <div class="c-date">${o.end?esc(chFmtD(o.end)):""}</div>
+        <div class="c-days">${o.start&&o.end?spentOf(o):""}</div>
+      </div><div class="pc-grid">${cells}</div></div>`;};
+    let rows="";
+    projs.forEach((p,pi)=>{rows+=rowHTML(p,String(pi+1),false);projTasks(p.id).filter(taskMatches).forEach((t,ti)=>{rows+=rowHTML(t,(pi+1)+"."+(ti+1),true);});});
+    box.innerHTML=`<div class="pc-scroll"><div class="pc-inner">
+      <div class="pc-head"><div class="pc-left-h"><div class="pc-title">Project Information</div>
+        <div class="pc-colhead"><div>No.</div><div class="act">Project Activity</div><div>Owner(s)</div><div>Status</div><div>Start Date</div><div>Deadline</div><div>Days</div></div></div>
+        <div class="pc-time-head"><div class="pc-q-row">${qh}</div><div class="pc-m-row">${mh}</div><div class="pc-w-row">${wh}</div></div></div>
+      <div>${rows}</div>
+      <div class="pc-legend">${["Not started","In progress","Review","UAT","Done","On Hold","Blocked"].map(k=>`<span class="lg"><span class="sw" style="background:var(${statColor(k)})"></span>${esc(k)}</span>`).join("")}</div>
+    </div></div>`;
+    main.appendChild(box);
+    box.querySelectorAll("[data-pid]").forEach(n=>n.addEventListener("click",()=>openProjectDetail(n.dataset.pid)));
+    box.querySelectorAll("[data-tid2]").forEach(n=>n.addEventListener("click",()=>openTaskDetail(n.dataset.tid2)));
+  }
+  function exportCharterXls(){
+    const D=chYears();
+    if(!D.years){alert("ไม่มีงานที่มีวันที่ในตัวกรองนี้");return;}
+    const {projs,years,ncols,span}=D;
+    const cx=s=>String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    const hex=st=>cssVal(statColor(st||"Not started"))||"#888";
+    let h='<table border="1" style="border-collapse:collapse;font-family:sans-serif;font-size:12px"><thead>';
+    h+='<tr><th colspan="7" bgcolor="#e9ecf4">Project Information</th>';
+    years.forEach(y=>{for(let q=0;q<4;q++)h+=`<th colspan="12">Q${q+1} ${y}</th>`;});h+='</tr>';
+    h+='<tr><th>No.</th><th>Project Activity</th><th>Owner(s)</th><th>Status</th><th>Start Date</th><th>Deadline</th><th>Days</th>';
+    years.forEach(()=>CH_MONTHS.forEach(mn=>h+=`<th colspan="4">${cx(mn)}</th>`));h+='</tr>';
+    h+='<tr>'+Array(7).fill('<th></th>').join('');for(let i=0;i<ncols;i++)h+=`<th>W${(i%4)+1}</th>`;h+='</tr></thead><tbody>';
+    const row=(o,no,isSub)=>{const sp=span(o),col=hex(o.status);
+      let r='<tr>'+`<td align="center">${cx(no)}</td><td>${(isSub?"    ↳ ":"")+cx(isSub?o.title:o.name)}</td><td>${cx(chOwner(o))}</td>`
+        +`<td align="center" bgcolor="${col}"><font color="#ffffff">${cx(o.status||"")}</font></td>`
+        +`<td align="center">${o.start?cx(chFmtD(o.start)):""}</td><td align="center">${o.end?cx(chFmtD(o.end)):""}</td><td align="center">${o.start&&o.end?spentOf(o):""}</td>`;
+      for(let i=0;i<ncols;i++){const on=sp&&i>=sp[0]&&i<=sp[1];r+=`<td${on?` bgcolor="${col}"`:""}></td>`;}
+      return r+'</tr>';};
+    projs.forEach((p,pi)=>{h+=row(p,String(pi+1),false);projTasks(p.id).filter(taskMatches).forEach((t,ti)=>{h+=row(t,(pi+1)+"."+(ti+1),true);});});
+    h+='</tbody></table>';
+    dl(new Blob(['﻿<html><head><meta charset="utf-8"></head><body>'+h+'</body></html>'],{type:"application/vnd.ms-excel"}),"project-charter.xls");
+  }
   function capData(){
     const map={};
     tasks.filter(taskMatches).forEach(t=>{const who=t.owner;if(!who)return;if(!map[who])map[who]={who,days:0,wip:0};map[who].days+=(DAYS_OF[t.size]||0);if(["M","L","XL"].indexOf(t.size)>=0&&WIP_EXCLUDE.indexOf(t.status)<0)map[who].wip++;});
@@ -757,7 +867,13 @@
     $("#v-stat").setAttribute("aria-pressed",view==="stat");
     $("#v-plan").setAttribute("aria-pressed",view==="planning");
     $("#v-time").setAttribute("aria-pressed",view==="timeline");
-    $("#z3").textContent=view==="timeline"?"Task Timeline":view==="planning"?"Planning · Capacity + Gate/Value":"Task Priority";
+    $("#z3").textContent=view==="timeline"?(timeMode==="charter"?"Project Charter":"Task Timeline"):view==="planning"?"Planning · Capacity + Gate/Value":"Task Priority";
+    const tm=$("#tmode");
+    if(view==="timeline"){tm.hidden=false;
+      tm.innerHTML=`<div class="seg2" role="group" aria-label="โหมด Timeline"><button data-tm="gantt" aria-pressed="${timeMode!=="charter"}">Task Timeline</button><button data-tm="charter" aria-pressed="${timeMode==="charter"}">Project Charter</button></div>${timeMode==="charter"?'<button class="ghost" id="chExp" title="ดาวน์โหลด charter เป็น Excel">⬇ Export Excel</button>':""}`;
+      tm.querySelectorAll("[data-tm]").forEach(b=>b.addEventListener("click",()=>{timeMode=b.dataset.tm;render();}));
+      const ce=$("#chExp"); if(ce)ce.addEventListener("click",exportCharterXls);
+    } else tm.hidden=true;
     $("#buFilter").value=filterBU;
     const lk=$("#lock"); lk.innerHTML=locked?"🔒 Locked":"🔓 Unlocked"; lk.classList.toggle("on",locked);
     document.querySelector(".app").classList.toggle("locked",locked);
@@ -767,7 +883,7 @@
     refreshOwners(); refreshFilterOpts();
     const list=tasks.filter(taskMatches);
     renderImpact(); renderProjBoard();
-    if(view==="timeline")renderTimeline(); else if(view==="planning")renderPlanning(); else renderBoard(list);
+    if(view==="timeline"){if(timeMode==="charter")renderCharter(); else renderTimeline();} else if(view==="planning")renderPlanning(); else renderBoard(list);
     save();
   }
   function refreshFilterOpts(){
