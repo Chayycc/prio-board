@@ -461,7 +461,7 @@
   const SB_URL="https://rticsujbdozqmjyiohvm.supabase.co";
   const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ0aWNzdWpiZG96cW1qeWlvaHZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ4OTg0NzksImV4cCI6MjEwMDQ3NDQ3OX0.sXpsoHkXh8Exwb4Ep2H25PuVLNrw7GUlJNcnyzPb6hk";
   const SB_HEAD={apikey:SB_KEY,Authorization:"Bearer "+SB_KEY,"Content-Type":"application/json"};
-  const BUS=["MKT","Fin","Accounting","MBRS","PGY","IT","CEO Office","CEO Office : Data","QPCH","ทรัพย์หลุด","Easy Care","CX team","Audit","Sale"];
+  const BUS=["MKT","Fin","Accounting","MBRS","PGY","IT","HR","CEO Office","CEO Office : Data","QPCH","ทรัพย์หลุด","Easy Care","CX team","Audit","Sale"];
   const PMO_LIST=["Chay","Mew","Sine"];
   const OWNERS=["มายด์","บอล","ต้น","ฟ้า","เจ","แนน","โอ๊ต"];
   const TYPES=["Project","Ad-hoc"];
@@ -764,7 +764,7 @@
   }
   const CH_MONTHS=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const chFmtD=s=>{const x=new Date(s);return isNaN(x)?"":(String(x.getDate()).padStart(2,"0")+"/"+String(x.getMonth()+1).padStart(2,"0")+"/"+x.getFullYear());};
-  const chDept=o=>((o.assigns&&o.assigns[0]&&o.assigns[0].bu)||o.bu||"");
+  const chDept=o=>(o.ownerBu||(o.assigns&&o.assigns[0]&&o.assigns[0].bu)||o.bu||"");
   const chRelated=o=>(o.assigns||[]).flatMap(g=>(g.members||[]).map(m=>({m,bu:g.bu||""})));
   function chYears(){const projs=projects.filter(projMatches).slice().sort((a,b)=>pindex(b)-pindex(a));
     const dates=[];const pushD=o=>{[o.start,o.end].forEach(x=>{const d=new Date(x);if(!isNaN(d))dates.push(d);});};
@@ -937,7 +937,8 @@
         <div class="fld"><label>PMO ผู้ดูแล</label><select id="p-pmo"><option value=""${p.pmo?"":" selected"}>— ระบุภายหลัง —</option>${opt(PMO_LIST,p.pmo||"")}</select></div>
         <div class="fld"><label>Impact scope</label><select id="p-scope">${opt(["Corporate","BU"],p.scope||"Corporate")}</select></div>
         <div class="grid2"><div class="fld"><label>Owner (คนทำ)</label><input list="ownerlist" id="p-owner" value="${esc(p.owner)}" placeholder="พิมพ์ชื่อ / เลือก"></div>
-          <div class="fld"><label>BU/ฝ่าย (ที่มาขอ)</label><select id="p-bu">${opt(BUS,p.bu||BUS[0])}</select></div></div>
+          <div class="fld"><label>Owner ฝ่าย</label><select id="p-ownerbu"><option value=""${p.ownerBu?"":" selected"}>— ฝ่าย —</option>${opt(BUS,p.ownerBu||"")}</select></div></div>
+        <div class="fld"><label>BU/ฝ่าย (ที่มาขอ)</label><select id="p-bu">${opt(BUS,p.bu||BUS[0])}</select></div>
         <div class="fld"><label>เจ้าของงานร่วม (BU Assign + ทีมร่วม) — เพิ่มได้หลายคน</label><div id="p-assigns"></div></div>
         <div class="grid2"><div class="fld"><label>Start date</label><input type="date" id="p-start" value="${esc(p.start||"")}"></div>
           <div class="fld"><label>End date</label><input type="date" id="p-end" value="${esc(p.end||"")}"></div></div>
@@ -955,7 +956,7 @@
     drawer.querySelector("#dw-close").addEventListener("click",closeDetail);
     const bindP=(sel,fn)=>drawer.querySelector(sel).addEventListener("input",e=>{fn(e.target.value);drawer.querySelector("#p-pi").textContent=p.id+" · PI "+pindex(p).toFixed(2);render();});
     bindP("#p-name",v=>p.name=v);bindP("#p-pmo",v=>p.pmo=v);bindP("#p-owner",v=>p.owner=v);
-    bindP("#p-scope",v=>p.scope=v);bindP("#p-bu",v=>p.bu=v);bindP("#p-size",v=>p.size=v);
+    bindP("#p-scope",v=>p.scope=v);bindP("#p-bu",v=>p.bu=v);bindP("#p-ownerbu",v=>p.ownerBu=v);bindP("#p-size",v=>p.size=v);
     ["S","V","K","R","U"].forEach(k=>bindP("#p-"+k,v=>p[k]=+v));
     if(!Array.isArray(p.assigns))p.assigns=[];renderAssigns(drawer.querySelector("#p-assigns"),p.assigns,render);
     if(!Array.isArray(p.files))p.files=[];renderFiles(drawer.querySelector("#p-files"),p.files,render);
@@ -979,8 +980,9 @@
         <div class="grid2"><div class="fld"><label>อยู่โปรเจกต์</label><select id="f-proj">${projects.map(p=>`<option value="${esc(p.id)}"${p.id===t.proj?" selected":""}>${esc(p.id)}</option>`).join("")}</select></div>
           <div class="fld"><label>Type</label><select id="f-type">${opt(TYPES,t.type)}</select></div></div>
         <div class="grid2"><div class="fld"><label>Owner assign</label><input list="ownerlist" id="f-owner" value="${esc(t.owner)}" placeholder="พิมพ์ชื่อ / เลือก"></div>
-          <div class="fld"><label>PMO</label><select id="f-pmo"><option value=""${t.pmo?"":" selected"}>— ยังไม่เลือก —</option>${opt(PMO_LIST,t.pmo||"")}</select></div></div>
-        <div class="fld"><label>BU/ฝ่าย (ที่มาขอ)</label><select id="f-bu">${opt(BUS,t.bu)}</select></div>
+          <div class="fld"><label>Owner ฝ่าย</label><select id="f-ownerbu"><option value=""${t.ownerBu?"":" selected"}>— ฝ่าย —</option>${opt(BUS,t.ownerBu||"")}</select></div></div>
+        <div class="grid2"><div class="fld"><label>PMO</label><select id="f-pmo"><option value=""${t.pmo?"":" selected"}>— ยังไม่เลือก —</option>${opt(PMO_LIST,t.pmo||"")}</select></div>
+          <div class="fld"><label>BU/ฝ่าย (ที่มาขอ)</label><select id="f-bu">${opt(BUS,t.bu)}</select></div></div>
         <div class="fld"><label>เจ้าของงานร่วม (ทีมร่วม + BU Assign) — เพิ่มได้หลายคน</label><div id="f-assigns"></div></div>
         <div class="fld"><label>เฟส (delivery loop)</label><select id="f-phase">${opt(PHASES,phaseOf(t))}</select></div>
         <div class="grid2"><div class="fld"><label>Status</label><select id="f-status">${opt(TASK_STAT,t.status)}</select></div>
@@ -995,7 +997,7 @@
       </div>`;
     drawer.querySelector("#dw-close").addEventListener("click",closeDetail);
     const bind=(sel,fn)=>drawer.querySelector(sel).addEventListener("input",e=>{fn(e.target.value);render();});
-    bind("#f-title",v=>t.title=v);bind("#f-proj",v=>t.proj=v);bind("#f-type",v=>t.type=v);bind("#f-owner",v=>t.owner=v);bind("#f-pmo",v=>t.pmo=v);bind("#f-bu",v=>t.bu=v);
+    bind("#f-title",v=>t.title=v);bind("#f-proj",v=>t.proj=v);bind("#f-type",v=>t.type=v);bind("#f-owner",v=>t.owner=v);bind("#f-ownerbu",v=>t.ownerBu=v);bind("#f-pmo",v=>t.pmo=v);bind("#f-bu",v=>t.bu=v);
     bind("#f-status",v=>t.status=v);bind("#f-prio",v=>t.prio=v);bind("#f-size",v=>t.size=v);bind("#f-phase",v=>t.phase=v);
     if(!Array.isArray(t.comments))t.comments=[];renderComments(drawer.querySelector("#f-comments"),t.comments,render);
     if(!Array.isArray(t.assigns))t.assigns=[];renderAssigns(drawer.querySelector("#f-assigns"),t.assigns,render);
@@ -1115,7 +1117,8 @@
       <div class="grid2"><div class="fld"><label>PMO</label><select id="m-pmo"><option value=""${p.pmo?"":" selected"}>— ยังไม่เลือก —</option>${opt(PMO_LIST,p.pmo||"")}</select></div>
         <div class="fld"><label>Type</label><select id="m-type">${opt(TYPES,"Project")}</select></div></div>
       <div class="grid2"><div class="fld"><label>Owner assign</label><input list="ownerlist" id="m-owner" value="${esc(p.owner)}"></div>
-        <div class="fld"><label>BU/ฝ่าย (ที่มาขอ)</label><select id="m-bu">${opt(BUS,BUS[0])}</select></div></div>
+        <div class="fld"><label>Owner ฝ่าย</label><select id="m-ownerbu"><option value="" selected>— ฝ่าย —</option>${opt(BUS,"")}</select></div></div>
+      <div class="fld"><label>BU/ฝ่าย (ที่มาขอ)</label><select id="m-bu">${opt(BUS,BUS[0])}</select></div>
       <div class="fld"><label>เจ้าของงานร่วม (ทีมร่วม + BU Assign) — เพิ่มได้หลายคน</label><div id="m-assigns"></div></div>
       <div class="grid2"><div class="fld"><label>เฟส (delivery loop)</label><select id="m-phase">${opt(PHASES,"Setup")}</select></div>
         <div class="fld"><label>Priority</label><select id="m-prio">${opt(PRIO.map(x=>x.k),"Med")}</select></div></div>
@@ -1125,7 +1128,7 @@
       <div class="fld"><label>📎 ไฟล์แนบ (ลิงก์)</label><div class="files-box" id="m-files"></div></div>`,
       ()=>{const title=$("#m-title").value.trim();if(!title){$("#m-title").focus();return false;}
         const st=$("#m-start").value,en=$("#m-end").value,d=dayspan(st,en);
-        tasks.push({id:nextTaskId(),proj:p.id,title,type:$("#m-type").value,owner:$("#m-owner").value,pmo:$("#m-pmo").value,bu:$("#m-bu").value,assigns:assigns.filter(g=>g.bu||(g.members&&g.members.length)).map(g=>({bu:g.bu,members:[...(g.members||[])]})),
+        tasks.push({id:nextTaskId(),proj:p.id,title,type:$("#m-type").value,owner:$("#m-owner").value,ownerBu:$("#m-ownerbu").value,pmo:$("#m-pmo").value,bu:$("#m-bu").value,assigns:assigns.filter(g=>g.bu||(g.members&&g.members.length)).map(g=>({bu:g.bu,members:[...(g.members||[])]})),
           files:files.filter(f=>(f.url||"").trim()||(f.name||"").trim()).map(f=>({name:f.name||"",url:f.url||""})),
           phase:$("#m-phase").value,size:d?sizeFromDays(d):"M",prio:$("#m-prio").value,status:$("#m-status").value,start:st,end:en,comment:"",comments:[]});
         renderProjSubs(p);});
@@ -1140,7 +1143,8 @@
       <div class="fld"><label>PMO ผู้ดูแล (เว้นว่างได้)</label><select id="m-pmo"><option value="" selected>— ระบุภายหลัง —</option>${PMO_LIST.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("")}</select></div>
       <div class="fld"><label>Impact scope</label><select id="m-scope">${opt(["Corporate","BU"],"Corporate")}</select></div>
       <div class="grid2"><div class="fld"><label>Owner (คนทำ)</label><input list="ownerlist" id="m-owner" placeholder="พิมพ์ชื่อ / เลือก"></div>
-        <div class="fld"><label>BU/ฝ่าย (ที่มาขอ)</label><select id="m-bu">${opt(BUS,BUS[0])}</select></div></div>
+        <div class="fld"><label>Owner ฝ่าย</label><select id="m-ownerbu"><option value="" selected>— ฝ่าย —</option>${opt(BUS,"")}</select></div></div>
+      <div class="fld"><label>BU/ฝ่าย (ที่มาขอ)</label><select id="m-bu">${opt(BUS,BUS[0])}</select></div>
       <div class="fld"><label>เจ้าของงานร่วม (BU Assign + ทีมร่วม) — เพิ่มได้หลายคน</label><div id="m-assigns"></div></div>
       <div class="fld"><label>สถานะโปรเจกต์</label><select id="m-status">${opt(PROJ_STAT,"Not started")}</select></div>
       <div class="grid2"><div class="fld"><label>Start date</label><input type="date" id="m-start"></div>
@@ -1152,7 +1156,7 @@
         const base=((name.match(/[A-Za-z]/g)||[]).join("").slice(0,3).toUpperCase())||"PRJ";
         const id=uniqId(base,x=>projById(x));
         const scope=$("#m-scope").value; const st=$("#m-start").value,en=$("#m-end").value; const d=dayspan(st,en);
-        projects.push({id,name,pmo:$("#m-pmo").value,owner:$("#m-owner").value||OWNERS[0],scope,bu:scope==="BU"?$("#m-bu").value:"",assigns:assigns.filter(g=>g.bu||(g.members&&g.members.length)).map(g=>({bu:g.bu,members:[...(g.members||[])]})),files:files.filter(f=>(f.url||"").trim()||(f.name||"").trim()).map(f=>({name:f.name||"",url:f.url||""})),comments:[],status:$("#m-status").value,start:st,end:en,size:d?sizeFromDays(d):"M",S:+$("#m-S").value,V:+$("#m-V").value,K:+$("#m-K").value,R:+$("#m-R").value,U:+$("#m-U").value});
+        projects.push({id,name,pmo:$("#m-pmo").value,owner:$("#m-owner").value||OWNERS[0],ownerBu:$("#m-ownerbu").value,scope,bu:scope==="BU"?$("#m-bu").value:"",assigns:assigns.filter(g=>g.bu||(g.members&&g.members.length)).map(g=>({bu:g.bu,members:[...(g.members||[])]})),files:files.filter(f=>(f.url||"").trim()||(f.name||"").trim()).map(f=>({name:f.name||"",url:f.url||""})),comments:[],status:$("#m-status").value,start:st,end:en,size:d?sizeFromDays(d):"M",S:+$("#m-S").value,V:+$("#m-V").value,K:+$("#m-K").value,R:+$("#m-R").value,U:+$("#m-U").value});
         openProjectDetail(id);});
     renderAssigns($("#m-assigns"),assigns,null);
     renderFiles($("#m-files"),files,null);
