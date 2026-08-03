@@ -338,8 +338,8 @@
   /* ── project charter ── */
   .pc{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface)}
   .pc-scroll{overflow-x:auto}
-  .pc-inner{--wc:22px;--lw:690px;min-width:0;font-size:12px}
-  .pc-left,.pc-colhead{display:grid;grid-template-columns:40px 230px 140px 92px 74px 74px 40px}
+  .pc-inner{--wc:22px;--lw:784px;min-width:0;font-size:12px}
+  .pc-left,.pc-colhead{display:grid;grid-template-columns:38px 200px 118px 152px 100px 70px 70px 36px}
   .pc-left,.pc-left-h{width:var(--lw);flex:none;position:sticky;left:0;z-index:5;box-shadow:1px 0 0 var(--line)}
   .pc-head{display:flex;width:max-content;min-width:100%;background:var(--surface-2)}
   .pc-left-h{background:var(--surface-2);z-index:6}
@@ -361,11 +361,16 @@
   .c-act .sub{color:var(--ink-soft);margin-right:5px}
   .c-act .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
   .c-act .nm:hover{color:var(--accent-ink)}
-  .pc-left>.c-owner{font-size:11px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pc-left>.c-own,.pc-left>.c-rel{flex-direction:column;align-items:flex-start;justify-content:center;gap:1px;font-size:11px;color:var(--ink);overflow:hidden}
+  .c-own .own-nm{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  .c-own .own-dep{font-family:var(--mono);font-size:9px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  .c-rel .rel-it{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;font-size:10.5px;line-height:1.35}
+  .c-rel .rel-dep{color:var(--ink-soft);font-family:var(--mono);font-size:9px}
+  .c-rel .rel-none{color:var(--ink-soft)}
   .pc-left>.c-status{justify-content:center}
   .pc-left>.c-date{justify-content:center;font-family:var(--mono);font-size:10.5px;color:var(--ink-soft)}
   .pc-left>.c-days{justify-content:center;font-family:var(--mono);font-size:11px;color:var(--ink-soft)}
-  .pc-stp{font-size:9.5px;font-weight:800;color:#fff;border-radius:4px;padding:3px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  .pc-stp{font-size:9.5px;font-weight:800;color:#fff;border-radius:4px;padding:3px 7px;white-space:normal;text-align:center;line-height:1.18;max-width:100%}
   .pc-grid{display:flex;flex:none}
   .pc-cell{width:var(--wc);min-height:34px;border-right:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex:none}
   .pc-cell.qend{border-right:2px solid var(--line)}
@@ -759,12 +764,13 @@
   }
   const CH_MONTHS=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const chFmtD=s=>{const x=new Date(s);return isNaN(x)?"":(String(x.getDate()).padStart(2,"0")+"/"+String(x.getMonth()+1).padStart(2,"0")+"/"+x.getFullYear());};
-  const chOwner=o=>[...new Set([o.owner].concat((o.assigns||[]).flatMap(g=>g.members||[])).filter(Boolean))].join(", ");
+  const chDept=o=>((o.assigns&&o.assigns[0]&&o.assigns[0].bu)||o.bu||"");
+  const chRelated=o=>(o.assigns||[]).flatMap(g=>(g.members||[]).map(m=>({m,bu:g.bu||""})));
   function chYears(){const projs=projects.filter(projMatches).slice().sort((a,b)=>pindex(b)-pindex(a));
     const dates=[];const pushD=o=>{[o.start,o.end].forEach(x=>{const d=new Date(x);if(!isNaN(d))dates.push(d);});};
     projs.forEach(p=>{pushD(p);projTasks(p.id).filter(taskMatches).forEach(pushD);});
     if(!dates.length)return {projs,years:null};
-    const yMin=new Date(Math.min(...dates)).getFullYear(), yMax=new Date(Math.max(...dates)).getFullYear();
+    const yMin=new Date(Math.min(...dates)).getFullYear(), yMax=Math.max(new Date(Math.max(...dates)).getFullYear(),2027);
     const years=[];for(let y=yMin;y<=yMax;y++)years.push(y);
     const cellIdx=dstr=>{const d=new Date(dstr);if(isNaN(d))return null;const y=d.getFullYear();if(y<yMin||y>yMax)return null;return (y-yMin)*48+d.getMonth()*4+Math.min(3,Math.floor((d.getDate()-1)/7));};
     const span=o=>{const a=cellIdx(o.start),b=cellIdx(o.end);if(a==null||b==null)return null;return [Math.min(a,b),Math.max(a,b)];};
@@ -783,7 +789,8 @@
       return `<div class="pc-row ${isSub?"":"proj"}"><div class="pc-left">
         <div class="c-no">${esc(no)}</div>
         <div class="c-act">${isSub?'<span class="sub">↳</span>':""}<span class="nm" ${isSub?`data-tid2="${esc(o.id)}"`:`data-pid="${esc(o.id)}"`}>${esc(isSub?o.title:o.name)}</span></div>
-        <div class="c-owner" title="${esc(chOwner(o))}">${esc(chOwner(o))||"—"}</div>
+        <div class="c-own"><span class="own-nm">${esc(o.owner||"—")}</span>${chDept(o)?`<span class="own-dep">${esc(chDept(o))}</span>`:""}</div>
+        <div class="c-rel">${(()=>{const rel=chRelated(o);return rel.length?rel.map(x=>`<span class="rel-it"><b>${esc(x.m)}</b>${x.bu?`<span class="rel-dep"> · ${esc(x.bu)}</span>`:""}</span>`).join(""):'<span class="rel-none">—</span>';})()}</div>
         <div class="c-status"><span class="pc-stp" style="background:var(${stc})">${esc(o.status||"—")}</span></div>
         <div class="c-date">${o.start?esc(chFmtD(o.start)):""}</div>
         <div class="c-date">${o.end?esc(chFmtD(o.end)):""}</div>
@@ -793,7 +800,7 @@
     projs.forEach((p,pi)=>{rows+=rowHTML(p,String(pi+1),false);projTasks(p.id).filter(taskMatches).forEach((t,ti)=>{rows+=rowHTML(t,(pi+1)+"."+(ti+1),true);});});
     box.innerHTML=`<div class="pc-scroll"><div class="pc-inner">
       <div class="pc-head"><div class="pc-left-h"><div class="pc-title">Project Information</div>
-        <div class="pc-colhead"><div>No.</div><div class="act">Project Activity</div><div>Owner(s)</div><div>Status</div><div>Start Date</div><div>Deadline</div><div>Days</div></div></div>
+        <div class="pc-colhead"><div>No.</div><div class="act">Project Activity</div><div>Owner · ฝ่าย</div><div>Owner ที่เกี่ยวข้อง · ฝ่าย</div><div>Status</div><div>Start Date</div><div>Deadline</div><div>Days</div></div></div>
         <div class="pc-time-head"><div class="pc-q-row">${qh}</div><div class="pc-m-row">${mh}</div><div class="pc-w-row">${wh}</div></div></div>
       <div>${rows}</div>
       <div class="pc-legend">${["Not started","In progress","Review","UAT","Done","On Hold","Blocked"].map(k=>`<span class="lg"><span class="sw" style="background:var(${statColor(k)})"></span>${esc(k)}</span>`).join("")}</div>
@@ -809,13 +816,15 @@
     const cx=s=>String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
     const hex=st=>cssVal(statColor(st||"Not started"))||"#888";
     let h='<table border="1" style="border-collapse:collapse;font-family:sans-serif;font-size:12px"><thead>';
-    h+='<tr><th colspan="7" bgcolor="#e9ecf4">Project Information</th>';
+    h+='<tr><th colspan="8" bgcolor="#e9ecf4">Project Information</th>';
     years.forEach(y=>{for(let q=0;q<4;q++)h+=`<th colspan="12">Q${q+1} ${y}</th>`;});h+='</tr>';
-    h+='<tr><th>No.</th><th>Project Activity</th><th>Owner(s)</th><th>Status</th><th>Start Date</th><th>Deadline</th><th>Days</th>';
+    h+='<tr><th>No.</th><th>Project Activity</th><th>Owner · ฝ่าย</th><th>Owner ที่เกี่ยวข้อง · ฝ่าย</th><th>Status</th><th>Start Date</th><th>Deadline</th><th>Days</th>';
     years.forEach(()=>CH_MONTHS.forEach(mn=>h+=`<th colspan="4">${cx(mn)}</th>`));h+='</tr>';
-    h+='<tr>'+Array(7).fill('<th></th>').join('');for(let i=0;i<ncols;i++)h+=`<th>W${(i%4)+1}</th>`;h+='</tr></thead><tbody>';
+    h+='<tr>'+Array(8).fill('<th></th>').join('');for(let i=0;i<ncols;i++)h+=`<th>W${(i%4)+1}</th>`;h+='</tr></thead><tbody>';
+    const ownTxt=o=>(o.owner||"—")+(chDept(o)?" · "+chDept(o):"");
+    const relTxt=o=>{const r=chRelated(o);return r.length?r.map(x=>x.m+(x.bu?" · "+x.bu:"")).join(", "):"—";};
     const row=(o,no,isSub)=>{const sp=span(o),col=hex(o.status);
-      let r='<tr>'+`<td align="center">${cx(no)}</td><td>${(isSub?"    ↳ ":"")+cx(isSub?o.title:o.name)}</td><td>${cx(chOwner(o))}</td>`
+      let r='<tr>'+`<td align="center">${cx(no)}</td><td>${(isSub?"    ↳ ":"")+cx(isSub?o.title:o.name)}</td><td>${cx(ownTxt(o))}</td><td>${cx(relTxt(o))}</td>`
         +`<td align="center" bgcolor="${col}"><font color="#ffffff">${cx(o.status||"")}</font></td>`
         +`<td align="center">${o.start?cx(chFmtD(o.start)):""}</td><td align="center">${o.end?cx(chFmtD(o.end)):""}</td><td align="center">${o.start&&o.end?spentOf(o):""}</td>`;
       for(let i=0;i<ncols;i++){const on=sp&&i>=sp[0]&&i<=sp[1];r+=`<td${on?` bgcolor="${col}"`:""}></td>`;}
