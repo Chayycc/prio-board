@@ -869,7 +869,7 @@
   const nvFilterHTML=()=>`<div class="ctl"><span class="cl">ฝ่าย</span><select class="ghost" id="nvBUsel"><option value="">ทุกฝ่าย</option>${nvBUs().map(b=>`<option value="${esc(b)}"${nvBU===b?" selected":""}>${esc(b)}</option>`).join("")}</select></div><div class="ctl"><span class="cl">Status</span><select class="ghost" id="nvStatSel"><option value="">ทุกสถานะ</option>${PROJ_STAT.filter(s=>projects.some(p=>p.status===s)).map(s=>`<option value="${esc(s)}"${nvStat===s?" selected":""}>${esc(s)}</option>`).join("")}</select></div>`;
   const nvWire=fn=>{const b=$("#nvBUsel");if(b)b.addEventListener("change",function(){nvBU=this.value;fn();});const s=$("#nvStatSel");if(s)s.addEventListener("change",function(){nvStat=this.value;fn();});};
   const nvLastCmt=o=>{const cs=o.comments||[],l=cs[cs.length-1];return l?((cs.length>1?`(${cs.length}) `:"")+(l.by?l.by+": ":"")+(l.text||"")):"";};
-  const pWeeks=p=>{const d=dayspan(p.start,p.end);return d?Math.max(1,Math.round(d/7)):(EMAP[p.size]||3)*2;};
+  const pWeeks=p=>{const e=+(p&&p.effort);return e>0?e:(EMAP[p.size]||3);}; // effort จริง (staff-weeks) ก่อน · fallback = size (XS1..XL5)
   const nvRatioCls=r=>r>=1.1?"hi":r>=0.7?"mid":"lo";
   const nvFmtD=s=>{const x=new Date(s);return isNaN(x)?"—":(String(x.getDate()).padStart(2,"0")+"/"+String(x.getMonth()+1).padStart(2,"0")+"/"+x.getFullYear());};
   const NV_MON=["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
@@ -1227,6 +1227,7 @@
           <div class="fld"><label>End date</label><input type="date" id="p-end" value="${esc(p.end||"")}"></div></div>
         <div class="grid2"><div class="fld"><label>เวลาที่ใช้ (auto)</label><input id="p-spent" value="${dayspan(p.start,p.end)} วัน" readonly></div>
           <div class="fld"><label>Size (auto จากวันที่)</label><select id="p-size">${opt(["XS","S","M","L","XL"],p.size)}</select></div></div>
+        <div class="fld"><label>Effort (คน-สัปดาห์) — ใช้คิด capacity/Kanban</label><input type="number" id="p-effort" min="0" step="0.5" value="${p.effort||""}" placeholder="เว้นว่าง = ประมาณจาก Size (${EMAP[p.size]||3}w)"></div>
         <div class="fld"><label>สถานะโปรเจกต์ (ตั้งเอง)</label><select id="p-status">${opt(PROJ_STAT,p.status||"Not started")}</select></div>
         <div class="fld"><label>คะแนน Impact (1–5) · 1 = ต่ำ → 5 = สูง (ชี้ที่ช่องเพื่อดูคำอธิบาย)</label><div class="grid5">${svku}</div></div>
         <div class="fld"><div class="subhead"><label>Sub-tasks (แสดงบน Task Priority)</label><span class="pct" id="psubcount"></span></div>
@@ -1239,7 +1240,7 @@
     drawer.querySelector("#dw-close").addEventListener("click",closeDetail);
     const bindP=(sel,fn)=>drawer.querySelector(sel).addEventListener("input",e=>{fn(e.target.value);drawer.querySelector("#p-pi").textContent=p.id+" · PI "+pindex(p).toFixed(2);render();});
     bindP("#p-name",v=>p.name=v);bindP("#p-pmo",v=>p.pmo=v);bindP("#p-owner",v=>p.owner=v);
-    bindP("#p-scope",v=>p.scope=v);bindP("#p-bu",v=>p.bu=v);bindP("#p-ownerbu",v=>p.ownerBu=v);bindP("#p-size",v=>p.size=v);
+    bindP("#p-scope",v=>p.scope=v);bindP("#p-bu",v=>p.bu=v);bindP("#p-ownerbu",v=>p.ownerBu=v);bindP("#p-size",v=>p.size=v);bindP("#p-effort",v=>p.effort=(+v||0));
     ["S","V","K","R","U"].forEach(k=>bindP("#p-"+k,v=>p[k]=+v));
     if(!Array.isArray(p.assigns))p.assigns=[];renderAssigns(drawer.querySelector("#p-assigns"),p.assigns,render);
     if(!Array.isArray(p.files))p.files=[];renderFiles(drawer.querySelector("#p-files"),p.files,render);
@@ -1433,13 +1434,14 @@
       <div class="grid2"><div class="fld"><label>Start date</label><input type="date" id="m-start"></div>
         <div class="fld"><label>End date</label><input type="date" id="m-end"></div></div>
       <div class="fld"><label>เวลาที่ใช้ (auto จาก start–end)</label><input id="m-spent" value="0 วัน" readonly></div>
+      <div class="fld"><label>Effort (คน-สัปดาห์) — ใช้คิด capacity</label><input type="number" id="m-effort" min="0" step="0.5" placeholder="เว้นว่าง = ประมาณจาก Size"></div>
       <div class="fld"><label>คะแนน Impact (1–5) · 1 = ต่ำ → 5 = สูง</label><div class="grid5">${svku}</div></div>
       <div class="fld"><label>📎 ไฟล์แนบ (ลิงก์)</label><div class="files-box" id="m-files"></div></div>`,
       ()=>{const name=$("#m-name").value.trim();if(!name){$("#m-name").focus();return false;}
         const base=((name.match(/[A-Za-z]/g)||[]).join("").slice(0,3).toUpperCase())||"PRJ";
         const id=uniqId(base,x=>projById(x));
         const scope=$("#m-scope").value; const st=$("#m-start").value,en=$("#m-end").value; const d=dayspan(st,en);
-        projects.push({id,name,pmo:$("#m-pmo").value,owner:$("#m-owner").value||OWNERS[0],ownerBu:$("#m-ownerbu").value,scope,bu:scope==="BU"?$("#m-bu").value:"",assigns:assigns.filter(g=>g.bu||(g.members&&g.members.length)).map(g=>({bu:g.bu,members:[...(g.members||[])]})),files:files.filter(f=>(f.url||"").trim()||(f.name||"").trim()).map(f=>({name:f.name||"",url:f.url||""})),comments:[],status:$("#m-status").value,start:st,end:en,size:d?sizeFromDays(d):"M",S:+$("#m-S").value,V:+$("#m-V").value,K:+$("#m-K").value,R:+$("#m-R").value,U:+$("#m-U").value});
+        projects.push({id,name,pmo:$("#m-pmo").value,owner:$("#m-owner").value||OWNERS[0],ownerBu:$("#m-ownerbu").value,scope,bu:scope==="BU"?$("#m-bu").value:"",assigns:assigns.filter(g=>g.bu||(g.members&&g.members.length)).map(g=>({bu:g.bu,members:[...(g.members||[])]})),files:files.filter(f=>(f.url||"").trim()||(f.name||"").trim()).map(f=>({name:f.name||"",url:f.url||""})),comments:[],status:$("#m-status").value,start:st,end:en,size:d?sizeFromDays(d):"M",effort:+($("#m-effort").value)||0,S:+$("#m-S").value,V:+$("#m-V").value,K:+$("#m-K").value,R:+$("#m-R").value,U:+$("#m-U").value});
         openProjectDetail(id);});
     renderAssigns($("#m-assigns"),assigns,null);
     renderFiles($("#m-files"),files,null);
