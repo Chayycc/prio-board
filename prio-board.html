@@ -402,6 +402,15 @@
   .ctl{display:flex;align-items:center;gap:6px}
   .ctl .cl{font-family:var(--mono);font-size:.64rem;letter-spacing:.06em;text-transform:uppercase;font-weight:700;color:var(--ink-soft)}
   .today-btn{font:inherit;font-size:.76rem;font-weight:700;color:var(--hi);background:var(--hi-soft);border:1px solid var(--hi);border-radius:8px;padding:6px 11px;cursor:pointer}
+  .msel{position:relative;display:inline-block}
+  .msel-btn{white-space:nowrap}
+  .msel-panel{position:absolute;top:calc(100% + 4px);left:0;z-index:40;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);padding:7px;min-width:190px;max-height:300px;overflow:auto;display:flex;flex-direction:column;gap:2px}
+  .ms-opt{display:flex;align-items:center;gap:8px;font-size:.8rem;padding:5px 8px;border-radius:7px;cursor:pointer;white-space:nowrap}
+  .ms-opt:hover{background:var(--surface-2)}
+  .ms-opt input{cursor:pointer;flex:none}
+  .ms-clear{margin-top:5px;font:inherit;font-size:.72rem;color:var(--ink-soft);background:var(--surface-2);border:1px solid var(--line);border-radius:7px;padding:5px;cursor:pointer}
+  .ms-clear:hover{color:var(--ink)}
+  .ms-empty{font-size:.8rem;color:var(--ink-soft);padding:5px 8px}
   .miniseg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
   .miniseg button{font:inherit;font-size:.73rem;font-weight:600;border:0;background:transparent;color:var(--ink-soft);padding:6px 11px;cursor:pointer}
   .miniseg button[aria-pressed="true"]{background:var(--accent);color:#fff}
@@ -840,6 +849,7 @@
 
   function renderBoard(list){
     const main=$("#main"); main.innerHTML="";
+    const fbar=el("div","tlbar"); fbar.innerHTML=`<div class="tl-ctrls" style="margin-left:0">${nvFilterHTML()}</div>`; main.appendChild(fbar);
     const wrap=el("div","board-wrap"), board=el("div","board");
     const cols = taskMode==="status" ? TASK_STAT.map(k=>({k,c:statColor(k)})) : PRIO.map(p=>({k:p.k,c:p.c}));
     cols.forEach(col=>{
@@ -859,16 +869,36 @@
       board.appendChild(c);
     });
     wrap.appendChild(board); main.appendChild(wrap);
+    nvWire(render);
   }
 
   // ===== shared helpers for new views (Projects) =====
-  let tlState={status:"all",group:"status"}, gSort={k:"ratio",dir:-1}, tlSubs=false, gSubs=false;
-  let nvBU="", nvStat="";
+  let tlState={status:"all",group:"status"}, gSort={k:"ratio",dir:-1}, tlSubs=false, gSubs=false, chSubs=false;
+  let nvBU=[], nvStat=[], nvOpen=null;   // multi-select filter (array = เลือกได้หลายตัว, ว่าง = ทั้งหมด)
   const deptOf=o=>((o&&o.bu)||chDept(o)||"");   // "ฝ่าย" = BU ที่มาขอ (งานเป็นของฝ่ายไหน) ก่อน · fallback ownerBu
-  const nvApply=l=>l.filter(p=>(!nvBU||deptOf(p)===nvBU)&&(!nvStat||p.status===nvStat));
-  const nvBUs=()=>[...new Set(projects.map(p=>deptOf(p)).filter(Boolean))].sort();
-  const nvFilterHTML=()=>`<div class="ctl"><span class="cl">ฝ่าย</span><select class="ghost" id="nvBUsel"><option value="">ทุกฝ่าย</option>${nvBUs().map(b=>`<option value="${esc(b)}"${nvBU===b?" selected":""}>${esc(b)}</option>`).join("")}</select></div><div class="ctl"><span class="cl">Status</span><select class="ghost" id="nvStatSel"><option value="">ทุกสถานะ</option>${PROJ_STAT.filter(s=>projects.some(p=>p.status===s)).map(s=>`<option value="${esc(s)}"${nvStat===s?" selected":""}>${esc(s)}</option>`).join("")}</select></div>`;
-  const nvWire=fn=>{const b=$("#nvBUsel");if(b)b.addEventListener("change",function(){nvBU=this.value;fn();});const s=$("#nvStatSel");if(s)s.addEventListener("change",function(){nvStat=this.value;fn();});};
+  const nvApply=l=>l.filter(p=>(!nvBU.length||nvBU.includes(deptOf(p)))&&(!nvStat.length||nvStat.includes(p.status)));
+  const nvBUs=()=>[...new Set([...projects.map(deptOf),...tasks.map(deptOf)].filter(Boolean))].sort();
+  const nvStatOpts=()=>[...PROJ_STAT,...TASK_STAT].filter((s,i,a)=>a.indexOf(s)===i).filter(s=>projects.some(p=>p.status===s)||tasks.some(t=>t.status===s));
+  const nvChip=(kind,label,vals,sel)=>{
+    const summary=sel.length?`${esc(label)}: ${sel.length}`:`${esc(label)}: ทั้งหมด`;
+    const opts=vals.map(v=>`<label class="ms-opt"><input type="checkbox" value="${esc(v)}"${sel.includes(v)?" checked":""}> ${esc(v)}</label>`).join("")||'<span class="ms-empty">—</span>';
+    return `<div class="msel" data-k="${kind}"><button type="button" class="ghost msel-btn">${summary} ▾</button><div class="msel-panel"${nvOpen===kind?"":" hidden"}>${opts}<button type="button" class="ms-clear">ล้างตัวกรอง</button></div></div>`;
+  };
+  const nvFilterHTML=()=>nvChip("bu","ฝ่าย",nvBUs(),nvBU)+nvChip("stat","Status",nvStatOpts(),nvStat);
+  const nvWire=fn=>{
+    document.querySelectorAll(".msel").forEach(function(ms){
+      const kind=ms.dataset.k;
+      ms.querySelector(".msel-btn").addEventListener("click",function(e){e.stopPropagation();nvOpen=nvOpen===kind?null:kind;fn();});
+      ms.querySelectorAll(".msel-panel input").forEach(function(inp){inp.addEventListener("change",function(){
+        const arr=kind==="bu"?nvBU:nvStat;
+        if(inp.checked){if(arr.indexOf(inp.value)<0)arr.push(inp.value);}else{const i=arr.indexOf(inp.value);if(i>=0)arr.splice(i,1);}
+        nvOpen=kind;fn();
+      });});
+      const clr=ms.querySelector(".ms-clear");
+      if(clr)clr.addEventListener("click",function(e){e.stopPropagation();if(kind==="bu")nvBU.length=0;else nvStat.length=0;nvOpen=kind;fn();});
+    });
+  };
+  if(!window.__nvDoc){window.__nvDoc=true;document.addEventListener("click",function(e){if(nvOpen&&!e.target.closest(".msel")){nvOpen=null;document.querySelectorAll(".msel-panel").forEach(function(p){p.hidden=true;});}});}
   const nvLastCmt=o=>{const cs=o.comments||[],l=cs[cs.length-1];return l?((cs.length>1?`(${cs.length}) `:"")+(l.by?l.by+": ":"")+(l.text||"")):"";};
   const pWeeks=p=>{const e=+(p&&p.effort);return e>0?e:(EMAP[p.size]||3);}; // effort จริง (staff-weeks) ก่อน · fallback = size (XS1..XL5)
   const nvRatioCls=r=>r>=1.1?"hi":r>=0.7?"mid":"lo";
@@ -945,7 +975,7 @@
 
   const GCOLS=[
     {k:"id",t:"ID",s:p=>p.id},
-    {k:"dept",t:"ฝ่าย",s:p=>deptOf(p)||""},
+    {k:"dept",t:"BU/ฝ่าย (ที่มาขอ)",s:p=>deptOf(p)||""},
     {k:"name",t:"ชื่อโครงการ",s:p=>p.name},
     {k:"status",t:"สถานะ",s:p=>PROJ_STAT.indexOf(p.status)},
     {k:"cmt",t:"Comment",s:null},
@@ -1050,8 +1080,9 @@
     return {projs,years,ncols:years.length*48,span};}
   function renderCharter(){
     const main=$("#main");
-    main.innerHTML=`<div class="tlbar"><div class="tl-title">🗓 Project Charter <span class="cnt">รายสัปดาห์ Q1–Q4</span></div><div class="tl-ctrls">${nvFilterHTML()}<button class="ghost" id="chExp2">⬇ Export Excel</button></div></div>`;
+    main.innerHTML=`<div class="tlbar"><div class="tl-title">🗓 Project Charter <span class="cnt">รายสัปดาห์ Q1–Q4</span></div><div class="tl-ctrls">${nvFilterHTML()}<button class="ghost sub-toggle${chSubs?" on":""}" id="chSubBtn">${chSubs?"▾":"▸"} Sub-task</button><button class="ghost" id="chExp2">⬇ Export Excel</button></div></div>`;
     const chExpBtn=$("#chExp2"); if(chExpBtn)chExpBtn.addEventListener("click",exportCharterXls);
+    const chSubBtn=$("#chSubBtn"); if(chSubBtn)chSubBtn.addEventListener("click",()=>{chSubs=!chSubs;renderCharter();});
     nvWire(renderCharter);
     const D=chYears(), box=el("div","pc");
     if(!D.years){const e=el("div","empty");e.style.margin="16px";e.textContent="ไม่มีงานที่มีวันที่ในตัวกรองนี้";box.appendChild(e);main.appendChild(box);return;}
@@ -1073,7 +1104,7 @@
         <div class="c-days">${o.start&&o.end?spentOf(o):""}</div>
       </div><div class="pc-grid">${cells}</div></div>`;};
     let rows="";
-    projs.forEach((p,pi)=>{rows+=rowHTML(p,String(pi+1),false);projTasks(p.id).filter(taskMatches).forEach((t,ti)=>{rows+=rowHTML(t,(pi+1)+"."+(ti+1),true);});});
+    projs.forEach((p,pi)=>{rows+=rowHTML(p,String(pi+1),false);if(chSubs)projTasks(p.id).filter(taskMatches).forEach((t,ti)=>{rows+=rowHTML(t,(pi+1)+"."+(ti+1),true);});});
     box.innerHTML=`<div class="pc-scroll"><div class="pc-inner">
       <div class="pc-head"><div class="pc-left-h"><div class="pc-title">Project Information</div>
         <div class="pc-colhead"><div>No.</div><div class="act">Project Activity</div><div>Owner · ฝ่าย</div><div>Owner ที่เกี่ยวข้อง · ฝ่าย</div><div>Status</div><div>Start Date</div><div>Deadline</div><div>Days</div></div></div>
@@ -1169,7 +1200,7 @@
     if(filterProj&&!projById(filterProj))filterProj=null;
     $("#reset").hidden=!filterProj&&!filterBU&&!filterOwner&&!filterPmo;
     refreshOwners(); refreshFilterOpts();
-    const list=tasks.filter(taskMatches);
+    const list=nvApply(tasks.filter(taskMatches));
     if(!FULL){renderImpact(); renderProjBoard();}
     if(view==="timeline")renderTimeline();
     else if(view==="charter")renderCharter();
