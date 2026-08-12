@@ -11,7 +11,7 @@
     --font:system-ui,-apple-system,"Segoe UI","Helvetica Neue","Noto Sans Thai","Sarabun",sans-serif;
     --mono:ui-monospace,"SF Mono","JetBrains Mono","Menlo",monospace;
     --serif:"Iowan Old Style","Palatino Linotype",Georgia,"Times New Roman",serif;
-    --shadow:0 1px 2px rgba(20,25,40,.05),0 4px 14px rgba(20,25,40,.05);
+    --shadow:0 1px 2px rgba(20,25,40,.05),0 4px 14px rgba(20,25,40,.05); --ok:#2e7d5b; --ok-soft:#e2f2ea;
   }
   @media (prefers-color-scheme:dark){:root{
     --paper:#0e1014; --ink:#eef1f6; --ink-soft:#a7b1c0; --line:#343c49;
@@ -20,7 +20,7 @@
     --copper:#e0bd8f; --copper-soft:#3a2c17;
     --hi:#f0806e; --hi-soft:#4a231d; --md:#e0a747; --md-soft:#41310f; --lo:#94a0b1; --lo-soft:#272d38;
     --st-todo:#94a0b1; --st-prog:#6f9dff; --st-rev:#e0a747; --st-appr:#57cbba; --st-uat:#a99bff; --st-done:#5fd0a2;
-    --shadow:0 1px 2px rgba(0,0,0,.35),0 8px 22px rgba(0,0,0,.45);
+    --shadow:0 1px 2px rgba(0,0,0,.35),0 8px 22px rgba(0,0,0,.45); --ok:#5fd0a2; --ok-soft:#123528;
   }}
   :root[data-theme="dark"]{
     --paper:#0e1014; --ink:#eef1f6; --ink-soft:#a7b1c0; --line:#343c49;
@@ -29,7 +29,7 @@
     --copper:#e0bd8f; --copper-soft:#3a2c17;
     --hi:#f0806e; --hi-soft:#4a231d; --md:#e0a747; --md-soft:#41310f; --lo:#94a0b1; --lo-soft:#272d38;
     --st-todo:#94a0b1; --st-prog:#6f9dff; --st-rev:#e0a747; --st-appr:#57cbba; --st-uat:#a99bff; --st-done:#5fd0a2;
-    --shadow:0 1px 2px rgba(0,0,0,.35),0 8px 22px rgba(0,0,0,.45);
+    --shadow:0 1px 2px rgba(0,0,0,.35),0 8px 22px rgba(0,0,0,.45); --ok:#5fd0a2; --ok-soft:#123528;
   }
   :root[data-theme="light"]{
     --paper:#faf9f6; --ink:#191c23; --ink-soft:#5b6472; --line:#e6e5df;
@@ -38,9 +38,10 @@
     --copper:#a5702f; --copper-soft:#f6ecdd;
     --hi:#c0402f; --hi-soft:#fce3e1; --md:#b0761a; --md-soft:#fbefd6; --lo:#6b7482; --lo-soft:#edeff2;
     --st-todo:#6b7482; --st-prog:#2f6df0; --st-rev:#b0761a; --st-appr:#1f8f80; --st-uat:#6b5bd0; --st-done:#2e7d5b;
-    --shadow:0 1px 2px rgba(20,25,40,.05),0 4px 14px rgba(20,25,40,.05);
+    --shadow:0 1px 2px rgba(20,25,40,.05),0 4px 14px rgba(20,25,40,.05); --ok:#2e7d5b; --ok-soft:#e2f2ea;
   }
   *{box-sizing:border-box} body{margin:0;font-family:var(--font);color:var(--ink)}
+  [hidden]{display:none!important}
   .app{background:var(--paper);color:var(--ink);font-family:var(--font);min-height:100vh;padding:0 clamp(14px,3vw,32px) 40px;-webkit-font-smoothing:antialiased}
   .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
   .bar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 0;margin-bottom:6px}
@@ -390,6 +391,102 @@
   .btn-primary:hover{background:var(--accent-ink)}
   .btn-cancel{font:inherit;font-weight:600;font-size:.85rem;border:1px solid var(--line);background:var(--surface);color:var(--ink-soft);border-radius:9px;padding:9px 16px;cursor:pointer}
   @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+  /* ===== NEW VIEWS: Timeline(Gantt) · Grid · Kanban ===== */
+  /* Timeline toolbar */
+  .tlbar{display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap;margin:6px 0 2px}
+  .tl-title{font-family:var(--serif);font-size:1.16rem;font-weight:700;display:flex;align-items:center;gap:9px}
+  .tl-title .cnt{font-family:var(--mono);font-size:.68rem;font-weight:700;color:var(--ink-soft);background:var(--surface-2);border:1px solid var(--line);border-radius:99px;padding:2px 9px}
+  .tl-sub{font-size:.77rem;color:var(--ink-soft);margin:3px 0 0}
+  .tl-sub b{color:var(--copper);font-family:var(--mono)}
+  .tl-ctrls{display:flex;align-items:center;gap:13px;flex-wrap:wrap;margin-left:auto}
+  .ctl{display:flex;align-items:center;gap:6px}
+  .ctl .cl{font-family:var(--mono);font-size:.64rem;letter-spacing:.06em;text-transform:uppercase;font-weight:700;color:var(--ink-soft)}
+  .today-btn{font:inherit;font-size:.76rem;font-weight:700;color:var(--hi);background:var(--hi-soft);border:1px solid var(--hi);border-radius:8px;padding:6px 11px;cursor:pointer}
+  .miniseg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+  .miniseg button{font:inherit;font-size:.73rem;font-weight:600;border:0;background:transparent;color:var(--ink-soft);padding:6px 11px;cursor:pointer}
+  .miniseg button[aria-pressed="true"]{background:var(--accent);color:#fff}
+  /* Timeline gantt */
+  .tgt{border:1px solid var(--line);border-radius:14px;background:var(--surface);overflow:hidden;margin-top:12px}
+  .tgt-scroll{overflow-x:auto}
+  .tg-head,.tg-row,.tg-grp{display:flex;width:max-content;min-width:100%}
+  .tg-l1{position:sticky;left:0;z-index:3;background:var(--surface);width:224px;flex:none;padding:7px 12px;border-right:1px solid var(--line);display:flex;align-items:center;gap:8px;min-width:0}
+  .tg-l2{position:sticky;left:224px;z-index:3;background:var(--surface);width:120px;flex:none;padding:7px 10px;border-right:1px solid var(--line);display:flex;align-items:center;gap:7px;overflow:hidden}
+  .tg-l3{position:sticky;left:344px;z-index:3;background:var(--surface);width:70px;flex:none;padding:7px 10px;border-right:1px solid var(--line);display:flex;align-items:center;gap:7px}
+  .tg-head{background:var(--surface-2);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+  .tg-head .tg-l1,.tg-head .tg-l2,.tg-head .tg-l3{background:var(--surface-2);font-family:var(--mono);font-size:.62rem;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);font-weight:700}
+  .tg-months{display:flex;flex:1}
+  .tg-mo{flex:none;border-left:1px solid var(--line)}
+  .tg-mo .mo-lbl{font-family:var(--mono);font-size:.64rem;color:var(--ink-soft);font-weight:700;padding:6px 0 2px 7px;white-space:nowrap}
+  .tg-ticks{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.54rem;color:var(--ink-soft);opacity:.55;padding:0 5px 4px}
+  .tg-grp{background:var(--surface-2);border-bottom:1px solid var(--line)}
+  .tg-grp .tg-l1{background:var(--surface-2);font-weight:700;font-size:.82rem}
+  .tg-grp .gdot{width:10px;height:10px;border-radius:3px;flex:none}
+  .tg-grp .tg-l2,.tg-grp .tg-l3{background:var(--surface-2);font-family:var(--mono);font-weight:700;color:var(--ink-soft);font-size:.72rem}
+  .tg-row{border-bottom:1px solid var(--line)}
+  .tg-row:last-child{border-bottom:0}
+  .tg-row:hover{background:var(--surface-2)}
+  .tg-id{font-family:var(--mono);font-size:.66rem;color:var(--ink-soft);font-weight:700;flex:none}
+  .tg-nm{font-size:.8rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;cursor:pointer}
+  .tg-dept{font-size:.62rem;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .tg-eff{font-family:var(--mono);font-size:.66rem;font-weight:700;color:var(--accent-ink);background:var(--accent-soft);border-radius:6px;padding:2px 7px;flex:none}
+  .tg-track{position:relative;flex:1;display:flex;min-height:36px}
+  .tg-cell{flex:none;border-left:1px solid var(--line)}
+  .tg-bar{position:absolute;top:50%;transform:translateY(-50%);height:21px;border-radius:6px;display:flex;align-items:center;padding:0 8px;color:#fff;font-size:.64rem;font-weight:700;white-space:nowrap;overflow:hidden;box-shadow:var(--shadow);cursor:pointer;z-index:1}
+  .tg-flag{position:absolute;top:50%;transform:translateY(-50%);font-size:.68rem;color:var(--ink-soft);white-space:nowrap}
+  .tg-today{position:absolute;top:0;bottom:0;width:2px;background:var(--hi);z-index:2}
+  .tg-today .tdlbl{position:absolute;top:2px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:.52rem;font-weight:800;color:#fff;background:var(--hi);padding:1px 5px;border-radius:4px}
+  /* Grid */
+  .grid-wrap{border:1px solid var(--line);border-radius:14px;background:var(--surface);overflow:hidden;margin-top:12px}
+  .gscroll{overflow-x:auto}
+  table.gt{border-collapse:collapse;width:100%;min-width:1120px;font-size:.82rem}
+  .gt thead th{position:sticky;top:0;z-index:2;background:var(--surface-2);text-align:left;padding:11px 12px;font-family:var(--mono);font-size:.62rem;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);font-weight:700;border-bottom:1px solid var(--line);cursor:pointer;white-space:nowrap;user-select:none}
+  .gt thead th:hover{color:var(--ink)}
+  .gt thead th.ratio-col{background:var(--copper-soft)}
+  .gt thead th .ar{opacity:.35;font-size:.7rem}
+  .gt thead th.sorted .ar{opacity:1;color:var(--accent)}
+  .gt tbody td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+  .gt tbody tr:last-child td{border-bottom:0}
+  .gt tbody tr:hover{background:var(--surface-2)}
+  .gt .gid{font-family:var(--mono);color:var(--ink-soft);font-weight:700;text-align:right}
+  .gt .gtitle{font-weight:600;max-width:330px;line-height:1.35;cursor:pointer}
+  .gt .gtitle:hover{color:var(--accent)}
+  .gt .gdept{white-space:nowrap;color:var(--ink-soft)}
+  .gt .gstp{font-weight:700;border-radius:7px;padding:3px 9px;font-size:.74rem;white-space:nowrap;color:#fff;display:inline-block}
+  .gt .geff{font-family:var(--mono);font-weight:700;text-align:center}
+  .rbadge{display:inline-block;min-width:44px;text-align:center;font-family:var(--mono);font-size:.76rem;font-weight:800;border-radius:8px;padding:3px 10px}
+  .rbadge.hi{color:#fff;background:var(--ok)} .rbadge.mid{color:#fff;background:var(--accent)} .rbadge.lo{color:var(--ink-soft);background:var(--surface-3)}
+  .gt .gdl{font-family:var(--mono);color:var(--hi);font-weight:700;white-space:nowrap;text-align:center}
+  .gt .gedit{color:var(--copper);cursor:pointer;background:none;border:1px solid var(--line);border-radius:8px;padding:3px 9px;font-size:.9rem}
+  /* Kanban */
+  .kb{display:flex;gap:14px;overflow-x:auto;padding:14px 2px 8px;align-items:flex-start}
+  .kcol{flex:0 0 300px;background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:10px}
+  .khead{display:flex;align-items:center;gap:8px}
+  .kdot{width:11px;height:11px;border-radius:99px;flex:none}
+  .khead .kt{font-weight:700;font-size:.95rem}
+  .khead .kc{margin-left:auto;font-family:var(--mono);font-size:.72rem;font-weight:700;color:var(--ink-soft);background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:2px 9px}
+  .kcap{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 10px;display:flex;flex-direction:column;gap:6px}
+  .kcap .cr{display:flex;align-items:center;justify-content:space-between;font-size:.76rem}
+  .kcap .cr .k{color:var(--ink-soft)}
+  .kcap .cr .v{font-family:var(--mono);font-weight:700}
+  .kcap .val-target{font-family:var(--mono);font-weight:700;border:1px solid var(--line);border-radius:7px;padding:1px 7px;background:var(--surface-2)}
+  .rem{font-family:var(--mono);font-weight:800;border-radius:7px;padding:2px 9px}
+  .rem.ok{color:var(--ok);background:var(--ok-soft)}
+  .rem.over{color:var(--hi);background:var(--hi-soft)}
+  .capbar{height:6px;border-radius:99px;background:var(--surface-3);overflow:hidden}
+  .capbar i{display:block;height:100%;border-radius:99px}
+  .kcards{display:flex;flex-direction:column;gap:9px;min-height:20px}
+  .kcard{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:11px 12px;box-shadow:var(--shadow);transition:.15s;border-left:3px solid var(--st-todo)}
+  .kcard:hover{transform:translateY(-1px);border-color:var(--ink-soft)}
+  .kc-top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+  .kc-id{font-family:var(--mono);font-size:.72rem;color:var(--ink-soft);font-weight:700}
+  .kc-dept{margin-left:auto;font-size:.68rem;font-weight:700;color:var(--accent-ink);background:var(--accent-soft);border-radius:99px;padding:2px 9px}
+  .kc-title{font-size:.9rem;font-weight:600;line-height:1.32;margin-bottom:9px;cursor:pointer}
+  .kc-title:hover{color:var(--accent)}
+  .kc-meta{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+  .kc-due{font-family:var(--mono);font-size:.7rem;font-weight:700;color:var(--hi);background:var(--hi-soft);border-radius:7px;padding:2px 8px}
+  .kc-eff{font-family:var(--mono);font-size:.7rem;font-weight:700;color:var(--ink-soft)}
+  .kratio{margin-left:auto;font-family:var(--mono);font-size:.74rem;font-weight:800;border-radius:8px;padding:3px 10px}
+  .kratio.hi{color:#fff;background:var(--ok)} .kratio.mid{color:#fff;background:var(--accent)} .kratio.lo{color:var(--ink-soft);background:var(--surface-3)}
 </style>
 
 <div class="app">
@@ -407,14 +504,16 @@
     <button class="ghost" id="imp" title="โหลด JSON กลับ">Import</button>
     <div class="seg" role="group" aria-label="มุมมอง">
       <button id="v-prio" aria-pressed="true">Priority</button>
-      <button id="v-stat" aria-pressed="false">Status</button>
       <button id="v-plan" aria-pressed="false">Planning</button>
       <button id="v-time" aria-pressed="false">Timeline</button>
+      <button id="v-chart" aria-pressed="false">Charter</button>
+      <button id="v-grid" aria-pressed="false">Grid</button>
+      <button id="v-kanban" aria-pressed="false">Kanban</button>
     </div>
     <button class="ghost icon" id="theme" aria-label="สลับธีม" title="สลับ Dark / Light">◐</button>
   </header>
 
-  <section class="zone" aria-labelledby="z1">
+  <section class="zone" aria-labelledby="z1" id="zoneImpact">
     <div class="zlab"><span class="n">1</span><h2 id="z1">Corporate Impact</h2>
       <button class="help-dot" id="scoreHelp" title="Value Score / Priority คืออะไร" aria-label="อธิบาย Value Score และ Priority">?</button>
       <span id="impCount" class="count-badge"></span>
@@ -426,13 +525,13 @@
     <div class="impact" id="impact"></div>
   </section>
 
-  <section class="zone" aria-labelledby="z2p">
+  <section class="zone" aria-labelledby="z2p" id="zoneProj">
     <div class="zlab"><span class="n">2</span><h2 id="z2p">Project Priority</h2></div>
     <div class="board-wrap"><div class="board" id="projboard"></div></div>
   </section>
 
   <section class="zone" aria-labelledby="z3">
-    <div class="zlab"><span class="n">3</span><h2 id="z3">Task Priority</h2><span class="spacer"></span><span id="tmode" class="tmode" hidden></span></div>
+    <div class="zlab" id="z3lab"><span class="n">3</span><h2 id="z3">Task Priority</h2><span class="spacer"></span><span id="tmode" class="tmode" hidden></span></div>
     <div id="main"></div>
   </section>
 </div>
@@ -710,58 +809,140 @@
     wrap.appendChild(board); main.appendChild(wrap);
   }
 
+  // ===== shared helpers for new views (Projects) =====
+  let tlState={status:"all",group:"status"}, gSort={k:"ratio",dir:-1};
+  const pWeeks=p=>{const d=dayspan(p.start,p.end);return d?Math.max(1,Math.round(d/7)):(EMAP[p.size]||3)*2;};
+  const nvRatioCls=r=>r>=1.1?"hi":r>=0.7?"mid":"lo";
+  const nvFmtD=s=>{const x=new Date(s);return isNaN(x)?"—":(String(x.getDate()).padStart(2,"0")+"/"+String(x.getMonth()+1).padStart(2,"0")+"/"+x.getFullYear());};
+  const NV_MON=["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+  const NV_COLW=78;
+  const nvYmd=s=>{const d=new Date(s);return isNaN(d)?null:d;};
+  function nvMonths(items){
+    let mn=null,mx=null;
+    items.forEach(o=>{const s=nvYmd(o.start),e=nvYmd(o.end);if(s&&(!mn||s<mn))mn=s;if(e&&(!mx||e>mx))mx=e;});
+    const now=new Date();now.setHours(0,0,0,0);
+    if(!mn)mn=new Date(now.getFullYear(),0,1); if(!mx)mx=new Date(now.getFullYear(),11,31);
+    if(now<mn)mn=now; if(now>mx)mx=now;
+    let arr=[],y=mn.getFullYear(),m=mn.getMonth(),ey=mx.getFullYear(),em=mx.getMonth();
+    while(y<ey||(y===ey&&m<=em)){arr.push({y,m,days:new Date(y,m+1,0).getDate()});m++;if(m>11){m=0;y++;}}
+    return arr;
+  }
+  function nvColX(d,mos,cw){for(let i=0;i<mos.length;i++){if(d.getFullYear()===mos[i].y&&d.getMonth()===mos[i].m)return i*cw+(d.getDate()-1)/mos[i].days*cw;}if(d<new Date(mos[0].y,mos[0].m,1))return 0;return mos.length*cw;}
+  const nvCells=(mos,cw)=>mos.map(()=>`<div class="tg-cell" style="width:${cw}px"></div>`).join("");
+  const nvToday=(mos,cw,lab)=>{const t=new Date();t.setHours(0,0,0,0);const tx=nvColX(t,mos,cw);return `<div class="tg-today" style="left:${tx}px">${lab?'<span class="tdlbl">TODAY</span>':''}</div>`;};
+
   function renderTimeline(){
-    const main=$("#main"); main.innerHTML="";
-    if(ganttExp===null){ganttExp={};projects.forEach(p=>ganttExp[p.id]=true);}
-    const projs=projects.filter(projMatches);
-    const dates=[];
-    const collect=o=>{const s=new Date(o.start),e=new Date(o.end);if(!isNaN(s))dates.push(s);if(!isNaN(e))dates.push(e);};
-    projs.forEach(p=>{collect(p);projTasks(p.id).filter(taskMatches).forEach(collect);});
-    const box=el("div","gantt");
-    if(!dates.length){const e=el("div","empty");e.style.margin="16px";e.textContent="ไม่มีงานที่มีวันที่ในตัวกรองนี้";box.appendChild(e);main.appendChild(box);return;}
-    const fmtY=s=>{const x=new Date(s);return isNaN(x)?"—":(String(x.getDate()).padStart(2,"0")+"/"+String(x.getMonth()+1).padStart(2,"0")+"/"+x.getFullYear());};
-    let min=new Date(Math.min(...dates)), max=new Date(Math.max(...dates));
-    min=new Date(+min-3*864e5);
-    const AXIS_END=new Date("2027-12-31");            // ยืดถึงสิ้นปี 2027
-    max=new Date(Math.max(+max+3*864e5,+AXIS_END));
-    min.setHours(0,0,0,0); max.setHours(0,0,0,0);
-    const totalDays=Math.max(Math.round((max-min)/864e5),30);
-    const span=max-min;
-    const pos=d=>{const x=new Date(d);return isNaN(x)?0:(x-min)/span*100;};
-    const PX_PER_DAY=5, trackPx=Math.max(Math.round(totalDays*PX_PER_DAY),700);
-    // tick + gridline รายเดือน (วันที่ 1 ของแต่ละเดือน)
-    let ticks="",gl="";
-    for(let d=new Date(min.getFullYear(),min.getMonth(),1); d<=max; d.setMonth(d.getMonth()+1)){if(d<min)continue;const L=pos(d);const yy=String(d.getFullYear()).slice(2);ticks+=`<div class="g-tick" style="left:${L}%">${(d.getMonth()+1)+"/"+yy}</div>`;gl+=`<div class="g-gl" style="left:${L}%"></div>`;}
-    const today=new Date();today.setHours(0,0,0,0);
-    const tline=(today>=min&&today<=max)?`<div class="g-today" style="left:${pos(today)}%"><span class="lb">วันนี้</span></div>`:"";
-    const bar=(o,color,isSub)=>{const s=new Date(o.start),e=new Date(o.end);if(isNaN(s)||isNaN(e)||e<s)return "";const left=pos(s),w=Math.max((e-s+864e5)/span*100,1.4);const done=o.status==="Done";return `<button class="g-bar ${done?"done":""}" data-id="${esc(o.id)}"${isSub?' data-sub="1"':''} style="left:${left}%;width:${w}%;background:${color}" title="${esc(fmt(o.start))} → ${esc(fmt(o.end))}"><span class="bd"></span>${isSub?esc(phaseOf(o)):esc(o.id)}</button>`;};
-    let rows="";
-    projs.forEach(p=>{
-      const subs=projTasks(p.id).filter(taskMatches);
-      const exp=ganttExp[p.id]!==false;
-      const di=dueMeta(p), stc=statColor(p.status), col=pcolor(p.id);
-      rows+=`<div class="g-row"><div class="g-left"><div class="g-nm"><button class="exp" data-tid="${esc(p.id)}">${subs.length?(exp?"▾":"▸"):""}</button><span class="dot" style="background:${col}"></span><span class="nm" data-pid="${esc(p.id)}">${esc(p.name)}</span></div>
-        <div class="g-st"><span class="g-stp" style="color:var(${stc});background:color-mix(in srgb,var(${stc}) 15%,transparent)">${esc(p.status)}</span></div>
-        <div class="g-dt">${p.start?fmtY(p.start):"—"}</div>
-        <div class="g-dt ${di.cls==="over"?"over":""}">${p.end?fmtY(p.end):"—"}</div></div>
-        <div class="g-tr">${gl}${tline}${bar(p,col,false)}</div></div>`;
-      if(exp)subs.forEach(t=>{const di2=dueMeta(t),stc2=statColor(t.status),phc="var("+(PHASE_COLOR[phaseOf(t)]||"--st-todo")+")";
-        rows+=`<div class="g-row sub"><div class="g-left"><div class="g-nm sub"><span class="dot" style="background:${phc}"></span><span class="nm" data-tid2="${esc(t.id)}">${esc(t.title)}</span></div>
-          <div class="g-st"><span class="g-stp" style="color:${phc};background:color-mix(in srgb,${phc} 16%,transparent)">${esc(t.status)}</span></div>
-          <div class="g-dt">${t.start?fmtY(t.start):"—"}</div>
-          <div class="g-dt ${di2.cls==="over"?"over":""}">${t.end?fmtY(t.end):"—"}</div></div>
-          <div class="g-tr">${gl}${tline}${bar(t,phc,true)}</div></div>`;});
+    const main=$("#main");
+    const items=projects.filter(projMatches).filter(p=>tlState.status==="all"||p.status===tlState.status);
+    const cw=NV_COLW, mos=nvMonths(items);
+    const totalEff=items.reduce((s,p)=>s+pWeeks(p),0);
+    const statOpts=`<option value="all">ทุกสถานะ (All)</option>`+PROJ_STAT.filter(s=>projects.some(p=>p.status===s)).map(s=>`<option value="${esc(s)}"${tlState.status===s?" selected":""}>${esc(s)}</option>`).join("");
+    let groups;
+    if(tlState.group==="none")groups=[{label:null,items}];
+    else if(tlState.group==="dept"){const by={};items.forEach(p=>{const d=chDept(p)||"— ไม่ระบุ —";(by[d]=by[d]||[]).push(p);});groups=Object.keys(by).sort().map(k=>({label:k,items:by[k]}));}
+    else {const by={};items.forEach(p=>{(by[p.status]=by[p.status]||[]).push(p);});groups=PROJ_STAT.filter(s=>by[s]).map(s=>({label:s,color:statColor(s),items:by[s]}));}
+    let first=true, rows="";
+    groups.forEach(g=>{
+      if(g.label!=null){
+        rows+=`<div class="tg-grp"><div class="tg-l1">${g.color?`<span class="gdot" style="background:var(${g.color})"></span>`:""}${esc(g.label)}</div><div class="tg-l2">${g.items.length} งาน</div><div class="tg-l3">${g.items.reduce((s,p)=>s+pWeeks(p),0)}w</div><div class="tg-track" style="min-height:30px">${nvCells(mos,cw)}${nvToday(mos,cw,first)}</div></div>`;
+        first=false;
+      }
+      g.items.slice().sort((a,b)=>(nvYmd(a.start)||0)-(nvYmd(b.start)||0)).forEach(p=>{
+        const s=nvYmd(p.start),e=nvYmd(p.end),stc=statColor(p.status);
+        let barHTML="";
+        if(s&&e&&e>=s){const x=nvColX(s,mos,cw),w=Math.max(cw*0.35,nvColX(e,mos,cw)-x);barHTML=`<div class="tg-bar" data-pid="${esc(p.id)}" style="left:${x}px;width:${w}px;background:var(${stc})">PI ${pindex(p).toFixed(2)}</div><div class="tg-flag" style="left:${x+w+8}px">${esc(p.name)}</div>`;}
+        else barHTML=`<div class="tg-flag" style="left:6px">${esc(p.name)} · (ไม่มีวันที่)</div>`;
+        rows+=`<div class="tg-row"><div class="tg-l1"><span class="tg-nm" data-pid="${esc(p.id)}">${esc(p.name)}</span></div><div class="tg-l2"><span class="tg-dept">${esc(chDept(p)||"—")}</span></div><div class="tg-l3"><span class="tg-eff">${pWeeks(p)}w</span></div><div class="tg-track">${nvCells(mos,cw)}${nvToday(mos,cw,first)}${barHTML}</div></div>`;
+        first=false;
+      });
     });
-    box.innerHTML=`<div class="gantt-scroll"><div class="gantt-inner" style="--trackpx:${trackPx}px">
-      <div class="g-head"><div class="g-left-h"><div>Project / งาน</div><div>Status</div><div>Start</div><div>Due</div></div><div class="g-th">${ticks}</div></div>
-      <div>${rows}</div>
-      <div class="g-legend">${PHASES.map(p=>`<span class="lg"><span class="sw" style="background:var(${PHASE_COLOR[p]})"></span>${esc(p)}</span>`).join("")}<span class="lg" style="margin-left:auto"><span class="sw" style="background:var(--hi)"></span>เส้นวันนี้ · แท่งจาง=Done</span></div>
-    </div></div>`;
-    main.appendChild(box);
-    box.querySelectorAll(".exp").forEach(b=>b.addEventListener("click",()=>{const id=b.dataset.tid;ganttExp[id]=ganttExp[id]===false?true:false;renderTimeline();}));
-    box.querySelectorAll("[data-pid]").forEach(n=>n.addEventListener("click",()=>openProjectDetail(n.dataset.pid)));
-    box.querySelectorAll("[data-tid2]").forEach(n=>n.addEventListener("click",()=>openTaskDetail(n.dataset.tid2)));
-    box.querySelectorAll(".g-bar").forEach(b=>b.addEventListener("click",()=>{if(b.dataset.sub)openTaskDetail(b.dataset.id);else openProjectDetail(b.dataset.id);}));
+    main.innerHTML=`
+      <div class="tlbar">
+        <div><div class="tl-title">📅 Timeline <span class="cnt">${items.length} โปรเจกต์</span></div>
+        <div class="tl-sub">ช่วง Start → Deadline · รวม Effort <b>${totalEff}w</b></div></div>
+        <div class="tl-ctrls">
+          <div class="ctl"><span class="cl">Status</span><select class="ghost" id="tlStatus">${statOpts}</select></div>
+          <button class="today-btn" id="tlTodayBtn">📍 Today</button>
+          <div class="ctl"><span class="cl">Group by</span><div class="miniseg" id="tlGroup"><button data-g="none" aria-pressed="${tlState.group==="none"}">None</button><button data-g="dept" aria-pressed="${tlState.group==="dept"}">ฝ่าย</button><button data-g="status" aria-pressed="${tlState.group==="status"}">สถานะ</button></div></div>
+        </div>
+      </div>
+      <div class="tgt"><div class="tgt-scroll" id="tgtScroll">
+        <div class="tg-head"><div class="tg-l1">Project</div><div class="tg-l2">ฝ่าย (Dept)</div><div class="tg-l3">Effort</div><div class="tg-months">${mos.map(mo=>`<div class="tg-mo" style="width:${cw}px"><div class="mo-lbl">${NV_MON[mo.m]} ${String(mo.y).slice(2)}</div><div class="tg-ticks"><span>1</span><span>15</span><span>${mo.days}</span></div></div>`).join("")}</div></div>
+        <div>${rows}</div>
+      </div></div>`;
+    $("#tlStatus").addEventListener("change",function(){tlState.status=this.value;renderTimeline();});
+    $("#tlTodayBtn").addEventListener("click",()=>{const sc=$("#tgtScroll");const t=new Date();t.setHours(0,0,0,0);const tx=nvColX(t,mos,cw);sc.scrollLeft=Math.max(0,tx-sc.clientWidth/2+180);});
+    main.querySelectorAll("#tlGroup button").forEach(b=>b.addEventListener("click",()=>{tlState.group=b.dataset.g;renderTimeline();}));
+    main.querySelectorAll(".tg-nm,.tg-bar").forEach(n=>n.addEventListener("click",()=>openProjectDetail(n.dataset.pid)));
+  }
+
+  const GCOLS=[
+    {k:"id",t:"ID",s:p=>p.id},
+    {k:"dept",t:"ฝ่าย (Dept)",s:p=>chDept(p)},
+    {k:"name",t:"ชื่อโครงการ",s:p=>p.name},
+    {k:"status",t:"สถานะ",s:p=>PROJ_STAT.indexOf(p.status)},
+    {k:"eff",t:"Effort (wk)",s:p=>pWeeks(p)},
+    {k:"value",t:"Value Score",s:p=>vscore(p)},
+    {k:"ratio",t:"Priority Index",cls:"ratio-col",s:p=>pindex(p)},
+    {k:"owner",t:"Owner",s:p=>p.owner||""},
+    {k:"start",t:"Start",s:p=>p.start||""},
+    {k:"deadline",t:"Deadline",s:p=>p.end||""},
+    {k:"act",t:"จัดการ",s:null}
+  ];
+  function renderGridView(){
+    const main=$("#main");
+    let items=projects.filter(projMatches);
+    const col=GCOLS.find(c=>c.k===gSort.k);
+    if(col&&col.s)items.sort((a,b)=>{const x=col.s(a),y=col.s(b);return (x<y?-1:x>y?1:0)*gSort.dir;});
+    const head=GCOLS.map(c=>{const on=gSort.k===c.k;const ar=c.s?`<span class="ar">${on?(gSort.dir<0?"▼":"▲"):"↕"}</span>`:"";return `<th class="${c.cls||""}${on?" sorted":""}" data-k="${c.k}">${esc(c.t)} ${ar}</th>`;}).join("");
+    const rows=items.map(p=>{const r=pindex(p),stc=statColor(p.status);
+      return `<tr>
+        <td class="gid">${esc(p.id)}</td>
+        <td class="gdept">${esc(chDept(p)||"—")}</td>
+        <td class="gtitle" data-pid="${esc(p.id)}">${esc(p.name)}</td>
+        <td><span class="gstp" style="background:var(${stc})">${esc(p.status)}</span></td>
+        <td class="geff">${pWeeks(p)}w</td>
+        <td style="text-align:center;font-family:var(--mono)">${vscore(p).toFixed(2)}</td>
+        <td style="text-align:center"><span class="rbadge ${nvRatioCls(r)}">${r.toFixed(2)}</span></td>
+        <td>${esc(p.owner||"—")}</td>
+        <td style="font-family:var(--mono);white-space:nowrap">${p.start?nvFmtD(p.start):"—"}</td>
+        <td class="gdl">${p.end?nvFmtD(p.end):"—"}</td>
+        <td style="text-align:center"><button class="gedit" data-pid="${esc(p.id)}">✎</button></td>
+      </tr>`;}).join("");
+    main.innerHTML=`<div class="tlbar"><div class="tl-title">▦ Grid <span class="cnt">${items.length} โปรเจกต์</span></div></div>
+      <div class="grid-wrap"><div class="gscroll"><table class="gt"><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table></div></div>`;
+    main.querySelectorAll("th[data-k]").forEach(th=>{const c=GCOLS.find(x=>x.k===th.dataset.k);if(!c||!c.s)return;th.addEventListener("click",()=>{if(gSort.k===c.k)gSort.dir*=-1;else{gSort.k=c.k;gSort.dir=1;}renderGridView();});});
+    main.querySelectorAll(".gtitle[data-pid],.gedit[data-pid]").forEach(n=>n.addEventListener("click",()=>openProjectDetail(n.dataset.pid)));
+  }
+
+  const KAN_TARGET={"In progress":14};
+  function renderKanbanView(){
+    const main=$("#main");
+    const all=projects.filter(projMatches);
+    const cols=PROJ_STAT.filter(s=>all.some(p=>p.status===s)||s==="In progress"||s==="Done");
+    let totalN=0,totalE=0,html="";
+    cols.forEach(st=>{
+      let items=all.filter(p=>p.status===st).sort((a,b)=>pindex(b)-pindex(a));
+      const used=items.reduce((s,p)=>s+pWeeks(p),0);
+      const tgt=KAN_TARGET[st]||Math.max(20,used);
+      const rem=tgt-used, over=rem<0, fill=Math.min(100,used/tgt*100);
+      totalN+=items.length; totalE+=used;
+      html+=`<div class="kcol"><div class="khead"><span class="kdot" style="background:var(${statColor(st)})"></span><span class="kt">${esc(st)}</span><span class="kc">${items.length} งาน</span></div>
+        <div class="kcap">
+          <div class="cr"><span class="k">โควตา (Target)</span><span class="val-target">${tgt} wk</span></div>
+          <div class="cr"><span class="k">ใช้ไป (Effort)</span><span class="v">${used} wk</span></div>
+          <div class="capbar"><i style="width:${fill}%;background:${over?"var(--hi)":"var("+statColor(st)+")"}"></i></div>
+          <div class="cr"><span class="k">คงเหลือ</span><span class="rem ${over?"over":"ok"}">${over?"":"+"}${rem} wk</span></div>
+        </div>
+        <div class="kcards">${items.map(p=>{const r=pindex(p);return `<div class="kcard" style="border-left-color:var(${statColor(p.status)})">
+          <div class="kc-top"><span class="kc-id">${esc(p.id)}</span><span class="kc-dept">${esc(chDept(p)||"—")}</span></div>
+          <div class="kc-title" data-pid="${esc(p.id)}">${esc(p.name)}</div>
+          <div class="kc-meta">${p.end?`<span class="kc-due">⚑ ${nvFmtD(p.end)}</span>`:""}<span class="kc-eff">${pWeeks(p)}w</span><span class="kratio ${nvRatioCls(r)}">PI ${r.toFixed(2)}</span></div>
+        </div>`;}).join("")||'<div style="font-size:.8rem;color:var(--ink-soft);padding:8px">— ไม่มีงาน —</div>'}</div>
+      </div>`;
+    });
+    main.innerHTML=`<div class="tlbar"><div class="tl-title">▤ Kanban <span class="cnt">${totalN} โปรเจกต์ · ${totalE}w</span></div></div><div class="kb">${html}</div>`;
+    main.querySelectorAll(".kc-title[data-pid]").forEach(n=>n.addEventListener("click",()=>openProjectDetail(n.dataset.pid)));
   }
   const CH_MONTHS=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const chFmtD=s=>{const x=new Date(s);return isNaN(x)?"":(String(x.getDate()).padStart(2,"0")+"/"+String(x.getMonth()+1).padStart(2,"0")+"/"+x.getFullYear());};
@@ -777,7 +958,9 @@
     const span=o=>{const a=cellIdx(o.start),b=cellIdx(o.end);if(a==null||b==null)return null;return [Math.min(a,b),Math.max(a,b)];};
     return {projs,years,ncols:years.length*48,span};}
   function renderCharter(){
-    const main=$("#main"); main.innerHTML="";
+    const main=$("#main");
+    main.innerHTML=`<div class="tlbar"><div class="tl-title">🗓 Project Charter <span class="cnt">รายสัปดาห์ Q1–Q4</span></div><div class="tl-ctrls"><button class="ghost" id="chExp2">⬇ Export Excel</button></div></div>`;
+    const chExpBtn=$("#chExp2"); if(chExpBtn)chExpBtn.addEventListener("click",exportCharterXls);
     const D=chYears(), box=el("div","pc");
     if(!D.years){const e=el("div","empty");e.style.margin="16px";e.textContent="ไม่มีงานที่มีวันที่ในตัวกรองนี้";box.appendChild(e);main.appendChild(box);return;}
     const {projs,years,ncols,span}=D;
@@ -873,17 +1056,16 @@
   }
 
   function render(){
+    const FULL=(view==="timeline"||view==="charter"||view==="grid"||view==="kanban");
     $("#v-prio").setAttribute("aria-pressed",view==="prio");
-    $("#v-stat").setAttribute("aria-pressed",view==="stat");
     $("#v-plan").setAttribute("aria-pressed",view==="planning");
     $("#v-time").setAttribute("aria-pressed",view==="timeline");
-    $("#z3").textContent=view==="timeline"?(timeMode==="charter"?"Project Charter":"Task Timeline"):view==="planning"?"Planning · Capacity + Gate/Value":"Task Priority";
-    const tm=$("#tmode");
-    if(view==="timeline"){tm.hidden=false;
-      tm.innerHTML=`<div class="seg2" role="group" aria-label="โหมด Timeline"><button data-tm="gantt" aria-pressed="${timeMode!=="charter"}">Task Timeline</button><button data-tm="charter" aria-pressed="${timeMode==="charter"}">Project Charter</button></div>${timeMode==="charter"?'<button class="ghost" id="chExp" title="ดาวน์โหลด charter เป็น Excel">⬇ Export Excel</button>':""}`;
-      tm.querySelectorAll("[data-tm]").forEach(b=>b.addEventListener("click",()=>{timeMode=b.dataset.tm;render();}));
-      const ce=$("#chExp"); if(ce)ce.addEventListener("click",exportCharterXls);
-    } else tm.hidden=true;
+    $("#v-chart").setAttribute("aria-pressed",view==="charter");
+    $("#v-grid").setAttribute("aria-pressed",view==="grid");
+    $("#v-kanban").setAttribute("aria-pressed",view==="kanban");
+    $("#zoneImpact").hidden=FULL; $("#zoneProj").hidden=FULL; $("#z3lab").hidden=FULL;
+    $("#z3").textContent=view==="planning"?"Planning · Capacity + Gate/Value":"Task Priority";
+    $("#tmode").hidden=true;
     $("#buFilter").value=filterBU;
     const lk=$("#lock"); lk.innerHTML=locked?"🔒 Locked":"🔓 Unlocked"; lk.classList.toggle("on",locked);
     document.querySelector(".app").classList.toggle("locked",locked);
@@ -892,8 +1074,13 @@
     $("#reset").hidden=!filterProj&&!filterBU&&!filterOwner&&!filterPmo;
     refreshOwners(); refreshFilterOpts();
     const list=tasks.filter(taskMatches);
-    renderImpact(); renderProjBoard();
-    if(view==="timeline"){if(timeMode==="charter")renderCharter(); else renderTimeline();} else if(view==="planning")renderPlanning(); else renderBoard(list);
+    if(!FULL){renderImpact(); renderProjBoard();}
+    if(view==="timeline")renderTimeline();
+    else if(view==="charter")renderCharter();
+    else if(view==="grid")renderGridView();
+    else if(view==="kanban")renderKanbanView();
+    else if(view==="planning")renderPlanning();
+    else renderBoard(list);
     save();
   }
   function refreshFilterOpts(){
@@ -1188,9 +1375,11 @@
   syncIcon();
 
   $("#v-prio").addEventListener("click",()=>{view="prio";render();});
-  $("#v-stat").addEventListener("click",()=>{view="stat";render();});
   $("#v-plan").addEventListener("click",()=>{view="planning";render();});
   $("#v-time").addEventListener("click",()=>{view="timeline";render();});
+  $("#v-chart").addEventListener("click",()=>{view="charter";render();});
+  $("#v-grid").addEventListener("click",()=>{view="grid";render();});
+  $("#v-kanban").addEventListener("click",()=>{view="kanban";render();});
   $("#reset").addEventListener("click",()=>{filterProj=null;filterBU="";filterOwner="";filterPmo="";render();});
   $("#buFilter").addEventListener("change",e=>{filterBU=e.target.value;filterProj=null;render();});
   $("#ownerFilter").addEventListener("change",e=>{filterOwner=e.target.value;filterProj=null;render();});
