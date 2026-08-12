@@ -409,11 +409,18 @@
   .tgt{border:1px solid var(--line);border-radius:14px;background:var(--surface);overflow:hidden;margin-top:12px}
   .tgt-scroll{overflow-x:auto}
   .tg-head,.tg-row,.tg-grp{display:flex;width:max-content;min-width:100%}
-  .tg-l1{position:sticky;left:0;z-index:3;background:var(--surface);width:224px;flex:none;padding:7px 12px;border-right:1px solid var(--line);display:flex;align-items:center;gap:8px;min-width:0}
-  .tg-l2{position:sticky;left:224px;z-index:3;background:var(--surface);width:120px;flex:none;padding:7px 10px;border-right:1px solid var(--line);display:flex;align-items:center;gap:7px;overflow:hidden}
-  .tg-l3{position:sticky;left:344px;z-index:3;background:var(--surface);width:70px;flex:none;padding:7px 10px;border-right:1px solid var(--line);display:flex;align-items:center;gap:7px}
+  .tg-l1{position:sticky;left:0;z-index:3;background:var(--surface);width:210px;flex:none;padding:7px 12px;border-right:1px solid var(--line);display:flex;align-items:center;gap:6px;min-width:0}
+  .tg-l2{position:sticky;left:210px;z-index:3;background:var(--surface);width:112px;flex:none;padding:7px 10px;border-right:1px solid var(--line);display:flex;align-items:center;gap:7px;overflow:hidden}
+  .tg-l3{position:sticky;left:322px;z-index:3;background:var(--surface);width:120px;flex:none;padding:7px 10px;border-right:1px solid var(--line);display:flex;align-items:center;gap:7px}
+  .tg-l4{position:sticky;left:442px;z-index:3;background:var(--surface);width:66px;flex:none;padding:7px 10px;border-right:1px solid var(--line);display:flex;align-items:center;gap:7px}
+  .tg-stp{font-size:.6rem;font-weight:700;color:#fff;border-radius:6px;padding:2px 7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  .sub-ar{color:var(--ink-soft);font-size:.8rem;flex:none}
+  .tg-row.sub .tg-l1{padding-left:20px}
+  .tg-row.sub .tg-nm{font-weight:500;font-size:.76rem;color:var(--ink-soft)}
+  .tg-bar.sub{height:15px;opacity:.9;font-size:.6rem}
+  .sub-toggle.on{background:var(--accent);color:#fff;border-color:var(--accent)}
   .tg-head{background:var(--surface-2);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
-  .tg-head .tg-l1,.tg-head .tg-l2,.tg-head .tg-l3{background:var(--surface-2);font-family:var(--mono);font-size:.62rem;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);font-weight:700}
+  .tg-head .tg-l1,.tg-head .tg-l2,.tg-head .tg-l3,.tg-head .tg-l4{background:var(--surface-2);font-family:var(--mono);font-size:.62rem;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);font-weight:700}
   .tg-months{display:flex;flex:1}
   .tg-mo{flex:none;border-left:1px solid var(--line)}
   .tg-mo .mo-lbl{font-family:var(--mono);font-size:.64rem;color:var(--ink-soft);font-weight:700;padding:6px 0 2px 7px;white-space:nowrap}
@@ -421,7 +428,7 @@
   .tg-grp{background:var(--surface-2);border-bottom:1px solid var(--line)}
   .tg-grp .tg-l1{background:var(--surface-2);font-weight:700;font-size:.82rem}
   .tg-grp .gdot{width:10px;height:10px;border-radius:3px;flex:none}
-  .tg-grp .tg-l2,.tg-grp .tg-l3{background:var(--surface-2);font-family:var(--mono);font-weight:700;color:var(--ink-soft);font-size:.72rem}
+  .tg-grp .tg-l2,.tg-grp .tg-l3,.tg-grp .tg-l4{background:var(--surface-2);font-family:var(--mono);font-weight:700;color:var(--ink-soft);font-size:.72rem}
   .tg-row{border-bottom:1px solid var(--line)}
   .tg-row:last-child{border-bottom:0}
   .tg-row:hover{background:var(--surface-2)}
@@ -457,6 +464,13 @@
   .rbadge.hi{color:#fff;background:var(--ok)} .rbadge.mid{color:#fff;background:var(--accent)} .rbadge.lo{color:var(--ink-soft);background:var(--surface-3)}
   .gt .gdl{font-family:var(--mono);color:var(--hi);font-weight:700;white-space:nowrap;text-align:center}
   .gt .gedit{color:var(--copper);cursor:pointer;background:none;border:1px solid var(--line);border-radius:8px;padding:3px 9px;font-size:.9rem}
+  .gt .gcmt{max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink-soft);font-size:.78rem}
+  .gt .gmut{color:var(--ink-soft);opacity:.6}
+  .gt tr.gsub td{background:color-mix(in srgb,var(--surface-2) 55%,transparent)}
+  .gt tr.gsub .gtitle{font-weight:500;color:var(--ink-soft);font-size:.8rem}
+  .gt .sub-ar{color:var(--ink-soft);margin-right:2px}
+  .subchk{display:flex;align-items:center;gap:6px;font-size:.76rem;color:var(--ink-soft);font-weight:600;cursor:pointer;white-space:nowrap}
+  .subchk input{cursor:pointer}
   /* Kanban */
   .kb{display:flex;gap:14px;overflow-x:auto;padding:14px 2px 8px;align-items:flex-start}
   .kcol{flex:0 0 300px;background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:10px}
@@ -810,7 +824,13 @@
   }
 
   // ===== shared helpers for new views (Projects) =====
-  let tlState={status:"all",group:"status"}, gSort={k:"ratio",dir:-1};
+  let tlState={status:"all",group:"status"}, gSort={k:"ratio",dir:-1}, tlSubs=false, gSubs=false;
+  let nvBU="", nvStat="";
+  const nvApply=l=>l.filter(p=>(!nvBU||p.bu===nvBU)&&(!nvStat||p.status===nvStat));
+  const nvBUs=()=>[...new Set(projects.map(p=>p.bu).filter(Boolean))].sort();
+  const nvFilterHTML=()=>`<div class="ctl"><span class="cl">ฝ่าย</span><select class="ghost" id="nvBUsel"><option value="">ทุกฝ่าย (ที่มาขอ)</option>${nvBUs().map(b=>`<option value="${esc(b)}"${nvBU===b?" selected":""}>${esc(b)}</option>`).join("")}</select></div><div class="ctl"><span class="cl">Status</span><select class="ghost" id="nvStatSel"><option value="">ทุกสถานะ</option>${PROJ_STAT.filter(s=>projects.some(p=>p.status===s)).map(s=>`<option value="${esc(s)}"${nvStat===s?" selected":""}>${esc(s)}</option>`).join("")}</select></div>`;
+  const nvWire=fn=>{const b=$("#nvBUsel");if(b)b.addEventListener("change",function(){nvBU=this.value;fn();});const s=$("#nvStatSel");if(s)s.addEventListener("change",function(){nvStat=this.value;fn();});};
+  const nvLastCmt=o=>{const cs=o.comments||[],l=cs[cs.length-1];return l?((cs.length>1?`(${cs.length}) `:"")+(l.by?l.by+": ":"")+(l.text||"")):"";};
   const pWeeks=p=>{const d=dayspan(p.start,p.end);return d?Math.max(1,Math.round(d/7)):(EMAP[p.size]||3)*2;};
   const nvRatioCls=r=>r>=1.1?"hi":r>=0.7?"mid":"lo";
   const nvFmtD=s=>{const x=new Date(s);return isNaN(x)?"—":(String(x.getDate()).padStart(2,"0")+"/"+String(x.getMonth()+1).padStart(2,"0")+"/"+x.getFullYear());};
@@ -833,54 +853,63 @@
 
   function renderTimeline(){
     const main=$("#main");
-    const items=projects.filter(projMatches).filter(p=>tlState.status==="all"||p.status===tlState.status);
-    const cw=NV_COLW, mos=nvMonths(items);
+    const items=nvApply(projects.filter(projMatches));
+    const cw=NV_COLW;
+    const dateSrc=tlSubs?items.reduce((a,p)=>a.concat([p],projTasks(p.id).filter(taskMatches)),[]):items;
+    const mos=nvMonths(dateSrc);
     const totalEff=items.reduce((s,p)=>s+pWeeks(p),0);
-    const statOpts=`<option value="all">ทุกสถานะ (All)</option>`+PROJ_STAT.filter(s=>projects.some(p=>p.status===s)).map(s=>`<option value="${esc(s)}"${tlState.status===s?" selected":""}>${esc(s)}</option>`).join("");
+    const buOf=p=>p.bu||"—";
+    const stPill=o=>`<span class="tg-stp" style="background:var(${statColor(o.status)})">${esc(o.status||"—")}</span>`;
+    const barOf=(o,isSub)=>{const s=nvYmd(o.start),e=nvYmd(o.end),stc=statColor(o.status);
+      if(s&&e&&e>=s){const x=nvColX(s,mos,cw),w=Math.max(cw*0.35,nvColX(e,mos,cw)-x);const lbl=isSub?esc(o.title):("PI "+pindex(o).toFixed(2));return `<div class="tg-bar${isSub?" sub":""}" data-${isSub?"tid":"pid"}="${esc(o.id)}" style="left:${x}px;width:${w}px;background:var(${stc})">${lbl}</div><div class="tg-flag" style="left:${x+w+8}px">${esc(isSub?o.title:o.name)}</div>`;}
+      return `<div class="tg-flag" style="left:6px">${esc(isSub?o.title:o.name)} · (ไม่มีวันที่)</div>`;};
     let groups;
     if(tlState.group==="none")groups=[{label:null,items}];
-    else if(tlState.group==="dept"){const by={};items.forEach(p=>{const d=chDept(p)||"— ไม่ระบุ —";(by[d]=by[d]||[]).push(p);});groups=Object.keys(by).sort().map(k=>({label:k,items:by[k]}));}
+    else if(tlState.group==="dept"){const by={};items.forEach(p=>{const d=buOf(p);(by[d]=by[d]||[]).push(p);});groups=Object.keys(by).sort().map(k=>({label:k,items:by[k]}));}
     else {const by={};items.forEach(p=>{(by[p.status]=by[p.status]||[]).push(p);});groups=PROJ_STAT.filter(s=>by[s]).map(s=>({label:s,color:statColor(s),items:by[s]}));}
     let first=true, rows="";
+    const projRow=p=>{
+      rows+=`<div class="tg-row"><div class="tg-l1"><span class="tg-nm" data-pid="${esc(p.id)}">${esc(p.name)}</span></div><div class="tg-l2"><span class="tg-dept">${esc(buOf(p))}</span></div><div class="tg-l3">${stPill(p)}</div><div class="tg-l4"><span class="tg-eff">${pWeeks(p)}w</span></div><div class="tg-track">${nvCells(mos,cw)}${nvToday(mos,cw,first)}${barOf(p,false)}</div></div>`;
+      first=false;
+      if(tlSubs)projTasks(p.id).filter(taskMatches).forEach(t=>{
+        rows+=`<div class="tg-row sub"><div class="tg-l1"><span class="sub-ar">↳</span><span class="tg-nm" data-tid="${esc(t.id)}">${esc(t.title)}</span></div><div class="tg-l2"><span class="tg-dept">${esc(t.bu||buOf(p))}</span></div><div class="tg-l3">${stPill(t)}</div><div class="tg-l4"><span class="tg-eff">${pWeeks(t)}w</span></div><div class="tg-track">${nvCells(mos,cw)}${nvToday(mos,cw,first)}${barOf(t,true)}</div></div>`;});
+    };
     groups.forEach(g=>{
       if(g.label!=null){
-        rows+=`<div class="tg-grp"><div class="tg-l1">${g.color?`<span class="gdot" style="background:var(${g.color})"></span>`:""}${esc(g.label)}</div><div class="tg-l2">${g.items.length} งาน</div><div class="tg-l3">${g.items.reduce((s,p)=>s+pWeeks(p),0)}w</div><div class="tg-track" style="min-height:30px">${nvCells(mos,cw)}${nvToday(mos,cw,first)}</div></div>`;
+        rows+=`<div class="tg-grp"><div class="tg-l1">${g.color?`<span class="gdot" style="background:var(${g.color})"></span>`:""}${esc(g.label)}</div><div class="tg-l2">${g.items.length} งาน</div><div class="tg-l3"></div><div class="tg-l4">${g.items.reduce((s,p)=>s+pWeeks(p),0)}w</div><div class="tg-track" style="min-height:30px">${nvCells(mos,cw)}${nvToday(mos,cw,first)}</div></div>`;
         first=false;
       }
-      g.items.slice().sort((a,b)=>(nvYmd(a.start)||0)-(nvYmd(b.start)||0)).forEach(p=>{
-        const s=nvYmd(p.start),e=nvYmd(p.end),stc=statColor(p.status);
-        let barHTML="";
-        if(s&&e&&e>=s){const x=nvColX(s,mos,cw),w=Math.max(cw*0.35,nvColX(e,mos,cw)-x);barHTML=`<div class="tg-bar" data-pid="${esc(p.id)}" style="left:${x}px;width:${w}px;background:var(${stc})">PI ${pindex(p).toFixed(2)}</div><div class="tg-flag" style="left:${x+w+8}px">${esc(p.name)}</div>`;}
-        else barHTML=`<div class="tg-flag" style="left:6px">${esc(p.name)} · (ไม่มีวันที่)</div>`;
-        rows+=`<div class="tg-row"><div class="tg-l1"><span class="tg-nm" data-pid="${esc(p.id)}">${esc(p.name)}</span></div><div class="tg-l2"><span class="tg-dept">${esc(chDept(p)||"—")}</span></div><div class="tg-l3"><span class="tg-eff">${pWeeks(p)}w</span></div><div class="tg-track">${nvCells(mos,cw)}${nvToday(mos,cw,first)}${barHTML}</div></div>`;
-        first=false;
-      });
+      g.items.slice().sort((a,b)=>(nvYmd(a.start)||0)-(nvYmd(b.start)||0)).forEach(projRow);
     });
     main.innerHTML=`
       <div class="tlbar">
         <div><div class="tl-title">📅 Timeline <span class="cnt">${items.length} โปรเจกต์</span></div>
         <div class="tl-sub">ช่วง Start → Deadline · รวม Effort <b>${totalEff}w</b></div></div>
         <div class="tl-ctrls">
-          <div class="ctl"><span class="cl">Status</span><select class="ghost" id="tlStatus">${statOpts}</select></div>
+          ${nvFilterHTML()}
           <button class="today-btn" id="tlTodayBtn">📍 Today</button>
           <div class="ctl"><span class="cl">Group by</span><div class="miniseg" id="tlGroup"><button data-g="none" aria-pressed="${tlState.group==="none"}">None</button><button data-g="dept" aria-pressed="${tlState.group==="dept"}">ฝ่าย</button><button data-g="status" aria-pressed="${tlState.group==="status"}">สถานะ</button></div></div>
+          <button class="ghost sub-toggle${tlSubs?" on":""}" id="tlSubBtn">${tlSubs?"▾":"▸"} Sub-task</button>
         </div>
       </div>
       <div class="tgt"><div class="tgt-scroll" id="tgtScroll">
-        <div class="tg-head"><div class="tg-l1">Project</div><div class="tg-l2">ฝ่าย (Dept)</div><div class="tg-l3">Effort</div><div class="tg-months">${mos.map(mo=>`<div class="tg-mo" style="width:${cw}px"><div class="mo-lbl">${NV_MON[mo.m]} ${String(mo.y).slice(2)}</div><div class="tg-ticks"><span>1</span><span>15</span><span>${mo.days}</span></div></div>`).join("")}</div></div>
+        <div class="tg-head"><div class="tg-l1">Project</div><div class="tg-l2">BU/ฝ่าย (ที่มาขอ)</div><div class="tg-l3">Status</div><div class="tg-l4">Effort</div><div class="tg-months">${mos.map(mo=>`<div class="tg-mo" style="width:${cw}px"><div class="mo-lbl">${NV_MON[mo.m]} ${String(mo.y).slice(2)}</div><div class="tg-ticks"><span>1</span><span>15</span><span>${mo.days}</span></div></div>`).join("")}</div></div>
         <div>${rows}</div>
       </div></div>`;
-    $("#tlStatus").addEventListener("change",function(){tlState.status=this.value;renderTimeline();});
+    nvWire(renderTimeline);
     $("#tlTodayBtn").addEventListener("click",()=>{const sc=$("#tgtScroll");const t=new Date();t.setHours(0,0,0,0);const tx=nvColX(t,mos,cw);sc.scrollLeft=Math.max(0,tx-sc.clientWidth/2+180);});
+    $("#tlSubBtn").addEventListener("click",()=>{tlSubs=!tlSubs;renderTimeline();});
     main.querySelectorAll("#tlGroup button").forEach(b=>b.addEventListener("click",()=>{tlState.group=b.dataset.g;renderTimeline();}));
-    main.querySelectorAll(".tg-nm,.tg-bar").forEach(n=>n.addEventListener("click",()=>openProjectDetail(n.dataset.pid)));
+    main.querySelectorAll("[data-pid]").forEach(n=>n.addEventListener("click",()=>openProjectDetail(n.dataset.pid)));
+    main.querySelectorAll("[data-tid]").forEach(n=>n.addEventListener("click",()=>openTaskDetail(n.dataset.tid)));
   }
 
   const GCOLS=[
     {k:"id",t:"ID",s:p=>p.id},
-    {k:"dept",t:"ฝ่าย (Dept)",s:p=>chDept(p)},
+    {k:"dept",t:"BU/ฝ่าย",s:p=>p.bu||""},
     {k:"name",t:"ชื่อโครงการ",s:p=>p.name},
     {k:"status",t:"สถานะ",s:p=>PROJ_STAT.indexOf(p.status)},
+    {k:"cmt",t:"Comment",s:null},
     {k:"eff",t:"Effort (wk)",s:p=>pWeeks(p)},
     {k:"value",t:"Value Score",s:p=>vscore(p)},
     {k:"ratio",t:"Priority Index",cls:"ratio-col",s:p=>pindex(p)},
@@ -891,16 +920,17 @@
   ];
   function renderGridView(){
     const main=$("#main");
-    let items=projects.filter(projMatches);
+    let items=nvApply(projects.filter(projMatches));
     const col=GCOLS.find(c=>c.k===gSort.k);
     if(col&&col.s)items.sort((a,b)=>{const x=col.s(a),y=col.s(b);return (x<y?-1:x>y?1:0)*gSort.dir;});
     const head=GCOLS.map(c=>{const on=gSort.k===c.k;const ar=c.s?`<span class="ar">${on?(gSort.dir<0?"▼":"▲"):"↕"}</span>`:"";return `<th class="${c.cls||""}${on?" sorted":""}" data-k="${c.k}">${esc(c.t)} ${ar}</th>`;}).join("");
-    const rows=items.map(p=>{const r=pindex(p),stc=statColor(p.status);
+    const projRow=p=>{const r=pindex(p),stc=statColor(p.status);
       return `<tr>
         <td class="gid">${esc(p.id)}</td>
-        <td class="gdept">${esc(chDept(p)||"—")}</td>
+        <td class="gdept">${esc(p.bu||"—")}</td>
         <td class="gtitle" data-pid="${esc(p.id)}">${esc(p.name)}</td>
         <td><span class="gstp" style="background:var(${stc})">${esc(p.status)}</span></td>
+        <td class="gcmt">${nvLastCmt(p)?esc(nvLastCmt(p)):'<span class="gmut">—</span>'}</td>
         <td class="geff">${pWeeks(p)}w</td>
         <td style="text-align:center;font-family:var(--mono)">${vscore(p).toFixed(2)}</td>
         <td style="text-align:center"><span class="rbadge ${nvRatioCls(r)}">${r.toFixed(2)}</span></td>
@@ -908,17 +938,38 @@
         <td style="font-family:var(--mono);white-space:nowrap">${p.start?nvFmtD(p.start):"—"}</td>
         <td class="gdl">${p.end?nvFmtD(p.end):"—"}</td>
         <td style="text-align:center"><button class="gedit" data-pid="${esc(p.id)}">✎</button></td>
-      </tr>`;}).join("");
-    main.innerHTML=`<div class="tlbar"><div class="tl-title">▦ Grid <span class="cnt">${items.length} โปรเจกต์</span></div></div>
-      <div class="grid-wrap"><div class="gscroll"><table class="gt"><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table></div></div>`;
+      </tr>`;};
+    const taskRow=t=>{const stc=statColor(t.status);
+      return `<tr class="gsub">
+        <td class="gid">${esc(t.id)}</td>
+        <td class="gdept">${esc(t.bu||"—")}</td>
+        <td class="gtitle" data-tid="${esc(t.id)}"><span class="sub-ar">↳</span> ${esc(t.title)}</td>
+        <td><span class="gstp" style="background:var(${stc})">${esc(t.status)}</span></td>
+        <td class="gcmt">${nvLastCmt(t)?esc(nvLastCmt(t)):'<span class="gmut">—</span>'}</td>
+        <td class="geff">${pWeeks(t)}w</td>
+        <td style="text-align:center" class="gmut">—</td>
+        <td style="text-align:center" class="gmut">—</td>
+        <td>${esc(t.owner||"—")}</td>
+        <td style="font-family:var(--mono);white-space:nowrap">${t.start?nvFmtD(t.start):"—"}</td>
+        <td class="gdl">${t.end?nvFmtD(t.end):"—"}</td>
+        <td style="text-align:center"><button class="gedit" data-tid="${esc(t.id)}">✎</button></td>
+      </tr>`;};
+    let body="";
+    items.forEach(p=>{body+=projRow(p);if(gSubs)projTasks(p.id).filter(taskMatches).forEach(t=>{body+=taskRow(t);});});
+    main.innerHTML=`<div class="tlbar"><div class="tl-title">▦ Grid <span class="cnt">${items.length} โปรเจกต์</span></div>
+      <div class="tl-ctrls">${nvFilterHTML()}<label class="subchk"><input type="checkbox" id="gSubChk"${gSubs?" checked":""}> โชว์ sub-task</label></div></div>
+      <div class="grid-wrap"><div class="gscroll"><table class="gt"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div></div>`;
     main.querySelectorAll("th[data-k]").forEach(th=>{const c=GCOLS.find(x=>x.k===th.dataset.k);if(!c||!c.s)return;th.addEventListener("click",()=>{if(gSort.k===c.k)gSort.dir*=-1;else{gSort.k=c.k;gSort.dir=1;}renderGridView();});});
+    nvWire(renderGridView);
+    const chk=$("#gSubChk");if(chk)chk.addEventListener("change",function(){gSubs=this.checked;renderGridView();});
     main.querySelectorAll(".gtitle[data-pid],.gedit[data-pid]").forEach(n=>n.addEventListener("click",()=>openProjectDetail(n.dataset.pid)));
+    main.querySelectorAll(".gtitle[data-tid],.gedit[data-tid]").forEach(n=>n.addEventListener("click",()=>openTaskDetail(n.dataset.tid)));
   }
 
   const KAN_TARGET={"In progress":14};
   function renderKanbanView(){
     const main=$("#main");
-    const all=projects.filter(projMatches);
+    const all=nvApply(projects.filter(projMatches));
     const cols=PROJ_STAT.filter(s=>all.some(p=>p.status===s)||s==="In progress"||s==="Done");
     let totalN=0,totalE=0,html="";
     cols.forEach(st=>{
@@ -941,14 +992,15 @@
         </div>`;}).join("")||'<div style="font-size:.8rem;color:var(--ink-soft);padding:8px">— ไม่มีงาน —</div>'}</div>
       </div>`;
     });
-    main.innerHTML=`<div class="tlbar"><div class="tl-title">▤ Kanban <span class="cnt">${totalN} โปรเจกต์ · ${totalE}w</span></div></div><div class="kb">${html}</div>`;
+    main.innerHTML=`<div class="tlbar"><div class="tl-title">▤ Kanban <span class="cnt">${totalN} โปรเจกต์ · ${totalE}w</span></div><div class="tl-ctrls">${nvFilterHTML()}</div></div><div class="kb">${html}</div>`;
+    nvWire(renderKanbanView);
     main.querySelectorAll(".kc-title[data-pid]").forEach(n=>n.addEventListener("click",()=>openProjectDetail(n.dataset.pid)));
   }
   const CH_MONTHS=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const chFmtD=s=>{const x=new Date(s);return isNaN(x)?"":(String(x.getDate()).padStart(2,"0")+"/"+String(x.getMonth()+1).padStart(2,"0")+"/"+x.getFullYear());};
   const chDept=o=>(o.ownerBu||(o.assigns&&o.assigns[0]&&o.assigns[0].bu)||o.bu||"");
   const chRelated=o=>(o.assigns||[]).flatMap(g=>(g.members||[]).map(m=>({m,bu:g.bu||""})));
-  function chYears(){const projs=projects.filter(projMatches).slice().sort((a,b)=>pindex(b)-pindex(a));
+  function chYears(){const projs=nvApply(projects.filter(projMatches)).slice().sort((a,b)=>pindex(b)-pindex(a));
     const dates=[];const pushD=o=>{[o.start,o.end].forEach(x=>{const d=new Date(x);if(!isNaN(d))dates.push(d);});};
     projs.forEach(p=>{pushD(p);projTasks(p.id).filter(taskMatches).forEach(pushD);});
     if(!dates.length)return {projs,years:null};
@@ -959,8 +1011,9 @@
     return {projs,years,ncols:years.length*48,span};}
   function renderCharter(){
     const main=$("#main");
-    main.innerHTML=`<div class="tlbar"><div class="tl-title">🗓 Project Charter <span class="cnt">รายสัปดาห์ Q1–Q4</span></div><div class="tl-ctrls"><button class="ghost" id="chExp2">⬇ Export Excel</button></div></div>`;
+    main.innerHTML=`<div class="tlbar"><div class="tl-title">🗓 Project Charter <span class="cnt">รายสัปดาห์ Q1–Q4</span></div><div class="tl-ctrls">${nvFilterHTML()}<button class="ghost" id="chExp2">⬇ Export Excel</button></div></div>`;
     const chExpBtn=$("#chExp2"); if(chExpBtn)chExpBtn.addEventListener("click",exportCharterXls);
+    nvWire(renderCharter);
     const D=chYears(), box=el("div","pc");
     if(!D.years){const e=el("div","empty");e.style.margin="16px";e.textContent="ไม่มีงานที่มีวันที่ในตัวกรองนี้";box.appendChild(e);main.appendChild(box);return;}
     const {projs,years,ncols,span}=D;
