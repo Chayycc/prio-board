@@ -864,8 +864,9 @@
   // ===== shared helpers for new views (Projects) =====
   let tlState={status:"all",group:"status"}, gSort={k:"ratio",dir:-1}, tlSubs=false, gSubs=false;
   let nvBU="", nvStat="";
-  const nvApply=l=>l.filter(p=>(!nvBU||chDept(p)===nvBU)&&(!nvStat||p.status===nvStat));
-  const nvBUs=()=>[...new Set(projects.map(p=>chDept(p)).filter(Boolean))].sort();
+  const deptOf=o=>((o&&o.bu)||chDept(o)||"");   // "ฝ่าย" = BU ที่มาขอ (งานเป็นของฝ่ายไหน) ก่อน · fallback ownerBu
+  const nvApply=l=>l.filter(p=>(!nvBU||deptOf(p)===nvBU)&&(!nvStat||p.status===nvStat));
+  const nvBUs=()=>[...new Set(projects.map(p=>deptOf(p)).filter(Boolean))].sort();
   const nvFilterHTML=()=>`<div class="ctl"><span class="cl">ฝ่าย</span><select class="ghost" id="nvBUsel"><option value="">ทุกฝ่าย</option>${nvBUs().map(b=>`<option value="${esc(b)}"${nvBU===b?" selected":""}>${esc(b)}</option>`).join("")}</select></div><div class="ctl"><span class="cl">Status</span><select class="ghost" id="nvStatSel"><option value="">ทุกสถานะ</option>${PROJ_STAT.filter(s=>projects.some(p=>p.status===s)).map(s=>`<option value="${esc(s)}"${nvStat===s?" selected":""}>${esc(s)}</option>`).join("")}</select></div>`;
   const nvWire=fn=>{const b=$("#nvBUsel");if(b)b.addEventListener("change",function(){nvBU=this.value;fn();});const s=$("#nvStatSel");if(s)s.addEventListener("change",function(){nvStat=this.value;fn();});};
   const nvLastCmt=o=>{const cs=o.comments||[],l=cs[cs.length-1];return l?((cs.length>1?`(${cs.length}) `:"")+(l.by?l.by+": ":"")+(l.text||"")):"";};
@@ -896,7 +897,7 @@
     const dateSrc=tlSubs?items.reduce((a,p)=>a.concat([p],projTasks(p.id).filter(taskMatches)),[]):items;
     const mos=nvMonths(dateSrc);
     const totalEff=items.reduce((s,p)=>s+pWeeks(p),0);
-    const buOf=p=>chDept(p)||"—";
+    const buOf=p=>deptOf(p)||"—";
     const stPill=o=>`<span class="tg-stp" style="background:var(${statColor(o.status)})">${esc(o.status||"—")}</span>`;
     const barOf=(o,isSub)=>{const s=nvYmd(o.start),e=nvYmd(o.end),stc=statColor(o.status);
       if(s&&e&&e>=s){const x=nvColX(s,mos,cw),w=Math.max(cw*0.35,nvColX(e,mos,cw)-x);const lbl=isSub?esc(o.title):("PI "+pindex(o).toFixed(2));return `<div class="tg-bar${isSub?" sub":""}" data-${isSub?"tid":"pid"}="${esc(o.id)}" style="left:${x}px;width:${w}px;background:var(${stc})">${lbl}</div><div class="tg-flag" style="left:${x+w+8}px">${esc(isSub?o.title:o.name)}</div>`;}
@@ -910,7 +911,7 @@
       rows+=`<div class="tg-row"><div class="tg-l1"><span class="tg-nm" data-pid="${esc(p.id)}">${esc(p.name)}</span></div><div class="tg-l2"><span class="tg-dept">${esc(buOf(p))}</span></div><div class="tg-l3">${stPill(p)}</div><div class="tg-l4"><span class="tg-eff">${pWeeks(p)}w</span></div><div class="tg-track">${nvCells(mos,cw)}${nvToday(mos,cw,first)}${barOf(p,false)}</div></div>`;
       first=false;
       if(tlSubs)projTasks(p.id).filter(taskMatches).forEach(t=>{
-        rows+=`<div class="tg-row sub"><div class="tg-l1"><span class="sub-ar">↳</span><span class="tg-nm" data-tid="${esc(t.id)}">${esc(t.title)}</span></div><div class="tg-l2"><span class="tg-dept">${esc(chDept(t)||buOf(p))}</span></div><div class="tg-l3">${stPill(t)}</div><div class="tg-l4"><span class="tg-eff">${pWeeks(t)}w</span></div><div class="tg-track">${nvCells(mos,cw)}${nvToday(mos,cw,first)}${barOf(t,true)}</div></div>`;});
+        rows+=`<div class="tg-row sub"><div class="tg-l1"><span class="sub-ar">↳</span><span class="tg-nm" data-tid="${esc(t.id)}">${esc(t.title)}</span></div><div class="tg-l2"><span class="tg-dept">${esc(deptOf(t)||buOf(p))}</span></div><div class="tg-l3">${stPill(t)}</div><div class="tg-l4"><span class="tg-eff">${pWeeks(t)}w</span></div><div class="tg-track">${nvCells(mos,cw)}${nvToday(mos,cw,first)}${barOf(t,true)}</div></div>`;});
     };
     groups.forEach(g=>{
       if(g.label!=null){
@@ -931,7 +932,7 @@
         </div>
       </div>
       <div class="tgt"><div class="tgt-scroll" id="tgtScroll">
-        <div class="tg-head"><div class="tg-l1">Project</div><div class="tg-l2">ฝ่าย (เจ้าของงาน)</div><div class="tg-l3">Status</div><div class="tg-l4">Effort</div><div class="tg-months">${mos.map(mo=>`<div class="tg-mo" style="width:${cw}px"><div class="mo-lbl">${NV_MON[mo.m]} ${String(mo.y).slice(2)}</div><div class="tg-ticks"><span>1</span><span>15</span><span>${mo.days}</span></div></div>`).join("")}</div></div>
+        <div class="tg-head"><div class="tg-l1">Project</div><div class="tg-l2">ฝ่าย (ที่มาขอ)</div><div class="tg-l3">Status</div><div class="tg-l4">Effort</div><div class="tg-months">${mos.map(mo=>`<div class="tg-mo" style="width:${cw}px"><div class="mo-lbl">${NV_MON[mo.m]} ${String(mo.y).slice(2)}</div><div class="tg-ticks"><span>1</span><span>15</span><span>${mo.days}</span></div></div>`).join("")}</div></div>
         <div>${rows}</div>
       </div></div>`;
     nvWire(renderTimeline);
@@ -944,7 +945,7 @@
 
   const GCOLS=[
     {k:"id",t:"ID",s:p=>p.id},
-    {k:"dept",t:"ฝ่าย",s:p=>chDept(p)||""},
+    {k:"dept",t:"ฝ่าย",s:p=>deptOf(p)||""},
     {k:"name",t:"ชื่อโครงการ",s:p=>p.name},
     {k:"status",t:"สถานะ",s:p=>PROJ_STAT.indexOf(p.status)},
     {k:"cmt",t:"Comment",s:null},
@@ -965,7 +966,7 @@
     const projRow=p=>{const r=pindex(p),stc=statColor(p.status);
       return `<tr>
         <td class="gid">${esc(p.id)}</td>
-        <td class="gdept">${esc(chDept(p)||"—")}</td>
+        <td class="gdept">${esc(deptOf(p)||"—")}</td>
         <td class="gtitle" data-pid="${esc(p.id)}">${esc(p.name)}</td>
         <td><span class="gstp" style="background:var(${stc})">${esc(p.status)}</span></td>
         <td class="gcmt">${nvLastCmt(p)?esc(nvLastCmt(p)):'<span class="gmut">—</span>'}</td>
@@ -980,7 +981,7 @@
     const taskRow=(t,p,i)=>{const stc=statColor(t.status);
       return `<tr class="gsub">
         <td class="gid">${esc(p.id)}.${i+1}</td>
-        <td class="gdept">${esc(chDept(t)||"—")}</td>
+        <td class="gdept">${esc(deptOf(t)||"—")}</td>
         <td class="gtitle" data-tid="${esc(t.id)}"><span class="sub-ar">↳</span> ${esc(t.title)}</td>
         <td><span class="gstp" style="background:var(${stc})">${esc(t.status)}</span></td>
         <td class="gcmt">${nvLastCmt(t)?esc(nvLastCmt(t)):'<span class="gmut">—</span>'}</td>
@@ -1024,7 +1025,7 @@
           <div class="cr"><span class="k">คงเหลือ</span><span class="rem ${over?"over":"ok"}">${over?"":"+"}${rem} wk</span></div>
         </div>
         <div class="kcards">${items.map(p=>{const r=pindex(p);return `<div class="kcard" style="border-left-color:var(${statColor(p.status)})">
-          <div class="kc-top"><span class="kc-id">${esc(p.id)}</span><span class="kc-dept">${esc(chDept(p)||"—")}</span></div>
+          <div class="kc-top"><span class="kc-id">${esc(p.id)}</span><span class="kc-dept">${esc(deptOf(p)||"—")}</span></div>
           <div class="kc-title" data-pid="${esc(p.id)}">${esc(p.name)}</div>
           <div class="kc-meta">${p.end?`<span class="kc-due">⚑ ${nvFmtD(p.end)}</span>`:""}<span class="kc-eff">${pWeeks(p)}w</span><span class="kratio ${nvRatioCls(r)}">PI ${r.toFixed(2)}</span></div>
         </div>`;}).join("")||'<div style="font-size:.8rem;color:var(--ink-soft);padding:8px">— ไม่มีงาน —</div>'}</div>
