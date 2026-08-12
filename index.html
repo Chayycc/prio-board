@@ -400,7 +400,7 @@
     <span class="saved" id="saved">✓ บันทึกแล้ว</span>
     <span id="sync" class="synctag"></span>
     <span class="spacer"></span>
-    <button class="ghost" id="lock">🔓 Unlocked</button>
+    <button class="ghost on" id="lock">🔒 Locked</button>
     <button class="ghost" id="reset" hidden>× ล้าง filter</button>
     <button class="ghost" id="calcBtn" title="วิธีคิดคะแนน + ตารางคำนวณ">🧮 วิธีคิดคะแนน</button>
     <select id="expsel" class="ghost" title="ดาวน์โหลด"><option value="">⬇ Export</option><option value="xls">Excel (รายงาน)</option><option value="json">JSON (backup)</option></select>
@@ -494,8 +494,8 @@
   function phaseOf(t){if(t.phase&&PHASES.indexOf(t.phase)>=0)return t.phase;const m={"Done":"Close","UAT":"Review/UAT","In progress":"Execution","Review":"Review/UAT","Task Approved":"Setup"};return m[t.status]||"Intake";}
   function dueMeta(o){if(!o||!o.end)return{cls:"none",txt:""};const e=new Date(o.end);if(isNaN(e))return{cls:"none",txt:""};const now=new Date();now.setHours(0,0,0,0);const left=Math.round((e-now)/864e5);const done=o.status==="Done";if(!done&&left<0)return{cls:"over",txt:"🔴 เลย "+(-left)+"ว"};if(!done&&left<=3)return{cls:"soon",txt:"⚠️ "+left+"ว"};return{cls:"ok",txt:left+"ว"};}
 
-  let view="prio", filterProj=null, filterBU="", filterOwner="", filterPmo="", selId=null, locked=false, TH=3.0, ganttExp=null, timeMode="gantt";
-  try{locked=localStorage.getItem("em_prio_lock")==="1";}catch(e){}
+  let view="prio", filterProj=null, filterBU="", filterOwner="", filterPmo="", selId=null, locked=true, TH=3.0, ganttExp=null, timeMode="gantt";
+  const UNLOCK_PW="esm123";
   const projMatchesBU=p=>!filterBU||p.bu===filterBU||projTasks(p.id).some(t=>t.bu===filterBU);
   const taskHasOwner=(t,o)=>t.owner===o||(t.assigns||[]).some(g=>(g.members||[]).indexOf(o)>=0);
   const projMatchesOwner=p=>!filterOwner||p.owner===filterOwner||(p.assigns||[]).some(g=>(g.members||[]).indexOf(filterOwner)>=0)||projTasks(p.id).some(t=>taskHasOwner(t,filterOwner));
@@ -1195,7 +1195,10 @@
   $("#buFilter").addEventListener("change",e=>{filterBU=e.target.value;filterProj=null;render();});
   $("#ownerFilter").addEventListener("change",e=>{filterOwner=e.target.value;filterProj=null;render();});
   $("#pmoFilter").addEventListener("change",e=>{filterPmo=e.target.value;filterProj=null;render();});
-  $("#lock").addEventListener("click",()=>{locked=!locked;try{localStorage.setItem("em_prio_lock",locked?"1":"0");}catch(e){}closeDetail();render();});
+  $("#lock").addEventListener("click",()=>{
+    if(locked){const pw=prompt("🔒 ใส่รหัสเพื่อปลดล็อก:");if(pw===null)return;if(pw!==UNLOCK_PW){alert("❌ รหัสไม่ถูกต้อง");return;}locked=false;}
+    else{locked=true;}
+    closeDetail();render();});
   $("#buFilter").insertAdjacentHTML("beforeend",BUS.map(b=>`<option value="${esc(b)}">${esc(b)}</option>`).join(""));
 
   load(); normAll(); render(); initSync();
