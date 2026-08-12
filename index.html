@@ -501,6 +501,25 @@
   .kc-eff{font-family:var(--mono);font-size:.7rem;font-weight:700;color:var(--ink-soft)}
   .kratio{margin-left:auto;font-family:var(--mono);font-size:.74rem;font-weight:800;border-radius:8px;padding:3px 10px}
   .kratio.hi{color:#fff;background:var(--ok)} .kratio.mid{color:#fff;background:var(--accent)} .kratio.lo{color:var(--ink-soft);background:var(--surface-3)}
+  /* ===== Mobile (P1 responsive) ===== */
+  @media (max-width:640px){
+    .app{padding:0 12px 40px}
+    .bar{gap:7px;padding:10px 0}
+    .bar .spacer{display:none}
+    .seg{overflow-x:auto;max-width:100%;-webkit-overflow-scrolling:touch}
+    .seg button{white-space:nowrap;padding:8px 12px}
+    .brand h1{font-size:1.25rem}
+    .zone{padding:14px 0 4px}
+    .col{flex:0 0 80vw}
+    .kcol{flex:0 0 84vw}
+    .grid2{grid-template-columns:1fr}
+    .tlbar{gap:10px}
+    .tl-ctrls{margin-left:0;width:100%}
+    .tl-ctrls .ctl,.tl-ctrls select{flex:1;min-width:0}
+    .tg-l1{width:150px}
+    .tg-l2,.tg-l3,.tg-l4{position:static!important;left:auto!important}
+    .gt{min-width:760px}
+  }
 </style>
 
 <div class="app">
