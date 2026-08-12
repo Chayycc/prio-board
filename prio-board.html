@@ -593,7 +593,7 @@
   function phaseOf(t){if(t.phase&&PHASES.indexOf(t.phase)>=0)return t.phase;const m={"Done":"Close","UAT":"Review/UAT","In progress":"Execution","Review":"Review/UAT","Task Approved":"Setup"};return m[t.status]||"Intake";}
   function dueMeta(o){if(!o||!o.end)return{cls:"none",txt:""};const e=new Date(o.end);if(isNaN(e))return{cls:"none",txt:""};const now=new Date();now.setHours(0,0,0,0);const left=Math.round((e-now)/864e5);const done=o.status==="Done";if(!done&&left<0)return{cls:"over",txt:"🔴 เลย "+(-left)+"ว"};if(!done&&left<=3)return{cls:"soon",txt:"⚠️ "+left+"ว"};return{cls:"ok",txt:left+"ว"};}
 
-  let view="prio", filterProj=null, filterBU="", filterOwner="", filterPmo="", selId=null, locked=true, TH=3.0, ganttExp=null, timeMode="gantt";
+  let view="prio", filterProj=null, filterBU="", filterOwner="", filterPmo="", selId=null, locked=true, TH=3.0, ganttExp=null, timeMode="gantt", taskMode="prio";
   const UNLOCK_PW="esm123";
   const projMatchesBU=p=>!filterBU||p.bu===filterBU||projTasks(p.id).some(t=>t.bu===filterBU);
   const taskHasOwner=(t,o)=>t.owner===o||(t.assigns||[]).some(g=>(g.members||[]).indexOf(o)>=0);
@@ -767,8 +767,8 @@
     const c=el("div","tcard"); c.tabIndex=0; c.draggable=!locked; c.dataset.id=t.id;
     if(t.id===selId)c.classList.add("sel");
     const pm=prioMeta(t.prio), sc=statColor(t.status);
-    const stripe=view==="prio"?`var(${pm.c})`:`var(${sc})`;
-    const labHtml=view==="prio"
+    const stripe=taskMode==="status"?`var(${sc})`:`var(${pm.c})`;
+    const labHtml=taskMode!=="status"
       ? `<span class="lab" style="color:var(${sc});background:color-mix(in srgb,var(${sc}) 14%,transparent)">${esc(t.status)}</span>`
       : `<span class="lab" style="color:var(${pm.c});background:var(${pm.s})">${esc(t.prio)}</span>`;
     const cs=t.comments||[], lastC=cs[cs.length-1];
@@ -789,9 +789,9 @@
   function renderBoard(list){
     const main=$("#main"); main.innerHTML="";
     const wrap=el("div","board-wrap"), board=el("div","board");
-    const cols = view==="prio" ? PRIO.map(p=>({k:p.k,c:p.c})) : TASK_STAT.map(k=>({k,c:statColor(k)}));
+    const cols = taskMode==="status" ? TASK_STAT.map(k=>({k,c:statColor(k)})) : PRIO.map(p=>({k:p.k,c:p.c}));
     cols.forEach(col=>{
-      const items=list.filter(t=>(view==="prio"?t.prio:t.status)===col.k);
+      const items=list.filter(t=>(taskMode==="status"?t.status:t.prio)===col.k);
       const days=items.reduce((s,t)=>s+spentOf(t),0);
       const c=el("div","col");
       const h=el("div","col-h");
@@ -803,7 +803,7 @@
       c.appendChild(stack);
       c.addEventListener("dragover",e=>{e.preventDefault();c.classList.add("drop");});
       c.addEventListener("dragleave",()=>c.classList.remove("drop"));
-      c.addEventListener("drop",e=>{e.preventDefault();c.classList.remove("drop");const id=e.dataTransfer.getData("text/plain");if(id.startsWith("proj:"))return;const t=tasks.find(x=>x.id===id);if(!t)return;if(view==="prio")t.prio=col.k;else t.status=col.k;render();});
+      c.addEventListener("drop",e=>{e.preventDefault();c.classList.remove("drop");const id=e.dataTransfer.getData("text/plain");if(id.startsWith("proj:"))return;const t=tasks.find(x=>x.id===id);if(!t)return;if(taskMode==="status")t.status=col.k;else t.prio=col.k;render();});
       board.appendChild(c);
     });
     wrap.appendChild(board); main.appendChild(wrap);
@@ -1064,8 +1064,12 @@
     $("#v-grid").setAttribute("aria-pressed",view==="grid");
     $("#v-kanban").setAttribute("aria-pressed",view==="kanban");
     $("#zoneImpact").hidden=FULL; $("#zoneProj").hidden=FULL; $("#z3lab").hidden=FULL;
-    $("#z3").textContent=view==="planning"?"Planning · Capacity + Gate/Value":"Task Priority";
-    $("#tmode").hidden=true;
+    $("#z3").textContent=view==="planning"?"Planning · Capacity + Gate/Value":(taskMode==="status"?"Task Status":"Task Priority");
+    const tm=$("#tmode");
+    if(view==="prio"){tm.hidden=false;
+      tm.innerHTML=`<div class="seg2" role="group" aria-label="จัดกลุ่ม Task"><button data-tk="prio" aria-pressed="${taskMode!=="status"}">Priority</button><button data-tk="status" aria-pressed="${taskMode==="status"}">Status</button></div>`;
+      tm.querySelectorAll("[data-tk]").forEach(b=>b.addEventListener("click",()=>{taskMode=b.dataset.tk;render();}));
+    } else tm.hidden=true;
     $("#buFilter").value=filterBU;
     const lk=$("#lock"); lk.innerHTML=locked?"🔒 Locked":"🔓 Unlocked"; lk.classList.toggle("on",locked);
     document.querySelector(".app").classList.toggle("locked",locked);
