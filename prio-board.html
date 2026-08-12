@@ -178,7 +178,8 @@
   .drawer{position:fixed;top:0;right:0;height:100%;width:min(420px,94vw);background:var(--surface);color:var(--ink);border-left:1px solid var(--line);box-shadow:-8px 0 30px rgba(0,0,0,.15);z-index:50;transform:translateX(100%);transition:transform .24s cubic-bezier(.16,1,.3,1);display:flex;flex-direction:column;overflow:hidden}
   .drawer.open{transform:translateX(0)}
   .dw-h{display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid var(--line)}
-  .dw-h .did{font-family:var(--mono);font-size:.72rem;color:var(--ink-soft)}
+  .dw-h .did{font-family:var(--mono);font-size:.72rem;color:var(--ink-soft);flex:none}
+  .proj-nm-ro{flex:1;min-width:0;font-size:.82rem;font-weight:600;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .dw-h .close{margin-left:auto;width:32px;height:32px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink-soft);cursor:pointer;font-size:1rem;display:grid;place-items:center}
   .dw-h .close:hover{border-color:var(--accent);color:var(--accent-ink)}
   .dw-body{padding:16px 18px;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:14px}
@@ -1290,6 +1291,7 @@
     const t=tasks.find(x=>x.id===id); if(!t)return; selId=id;
     drawer.innerHTML=`
       <div class="dw-h"><span class="ptag-ro"><span class="pd" style="background:${pcolor(t.proj)}"></span>${esc(t.proj)}</span>
+        <span class="proj-nm-ro">${esc((projById(t.proj)||{}).name||"")}</span>
         <span class="did">${esc(t.id)}</span><button class="close" id="dw-close">✕</button></div>
       <div class="dw-body">
         <div class="fld f-title"><label>ชื่อ sub-task</label><input id="f-title" value="${esc(t.title)}"></div>
