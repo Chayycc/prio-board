@@ -939,9 +939,9 @@
         <td class="gdl">${p.end?nvFmtD(p.end):"—"}</td>
         <td style="text-align:center"><button class="gedit" data-pid="${esc(p.id)}">✎</button></td>
       </tr>`;};
-    const taskRow=t=>{const stc=statColor(t.status);
+    const taskRow=(t,p,i)=>{const stc=statColor(t.status);
       return `<tr class="gsub">
-        <td class="gid">${esc(t.id)}</td>
+        <td class="gid">${esc(p.id)}.${i+1}</td>
         <td class="gdept">${esc(t.bu||"—")}</td>
         <td class="gtitle" data-tid="${esc(t.id)}"><span class="sub-ar">↳</span> ${esc(t.title)}</td>
         <td><span class="gstp" style="background:var(${stc})">${esc(t.status)}</span></td>
@@ -955,7 +955,7 @@
         <td style="text-align:center"><button class="gedit" data-tid="${esc(t.id)}">✎</button></td>
       </tr>`;};
     let body="";
-    items.forEach(p=>{body+=projRow(p);if(gSubs)projTasks(p.id).filter(taskMatches).forEach(t=>{body+=taskRow(t);});});
+    items.forEach(p=>{body+=projRow(p);if(gSubs)projTasks(p.id).filter(taskMatches).forEach((t,i)=>{body+=taskRow(t,p,i);});});
     main.innerHTML=`<div class="tlbar"><div class="tl-title">▦ Grid <span class="cnt">${items.length} โปรเจกต์</span></div>
       <div class="tl-ctrls">${nvFilterHTML()}<label class="subchk"><input type="checkbox" id="gSubChk"${gSubs?" checked":""}> โชว์ sub-task</label></div></div>
       <div class="grid-wrap"><div class="gscroll"><table class="gt"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div></div>`;
